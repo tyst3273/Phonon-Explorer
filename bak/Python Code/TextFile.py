@@ -40,8 +40,6 @@ class Parameters(TextFile):
 #            print i,parameters[i]
 #        self.sqw_path=self.Parse(parameters[0])
         self.keyword=''
-        self.num_processes = self.evalIntWarning(self.ParseByKeyword('num_processes',parameters),1)
-        self.horace_threads = self.evalIntWarning(self.ParseByKeyword('horace_threads',parameters),4) # 4 is probably safe 
         self.BkgMode=self.evalIntWarning(self.ParseByKeyword("BkgMode",parameters),0)
         self.QMode=self.evalIntWarning(self.ParseByKeyword("QMode",parameters),0)
         self.sqw_path=self.evalError(self.ParseByKeyword("sqw_path",parameters))

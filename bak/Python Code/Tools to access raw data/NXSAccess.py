@@ -7,38 +7,24 @@
 #    Office of Science, under Contract No. DE-SC0006939                  %                  
 #________________________________________________________________________%
 
-# ------------------------------------------------------------------------
-# parallelism added by Tyler Sterling, Apr. 2022
-# ------------------------------------------------------------------------
-
 from TextFile import *
 import math
 import sys
 import numpy
 from numpy import *
 from RSE_Constants import *
-from mantid.simpleapi import LoadMD, MDNorm, CutMD, mtd, ConvertMDHistoToMatrixWorkspace, SaveAscii
-#, ConvertToMD, BinMD, ConvertUnits, Rebin
+from mantid.simpleapi import LoadMD, MDNorm, CutMD, mtd, ConvertMDHistoToMatrixWorkspace, SaveAscii#, ConvertToMD, BinMD, ConvertUnits, Rebin
 from mantid.api import Projection
+sys.path.append('C:/MantidInstall/bin')
 
-# sys.path.append('C:/MantidInstall/bin') this is probably not needed ...
+class RawData: #Dataset can be either a single cut at one Q or several cuts put together for the purposes of multizone fitting,
 
-class RawData: 
-
-    """
-    Dataset can be either a single cut at one Q or several cuts put together for the purposes of multizone fitting
-    """
-
-    # ----------------------------------------------------------------------------------------------
-
-    def __init__(self,params):
-
-        self.params = params
-        RSE_Constants.fileHandle = LoadMD( params.sqw_path, OutputWorkspace='proj_md',FileBackEnd=True)
-
+    def __init__(self,dataFile):
+#        self.params=params
+#        print(self.params.sqw_path)
+        RSE_Constants.fileHandle=LoadMD(dataFile,OutputWorkspace='proj_md',FileBackEnd=True)
+#        print(self.params.sqw_path)
         return
-
-    # ----------------------------------------------------------------------------------------------
 
     def GetSlice(self, bin_h, bin_k, bin_l, bin_e, Projection_u, Projection_v):
         print("bin_h: [{:01.3f}, {:01.3f}]".format(bin_h[0], bin_h[1]))
@@ -67,6 +53,4 @@ class RawData:
         self.Energy = E_edges[0][:-1]
 
         return 1
-
-    # ----------------------------------------------------------------------------------------------
     

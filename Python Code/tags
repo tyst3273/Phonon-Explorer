@@ -1,0 +1,385 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+ALL_FILES_APPEND	RSE_Constants.py	/^    ALL_FILES_APPEND = r'_AllFilesWithBackground.pdf'$/;"	v	class:RSE_Constants
+ALL_PLOTS	RSE_Constants.py	/^    ALL_PLOTS = r'_ALLPlots.pdf'$/;"	v	class:RSE_Constants
+Adjust	BackgroundAdjustment.py	/^def Adjust(H,K,L,Adjustment, maxY):$/;"	f
+Adjust	BackgroundAdjustmentLine.py	/^def Adjust(H,K,L,Intercept,slope, maxY, inFolder,T=0.1):$/;"	f
+Adjust	BackgroundAdjustmentLine2.py	/^def Adjust(H,K,L,Intercept,slope, maxY, inFolder,T=0.1):$/;"	f
+AdjustList	BackgroundAdjustment.py	/^AdjustList=Qs[:,][:,3]$/;"	v
+AllData	DispPlot.py	/^    AllData=np.genfromtxt(datasetdir+FileNames[i])$/;"	v
+AllData	TDepPlot.py	/^    AllData=np.genfromtxt(datasetdir[i]+FileName)$/;"	v
+AllData1	Symmetrize_H.py	/^           AllData1=np.genfromtxt(datasetdir1+filenames1[i])$/;"	v
+AllData1	Symmetrize_H_K.py	/^           AllData1=np.genfromtxt(datasetdir1+filenames1[i])$/;"	v
+AllData1	compare_data.py	/^           AllData1=np.genfromtxt(datasetdir1+filenames1[i])$/;"	v
+AllData2	Symmetrize_H.py	/^           AllData2=np.genfromtxt(datasetdir2+filenames2[j])$/;"	v
+AllData2	Symmetrize_H_K.py	/^           AllData2=np.genfromtxt(datasetdir2+filenames2[j])$/;"	v
+AllData2	compare_data.py	/^           AllData2=np.genfromtxt(datasetdir2+filenames2[j])$/;"	v
+AutomaticAdjustForConst	Background.py	/^    def AutomaticAdjustForConst(self,params,folder,rawData):$/;"	m	class:Background
+BACKGROUND_SUBTRACTED_FOLDER	RSE_Constants.py	/^    BACKGROUND_SUBTRACTED_FOLDER = r'subtr_Background'$/;"	v	class:RSE_Constants
+BACKGR_PREFIX	RSE_Constants.py	/^    BACKGR_PREFIX = r'B_'$/;"	v	class:RSE_Constants
+Backgr	SubtractBackground_old.py	/^    Backgr=Background(params,folder,rawData)$/;"	v
+Background	Background.py	/^class Background():$/;"	c
+BackgroundFiles	GenerateConstQCuts.py	/^    BackgroundFiles=DataBackgroundQs(params)$/;"	v
+CollectionOfQs	Data.py	/^class CollectionOfQs(Dataset):$/;"	c
+CompareDataWithBackground	Background.py	/^    def CompareDataWithBackground(self):$/;"	m	class:Background
+CompareDataWithFit	Background.py	/^    def CompareDataWithFit(self, data, funcEnergy, fit): #bug here. Not using$/;"	m	class:Background
+DIR_FORMAT	RSE_Constants.py	/^    DIR_FORMAT = r'H%5.2f K%5.2f L%5.2f\/'$/;"	v	class:RSE_Constants
+Data	MakeAdjustmentList.py	/^Data=Dataset(folder,[dataFileNames[0]])$/;"	v
+DataBackgroundQs	Data.py	/^class DataBackgroundQs(Dataset):$/;"	c
+DataMinus	Symmetrize_H.py	/^        DataMinus=np.genfromtxt(datasetdir1+File2)$/;"	v
+DataMinus	Symmetrize_H_K.py	/^        DataMinus=np.genfromtxt(datasetdir1+File2)$/;"	v
+DataPlus	Symmetrize_H.py	/^        DataPlus=np.genfromtxt(datasetdir1+filenames1[i])$/;"	v
+DataPlus	Symmetrize_H_K.py	/^        DataPlus=np.genfromtxt(datasetdir1+filenames1[i])$/;"	v
+DataSmall_q	Data.py	/^class DataSmall_q(Dataset):$/;"	c
+DataTextFile	TextFile.py	/^class DataTextFile(TextFile):$/;"	c
+Dataset	Data.py	/^class Dataset: #Dataset can be either a single cut at one Q or several cuts put together for the purposes of multizone fitting,$/;"	c
+Disp	BackgroundAdjustment.py	/^Disp=Display()$/;"	v
+Disp	BackgroundAdjustmentLine.py	/^Disp=Display()$/;"	v
+Disp	BackgroundAdjustmentLine2.py	/^Disp=Display()$/;"	v
+Disp	GenerateConstQCuts.py	/^    Disp=Display()$/;"	v
+Disp	MultiFit.py	/^    Disp=Display()$/;"	v
+Disp	SubtractBackground.py	/^Disp=Display() # initialize class to make the plots$/;"	v
+Disp	SubtractBackground_old.py	/^Disp=Display()$/;"	v
+Disp	Symmetrize_H.py	/^Disp=Display()$/;"	v
+Disp	Symmetrize_H_K.py	/^Disp=Display()$/;"	v
+Disp	compare_data.py	/^Disp=Display()$/;"	v
+Display	Display.py	/^class Display:$/;"	c
+DisplayAllFiles	Background.py	/^    def DisplayAllFiles(self,folder,plotsFolder,fileName):$/;"	m	class:Background
+DisplayOrigFile	Background.py	/^    def DisplayOrigFile(self,folder,plotsFolder,fileName):$/;"	m	class:Background
+DivideByBoseFactorNorm	Data.py	/^    def DivideByBoseFactorNorm(self,T,M=1.0):  #M normalization$/;"	m	class:Dataset
+ENDS_WITH	RSE_Constants.py	/^    ENDS_WITH = r'.pdf'$/;"	v	class:RSE_Constants
+E_MAX	RSE_Constants.py	/^    E_MAX = 250$/;"	v	class:RSE_Constants
+E_MIN	RSE_Constants.py	/^    E_MIN = -50$/;"	v	class:RSE_Constants
+E_STEP	RSE_Constants.py	/^    E_STEP = 0.1$/;"	v	class:RSE_Constants
+ExtractQfromFileName	Data.py	/^    def ExtractQfromFileName(self,FileName):$/;"	m	class:Dataset
+ExtractQfromFileName	Symmetrize_H.py	/^def ExtractQfromFileName(FileName):$/;"	f
+ExtractQfromFileName	Symmetrize_H_K.py	/^def ExtractQfromFileName(FileName):$/;"	f
+FILENAME_FORMAT	RSE_Constants.py	/^    FILENAME_FORMAT = r'H%5.2f K%5.2f L%5.2f'$/;"	v	class:RSE_Constants
+FINAL_FIT_PARAMS	RSE_Constants.py	/^    FINAL_FIT_PARAMS = r'FinilFittingParam.txt'$/;"	v	class:RSE_Constants
+FITTING_PARAM_FILE	RSE_Constants.py	/^    FITTING_PARAM_FILE = r'FittingParam'$/;"	v	class:RSE_Constants
+FLAG	RSE_Constants.py	/^    FLAG=0 #Never change this$/;"	v	class:RSE_Constants
+File2	Symmetrize_H.py	/^        File2=filenames1[i].replace('K-','K ')$/;"	v
+File2	Symmetrize_H_K.py	/^        File2=filenames1[i].replace('H-','H ')$/;"	v
+File3	Symmetrize_H_K.py	/^        File3=filenames1[i].replace('K-','K ')$/;"	v
+File4	Symmetrize_H_K.py	/^        File4=filenames1[i].replace('H ','H-')$/;"	v
+FileName	TDepPlot.py	/^FileName="H-5.00 K 0.00 L 0.00"$/;"	v
+FileNames	DispPlot.py	/^FileNames=[]$/;"	v
+Filterlist	Data.py	/^    def Filterlist(self,filenames):$/;"	m	class:DataSmall_q
+FirstLine	DispPlot.py	/^FirstLine='0'$/;"	v
+FitParameters	FitParameters.py	/^class FitParameters:$/;"	c
+FitTextFile	TextFile.py	/^class FitTextFile(TextFile):$/;"	c
+Fitting	MultiFit.py	/^    Fitting=FittingData(params,InitialGuesses,data)$/;"	v
+Fitting	SubtractBackground_old.py	/^            Fitting=FittingBackgroundData(params,folder,files[j])$/;"	v
+FittingBackgroundData	FittingData.py	/^class FittingBackgroundData(FittingData):$/;"	c
+FittingData	FittingData.py	/^class FittingData():$/;"	c
+FittingDataFromFile	FittingData.py	/^class FittingDataFromFile(FittingData):$/;"	c
+FittingFunction	FittingFunction.py	/^class FittingFunction:$/;"	c
+GEN_FOLDER	RSE_Constants.py	/^    GEN_FOLDER = 'GoodFilesForBackground_'$/;"	v	class:RSE_Constants
+Generate	Data.py	/^    def Generate(self):$/;"	m	class:CollectionOfQs
+Generate	Data.py	/^    def Generate(self):$/;"	m	class:DataSmall_q
+GenerateAllFiles	Data.py	/^    def GenerateAllFiles(self):$/;"	m	class:DataBackgroundQs
+GenerateBackgroundDataFile	Data.py	/^    def GenerateBackgroundDataFile(self,folder,index):$/;"	m	class:DataBackgroundQs
+GenerateFolder	Data.py	/^    def GenerateFolder(self,Q):#,eng):$/;"	m	class:DataBackgroundQs
+H	DispPlot.py	/^H=np.zeros(len(FileNames))$/;"	v
+INPUTS_FILENAME	RSE_Constants.py	/^    INPUTS_FILENAME = r'InputParameters.txt'$/;"	v	class:RSE_Constants
+INPUTS_FILENAME_MAIN	RSE_Constants.py	/^    INPUTS_FILENAME_MAIN = r'InputParameters.txt'$/;"	v	class:RSE_Constants
+INPUTS_PATH	RSE_Constants.py	/^    INPUTS_PATH = INPUTS_PATH_MAIN$/;"	v	class:RSE_Constants
+INPUTS_PATH_MAIN	RSE_Constants.py	/^    INPUTS_PATH_MAIN = os.path.normpath('\/home\/ty\/Desktop\/Phonon-Explorer_v1.2.2\/Phonon-Explorer\/Input_Files')$/;"	v	class:RSE_Constants
+INTERPOLATION_MASK	RSE_Constants.py	/^    INTERPOLATION_MASK = 1e10$/;"	v	class:RSE_Constants
+InitCommon	plotDataWithFit.py	/^    def InitCommon(self,params):$/;"	m	class:PlotDataWithFitParam
+InitialGuesses	FitParameters.py	/^class InitialGuesses(FitParameters):$/;"	c
+InitialGuesses	MultiFit.py	/^    InitialGuesses=InitialGuesses(params,data)$/;"	v
+InputValidationError	RSEErrors.py	/^class InputValidationError(Exception):$/;"	c
+InterceptList	BackgroundAdjustmentLine.py	/^InterceptList=Qs[:,][:,3]$/;"	v
+InterceptList	BackgroundAdjustmentLine2.py	/^InterceptList=Qs[:,][:,3]$/;"	v
+M1	compare_data.py	/^M1=1$/;"	v
+M2	compare_data.py	/^M2=1$/;"	v
+MD_WORKSPACE	RSE_Constants.py	/^    MD_WORKSPACE='_mantid_workspace_'$/;"	v	class:RSE_Constants
+MakePlotSummary	Display.py	/^    def MakePlotSummary(self,folder,subdir):$/;"	m	class:Display
+NOT_STARTS_WITH	RSE_Constants.py	/^    NOT_STARTS_WITH = r'x'$/;"	v	class:RSE_Constants
+Norm	TDepPlot.py	/^Norm=[1,1,1,0.75,0.75,0.75]$/;"	v
+NumDir	TDepPlot.py	/^NumDir=6$/;"	v
+OUTPUT_DATA_PRECISION	RSE_Constants.py	/^    OUTPUT_DATA_PRECISION = '%.6f'$/;"	v	class:RSE_Constants
+Parameters	TextFile.py	/^class Parameters(TextFile):$/;"	c
+Parse	TextFile.py	/^    def Parse(self,line):$/;"	m	class:Parameters
+ParseByKeyword	TextFile.py	/^    def ParseByKeyword(self,keyword,parameters):$/;"	m	class:Parameters
+Plot	plotDataWithFit.py	/^    def Plot(self):$/;"	m	class:Plot
+Plot	plotDataWithFit.py	/^class Plot:$/;"	c
+PlotDataWithFitParam	plotDataWithFit.py	/^class PlotDataWithFitParam(Plot):$/;"	c
+PlotDataWithFitParamCustomFolder	plotDataWithFit.py	/^class PlotDataWithFitParamCustomFolder(PlotDataWithFitParam):  $/;"	c
+PlotDataWithFitting	MultiFit.py	/^    PlotDataWithFitting=PlotDataWithFitParamCustomFolder(params,folder,folder,folder)$/;"	v
+PlotDataWithFitting	SubtractBackground_old.py	/^    PlotDataWithFitting=PlotDataWithFitParamCustomFolder(params,folder,folder,folder)$/;"	v
+PlotDataWithGaussianSmoothedBG	plotDataWithFit.py	/^class PlotDataWithGaussianSmoothedBG(Plot):$/;"	c
+ProjectDir	compare_data.py	/^ProjectDir='Longitudinal_110_bin01'$/;"	v
+Q	MakeAdjustmentList.py	/^    Q=Data.ExtractQfromFileName(dataFileNames[i])$/;"	v
+Q	Symmetrize_H.py	/^    Q=ExtractQfromFileName(filenames1[i])$/;"	v
+Q	Symmetrize_H_K.py	/^    Q=ExtractQfromFileName(filenames1[i])$/;"	v
+QHlist	BackgroundAdjustment.py	/^QHlist=Qs[:,][:,0]$/;"	v
+QHlist	BackgroundAdjustmentLine.py	/^QHlist=Qs[:,][:,0]$/;"	v
+QHlist	BackgroundAdjustmentLine2.py	/^QHlist=Qs[:,][:,0]$/;"	v
+QKlist	BackgroundAdjustment.py	/^QKlist=Qs[:,][:,1]$/;"	v
+QKlist	BackgroundAdjustmentLine.py	/^QKlist=Qs[:,][:,1]$/;"	v
+QKlist	BackgroundAdjustmentLine2.py	/^QKlist=Qs[:,][:,1]$/;"	v
+QLlist	BackgroundAdjustment.py	/^QLlist=Qs[:,][:,2]$/;"	v
+QLlist	BackgroundAdjustmentLine.py	/^QLlist=Qs[:,][:,2]$/;"	v
+QLlist	BackgroundAdjustmentLine2.py	/^QLlist=Qs[:,][:,2]$/;"	v
+Qs	BackgroundAdjustment.py	/^Qs=np.genfromtxt(params.folderForBkgSubtractedFiles+"BackgroundAdjustment.txt")$/;"	v
+Qs	BackgroundAdjustmentLine.py	/^Qs=np.genfromtxt(folder+"BackgroundAdjustment.txt")$/;"	v
+Qs	BackgroundAdjustmentLine2.py	/^Qs=np.genfromtxt(inFolder+"BackgroundAdjustment.txt")$/;"	v
+RSE_Constants	RSE_Constants.py	/^class RSE_Constants():$/;"	c
+Read	Data.py	/^    def Read(self):$/;"	m	class:DataSmall_q
+Read	TextFile.py	/^    def Read(self):$/;"	m	class:DataTextFile
+Read	TextFile.py	/^    def Read(self):$/;"	m	class:FitTextFile
+ReadAndPlot	plotDataWithFit.py	/^    def ReadAndPlot(self):$/;"	m	class:PlotDataWithFitParam
+ReadBackgroundParams	TextFile.py	/^    def ReadBackgroundParams(self):$/;"	m	class:Parameters
+ReadExtendedLine	FitParameters.py	/^    def ReadExtendedLine(self,paramFileLineIndex,parameters):$/;"	m	class:FitParameters
+ReadMultizoneFitParams	TextFile.py	/^    def ReadMultizoneFitParams(self):$/;"	m	class:Parameters
+ReadSharedParams	TextFile.py	/^    def ReadSharedParams(self,parameters): #multizone and background$/;"	m	class:Parameters
+SAVE_BACK	RSE_Constants.py	/^    SAVE_BACK = r'_Background.pdf'$/;"	v	class:RSE_Constants
+SLICE_TEMP_DIRECTORY	RSE_Constants.py	/^    SLICE_TEMP_DIRECTORY = os.path.normpath('E:\/TestData\/450K_Data\/Temp') #Not used in this version$/;"	v	class:RSE_Constants
+SMOOTHED_STARTS_WITH	RSE_Constants.py	/^    SMOOTHED_STARTS_WITH = 'smooth_'$/;"	v	class:RSE_Constants
+STARTS_WITH	RSE_Constants.py	/^    STARTS_WITH = r'H'$/;"	v	class:RSE_Constants
+SYMBOL	RSE_Constants.py	/^    SYMBOL = ['bo','ro','go','b*','r*','g*','b+','r+','g+','b^','r^','g^','bo','ro','go','b*','r*','g*','b+','r+','g+','b^','r^','g^','bo','ro','go','b*','r*','g*','b+','r+','g+','b^','r^','g^','bo','ro','go','b*','r*','g*','b+','r+','g+','b^','r^','g^']$/;"	v	class:RSE_Constants
+Save	Background.py	/^    def Save(self,folder,filename):$/;"	m	class:Background
+SlopeList	BackgroundAdjustmentLine.py	/^SlopeList=Qs[:,][:,4]$/;"	v
+SlopeList	BackgroundAdjustmentLine2.py	/^SlopeList=Qs[:,][:,4]$/;"	v
+SmoothedBackground	GaussianSmooth.py	/^class SmoothedBackground:$/;"	c
+StringArray	DispPlot.py	/^StringArray=[]$/;"	v
+StringArray	TDepPlot.py	/^StringArray=[]$/;"	v
+SubtractConstant	Data.py	/^    def SubtractConstant(self,Const):$/;"	m	class:Dataset
+SubtractLine	Data.py	/^    def SubtractLine(self,Intercept,Slope):$/;"	m	class:Dataset
+T	BackgroundAdjustmentLine.py	/^    T=1$/;"	v
+T	BackgroundAdjustmentLine.py	/^    T=float(sys.argv[1])$/;"	v
+T	BackgroundAdjustmentLine2.py	/^    T=1$/;"	v
+T	BackgroundAdjustmentLine2.py	/^    T=float(sys.argv[1])$/;"	v
+T	DispPlot.py	/^T=1$/;"	v
+T	DispPlot.py	/^T=10$/;"	v
+T	Symmetrize_H.py	/^T=10$/;"	v
+T	TDepPlot.py	/^T=[0.1,0.1,0.1,0.1,0.1,0.1]$/;"	v
+T1	Symmetrize_H.py	/^T1=10$/;"	v
+T1	Symmetrize_H_K.py	/^T1=10$/;"	v
+T1	compare_data.py	/^T1=10$/;"	v
+T2	Symmetrize_H.py	/^T2=450$/;"	v
+T2	Symmetrize_H_K.py	/^T2=450$/;"	v
+T2	compare_data.py	/^T2=10$/;"	v
+TEMP_FILE	RSE_Constants.py	/^    TEMP_FILE = r'guru99.py'$/;"	v	class:RSE_Constants
+Temp	DispPlot.py	/^Temp=240$/;"	v
+TextFile	TextFile.py	/^class TextFile():$/;"	c
+TxtFile	DispPlot.py	/^TxtFile=open(location_ForPlots+'\/Disp.csv','w+')$/;"	v
+TxtFile	MakeAdjustmentList.py	/^TxtFile=open(folder+"BackgroundAdjustment.txt",'w+')$/;"	v
+TxtFile	Symmetrize_H.py	/^        TxtFile=open(datasetdir1+File2,'w+')    $/;"	v
+TxtFile	Symmetrize_H_K.py	/^        TxtFile=open(datasetdir1+'a'+File2,'w+')    $/;"	v
+TxtFile	TDepPlot.py	/^TxtFile=open(location_ForPlots+FileName,'w+')    $/;"	v
+Write	TextFile.py	/^    def Write(self, Energy, Intensity, Error):$/;"	m	class:DataTextFile
+Write	TextFile.py	/^    def Write(self, FitResultsArray):$/;"	m	class:FitTextFile
+WriteFinalParamToFile	WriteFinalParamToFile.py	/^class WriteFinalParamToFile:$/;"	c
+WriteToText	MultiFit.py	/^    WriteToText=FitParameters(numpy.sqrt(numpy.diag(pcov)),data.filenames)$/;"	v
+WriteToText	MultiFit.py	/^    WriteToText=FitParameters(popt,data.filenames)$/;"	v
+WriteToText	SubtractBackground_old.py	/^            WriteToText=FitParameters(popt,data.filenames)$/;"	v
+X_LABEL	RSE_Constants.py	/^    X_LABEL = r'Energy'$/;"	v	class:RSE_Constants
+Y_LABEL	RSE_Constants.py	/^    Y_LABEL = r'Intensity'$/;"	v	class:RSE_Constants
+__init__	Background.py	/^    def __init__(self,params,folder,rawData):$/;"	m	class:Background
+__init__	Data.py	/^    def __init__(self,folder,filenames):$/;"	m	class:Dataset
+__init__	Data.py	/^    def __init__(self,params):$/;"	m	class:CollectionOfQs
+__init__	Data.py	/^    def __init__(self,params):$/;"	m	class:DataBackgroundQs
+__init__	Data.py	/^    def __init__(self,params,dataDirectory,q=[1000,1000,1000]):$/;"	m	class:DataSmall_q
+__init__	FitParameters.py	/^    def __init__(self,fitResults,filenames):$/;"	m	class:FitParameters
+__init__	FitParameters.py	/^    def __init__(self,params,data):$/;"	m	class:InitialGuesses
+__init__	FittingData.py	/^    def __init__(self,params,InitialGuesses,data):$/;"	m	class:FittingData
+__init__	FittingData.py	/^    def __init__(self,params,InitialGuesses,folder,datafile):$/;"	m	class:FittingDataFromFile
+__init__	FittingData.py	/^    def __init__(self,params,folder,datafile):$/;"	m	class:FittingBackgroundData
+__init__	FittingFunction.py	/^    def __init__(self,InitialGuesses):$/;"	m	class:FittingFunction
+__init__	GaussianSmooth.py	/^    def __init__(self,folder):$/;"	m	class:SmoothedBackground
+__init__	RSEErrors.py	/^    def __init__(self, *args, **kwargs):$/;"	m	class:InputValidationError
+__init__	TextFile.py	/^    def __init__(self,FolderName,FileName):$/;"	m	class:DataTextFile
+__init__	TextFile.py	/^    def __init__(self,FolderName,FileName):$/;"	m	class:FitTextFile
+__init__	TextFile.py	/^    def __init__(self,FolderName,FileName):$/;"	m	class:Parameters
+__init__	TextFile.py	/^    def __init__(self,FolderName,FileName):$/;"	m	class:TextFile
+__init__	WriteFinalParamToFile.py	/^    def __init__(self,params,data):$/;"	m	class:WriteFinalParamToFile
+__init__	plotDataWithFit.py	/^    def __init__(self,params):$/;"	m	class:Plot
+__init__	plotDataWithFit.py	/^    def __init__(self,params):$/;"	m	class:PlotDataWithFitParam
+__init__	plotDataWithFit.py	/^    def __init__(self,params,bg_folder,bg_files):$/;"	m	class:PlotDataWithGaussianSmoothedBG
+__init__	plotDataWithFit.py	/^    def __init__(self,params,location_ForPlots,locationForOutputParam,dataDirectory):$/;"	m	class:PlotDataWithFitParamCustomFolder
+_smooth_cut	GaussianSmooth.py	/^    def _smooth_cut(self,bg_data):$/;"	m	class:SmoothedBackground
+_write_background	GaussianSmooth.py	/^    def _write_background(self,fine_e,pbp_min,raw_file_path,raw_file_name):$/;"	m	class:SmoothedBackground
+_write_smooth_file	GaussianSmooth.py	/^    def _write_smooth_file(self,fine_e,sf_int,bg_file):$/;"	m	class:SmoothedBackground
+appendDataset	Data.py	/^    def appendDataset(self):$/;"	m	class:Dataset
+buildInitArray	FitParameters.py	/^    def buildInitArray(self,NumberofPeaks,NumberofDatasets,positions):$/;"	m	class:InitialGuesses
+buildfittingFunction	FittingFunction.py	/^    def buildfittingFunction(self):$/;"	m	class:FittingFunction
+buildfittingFunctionDeclaration	FittingFunction.py	/^    def buildfittingFunctionDeclaration(self):$/;"	m	class:FittingFunction
+clean	Data.py	/^    def clean(self):$/;"	m	class:Dataset
+d	Symmetrize_H.py	/^            d=1$/;"	v
+d	Symmetrize_H_K.py	/^            d=1$/;"	v
+data	MultiFit.py	/^        data=DataSmall_q(params,params.folderForBkgSubtractedFiles)$/;"	v
+data	MultiFit.py	/^        data=DataSmall_q(params,params.folderForBkgSubtractedFiles,params.reducedQlist[i:i+1][0])$/;"	v
+data	SubtractBackground_old.py	/^            data=Dataset(folder,[files[j]])$/;"	v
+dataFileNames	MakeAdjustmentList.py	/^dataFileNames=[file for file in os.listdir(folder) if file.startswith("H") and not file.endswith("pdf")]$/;"	v
+dataIsValid	Data.py	/^    def dataIsValid(self,minPointsInDataFile):$/;"	m	class:Dataset
+datasetdir	DispPlot.py	/^datasetdir='E:\/Bagage22\/Bagage_22_TA\/subtr_background\/'$/;"	v
+datasetdir	DispPlot.py	/^datasetdir=location_ForPlots$/;"	v
+datasetdir	TDepPlot.py	/^datasetdir=[]$/;"	v
+datasetdir1	Symmetrize_H.py	/^datasetdir1='E:\/Data_LSNO_120meV_240K\/Longitudinal_LSNO110K01DH01K005\/good_slices\/'$/;"	v
+datasetdir1	Symmetrize_H_K.py	/^datasetdir1='E:\/Data_IPTS-12942_UD55_55meV_10K\/BendingDispSingleH0x025\/good_slices\/'$/;"	v
+datasetdir1	compare_data.py	/^datasetdir1='E:\/Data_LSNO_120meV_240K\/'+ProjectDir + '\/subtr_background\/'$/;"	v
+datasetdir2	compare_data.py	/^datasetdir2='E:\/Data_LSNO_120meV_450K\/'+ProjectDir + '\/subtr_background\/'$/;"	v
+dd	GenerateConstQCuts.py	/^    dd=1$/;"	v
+dim2array	Data.py	/^    def dim2array(self,d):$/;"	m	class:Dataset
+doFitting	FittingData.py	/^    def doFitting(self):$/;"	m	class:FittingData
+energy	DispPlot.py	/^    energy=AllData[:,][:,0]$/;"	v
+energy	DispPlot.py	/^energy=[]$/;"	v
+energy	TDepPlot.py	/^    energy=AllData[:,][:,0]$/;"	v
+energy	TDepPlot.py	/^energy=[]$/;"	v
+energy0	DispPlot.py	/^energy0=np.zeros(int((energyMax-energyMin)\/estep)+1)$/;"	v
+energy0	TDepPlot.py	/^energy0=np.zeros(int((energyMax-energyMin)\/estep)+1)$/;"	v
+energy1	Symmetrize_H.py	/^           energy1=AllData1[:,][:,0]$/;"	v
+energy1	Symmetrize_H.py	/^        energy1=DataPlus[:,][:,0]$/;"	v
+energy1	Symmetrize_H_K.py	/^           energy1=AllData1[:,][:,0]$/;"	v
+energy1	Symmetrize_H_K.py	/^        energy1=DataPlus[:,][:,0]$/;"	v
+energy1	compare_data.py	/^           energy1=AllData1[:,][:,0]$/;"	v
+energy2	Symmetrize_H.py	/^           energy2=AllData2[:,][:,0]$/;"	v
+energy2	Symmetrize_H.py	/^        energy2=DataMinus[:,][:,0]$/;"	v
+energy2	Symmetrize_H_K.py	/^           energy2=AllData2[:,][:,0]$/;"	v
+energy2	Symmetrize_H_K.py	/^        energy2=DataMinus[:,][:,0]$/;"	v
+energy2	compare_data.py	/^           energy2=AllData2[:,][:,0]$/;"	v
+energy3	Symmetrize_H_K.py	/^        energy3=DataMinus[:,][:,0]$/;"	v
+energy4	Symmetrize_H_K.py	/^        energy4=DataMinus[:,][:,0]$/;"	v
+energyMax	DispPlot.py	/^    energyMax=max(np.amax(energy),energyMax)$/;"	v
+energyMax	DispPlot.py	/^energyMax=-500$/;"	v
+energyMax	TDepPlot.py	/^    energyMax=max(np.amax(energy),energyMax)$/;"	v
+energyMax	TDepPlot.py	/^energyMax=-500$/;"	v
+energyMin	DispPlot.py	/^    energyMin=min(np.amin(energy),energyMin)$/;"	v
+energyMin	DispPlot.py	/^energyMin=1000$/;"	v
+energyMin	TDepPlot.py	/^    energyMin=min(np.amin(energy),energyMin)$/;"	v
+energyMin	TDepPlot.py	/^energyMin=1000$/;"	v
+error	DispPlot.py	/^    error=AllData[:,][:,2]$/;"	v
+error	DispPlot.py	/^error=[]$/;"	v
+error	Symmetrize_H.py	/^        error=error1$/;"	v
+error	Symmetrize_H_K.py	/^        error=error1$/;"	v
+error	TDepPlot.py	/^    error=AllData[:,][:,2]$/;"	v
+error	TDepPlot.py	/^error=[]$/;"	v
+error0	DispPlot.py	/^error0=np.zeros((len(energy0),len(FileNames)))$/;"	v
+error0	TDepPlot.py	/^error0=np.zeros((len(energy0),len(datasetdir)))$/;"	v
+error1	Symmetrize_H.py	/^           error1=AllData1[:,][:,2]$/;"	v
+error1	Symmetrize_H.py	/^        error1=DataPlus[:,][:,2]$/;"	v
+error1	Symmetrize_H_K.py	/^           error1=AllData1[:,][:,2]$/;"	v
+error1	Symmetrize_H_K.py	/^        error1=DataPlus[:,][:,2]$/;"	v
+error1	compare_data.py	/^           error1=AllData1[:,][:,2]$/;"	v
+error2	Symmetrize_H.py	/^           error2=AllData2[:,][:,2]$/;"	v
+error2	Symmetrize_H.py	/^        error2=DataMinus[:,][:,2]$/;"	v
+error2	Symmetrize_H_K.py	/^           error2=AllData2[:,][:,2]$/;"	v
+error2	Symmetrize_H_K.py	/^        error2=DataMinus[:,][:,2]$/;"	v
+error2	compare_data.py	/^           error2=AllData2[:,][:,2]$/;"	v
+error3	Symmetrize_H_K.py	/^        error3=DataMinus[:,][:,2]$/;"	v
+error4	Symmetrize_H_K.py	/^        error4=DataMinus[:,][:,2]$/;"	v
+estep	DispPlot.py	/^estep=0.25$/;"	v
+estep	TDepPlot.py	/^estep=1.25$/;"	v
+evalError	TextFile.py	/^    def evalError(self,string):$/;"	m	class:Parameters
+evalIntWarning	TextFile.py	/^    def evalIntWarning(self,string,default):$/;"	m	class:Parameters
+evalReaNoWarning	TextFile.py	/^    def evalReaNoWarning(self,string,default):$/;"	m	class:Parameters
+evalRealWarning	TextFile.py	/^    def evalRealWarning(self,string,default):$/;"	m	class:Parameters
+evalWarning	TextFile.py	/^    def evalWarning(self,string,default):$/;"	m	class:Parameters
+filenames1	Symmetrize_H.py	/^filenames1=[file for file in os.listdir(datasetdir1) if file.startswith("H")and not file.endswith("pdf")]$/;"	v
+filenames1	Symmetrize_H_K.py	/^filenames1=[file for file in os.listdir(datasetdir1) if file.startswith("H")and not file.endswith("pdf")]$/;"	v
+filenames1	compare_data.py	/^filenames1=[file for file in os.listdir(datasetdir1) if file.startswith("H")and not file.endswith("pdf")]$/;"	v
+filenames2	Symmetrize_H.py	/^filenames2=[file for file in os.listdir(datasetdir1) if file.startswith("B_H")and not file.endswith("pdf")]$/;"	v
+filenames2	Symmetrize_H_K.py	/^filenames2=[file for file in os.listdir(datasetdir1) if file.startswith("B_H")and not file.endswith("pdf")]$/;"	v
+filenames2	compare_data.py	/^filenames2=[file for file in os.listdir(datasetdir2) if file.startswith("H")and not file.endswith("pdf")]$/;"	v
+files	SubtractBackground.py	/^            and not file.endswith(RSE_Constants.ENDS_WITH)] $/;"	v
+files	SubtractBackground_old.py	/^    files=[file for file in os.listdir(folder) if file.startswith(RSE_Constants.STARTS_WITH) and not file.endswith(RSE_Constants.ENDS_WITH)] $/;"	v
+folder	BackgroundAdjustment.py	/^folder=params.folderForBkgSubtractedFiles$/;"	v
+folder	BackgroundAdjustmentLine.py	/^folder=params.folderForBkgSubtractedFiles$/;"	v
+folder	BackgroundAdjustmentLine2.py	/^folder=params.folderForBkgSubtractedFiles$/;"	v
+folder	MakeAdjustmentList.py	/^folder=params.folderForBkgSubtractedFiles$/;"	v
+folder	MultiFit.py	/^    folder=params.locationForOutputParam$/;"	v
+folder	SubtractBackground.py	/^    folder=params.path_data+folderForBkgSubtractedFiles[i]+'\/' # path of the folder to do in this iter.$/;"	v
+folder	SubtractBackground_old.py	/^    folder=params.path_data+folderForBkgSubtractedFiles[i]+'\/'$/;"	v
+folderForBkgSubtractedFiles	SubtractBackground.py	/^        subdir.startswith(RSE_Constants.GEN_FOLDER)]$/;"	v
+folderForBkgSubtractedFiles	SubtractBackground_old.py	/^folderForBkgSubtractedFiles=[subdir for subdir in os.listdir(params.path_data) if subdir.startswith(RSE_Constants.BACKGROUND_SUBTRACTED_FOLDER)]$/;"	v
+font	DispPlot.py	/^font = {'family': 'serif',$/;"	v
+font	Symmetrize_H.py	/^font = {'family': 'serif',$/;"	v
+font	Symmetrize_H_K.py	/^font = {'family': 'serif',$/;"	v
+font	TDepPlot.py	/^font = {'family': 'serif',$/;"	v
+font	compare_data.py	/^font = {'family': 'serif',$/;"	v
+getFileName	TextFile.py	/^    def getFileName(self):$/;"	m	class:TextFile
+getFitResultsArray	plotDataWithFit.py	/^    def getFitResultsArray(self,fitResults, Energy,indx):$/;"	m	class:Plot
+getFolderName	TextFile.py	/^    def getFolderName(self):$/;"	m	class:TextFile
+getIndex	TextFile.py	/^    def getIndex(self,keyword,parameters):$/;"	m	class:Parameters
+inFolder	BackgroundAdjustmentLine.py	/^inFolder=params.path_data$/;"	v
+inFolder	BackgroundAdjustmentLine2.py	/^inFolder=params.folderForBkgSubtractedFiles$/;"	v
+index	DispPlot.py	/^                index=jj$/;"	v
+index	TDepPlot.py	/^        index=np.argwhere(energy0==energy[j])$/;"	v
+initFromFitResults	FitParameters.py	/^    def initFromFitResults(self,fitResults):$/;"	m	class:FitParameters
+initialize	Data.py	/^    def initialize(self):$/;"	m	class:Dataset
+intensity	DispPlot.py	/^    intensity=AllData[:,][:,1]$/;"	v
+intensity	DispPlot.py	/^intensity=[]$/;"	v
+intensity	TDepPlot.py	/^    intensity=AllData[:,][:,1]$/;"	v
+intensity	TDepPlot.py	/^intensity=[]$/;"	v
+intensity0	DispPlot.py	/^intensity0=np.zeros((len(energy0),len(FileNames)))$/;"	v
+intensity0	TDepPlot.py	/^intensity0=np.zeros((len(energy0),len(datasetdir)))$/;"	v
+intensity1	Symmetrize_H.py	/^           intensity1=AllData1[:,][:,1]$/;"	v
+intensity1	Symmetrize_H.py	/^        intensity1=DataPlus[:,][:,1]$/;"	v
+intensity1	Symmetrize_H_K.py	/^           intensity1=AllData1[:,][:,1]$/;"	v
+intensity1	Symmetrize_H_K.py	/^        intensity1=DataPlus[:,][:,1]$/;"	v
+intensity1	compare_data.py	/^           intensity1=AllData1[:,][:,1]$/;"	v
+intensity2	Symmetrize_H.py	/^           intensity2=AllData2[:,][:,1]$/;"	v
+intensity2	Symmetrize_H.py	/^        intensity2=DataMinus[:,][:,1]$/;"	v
+intensity2	Symmetrize_H_K.py	/^           intensity2=AllData2[:,][:,1]$/;"	v
+intensity2	Symmetrize_H_K.py	/^        intensity2=DataMinus[:,][:,1]$/;"	v
+intensity2	compare_data.py	/^           intensity2=AllData2[:,][:,1]$/;"	v
+intensity3	Symmetrize_H_K.py	/^        intensity3=DataMinus[:,][:,1]$/;"	v
+intensity4	Symmetrize_H_K.py	/^        intensity4=DataMinus[:,][:,1]$/;"	v
+intensitySum	Symmetrize_H.py	/^        intensitySum=intensity1$/;"	v
+intensitySum	Symmetrize_H_K.py	/^        intensitySum=intensity1$/;"	v
+j	Symmetrize_H.py	/^                j=np.argwhere(energy2==energy1[k])$/;"	v
+j1	Symmetrize_H_K.py	/^                j1=np.argwhere(energy2==energy1[k])$/;"	v
+j2	Symmetrize_H_K.py	/^                j2=np.argwhere(energy2==energy1[k])$/;"	v
+j3	Symmetrize_H_K.py	/^                j3=np.argwhere(energy2==energy1[k])$/;"	v
+location_ForPlots	DispPlot.py	/^location_ForPlots='E:\/Bagage22\/Bagage_22_TA\/subtr_background\/'$/;"	v
+location_ForPlots	DispPlot.py	/^location_ForPlots='E:\/Bagage22\/Bagage_22_TA_002\/good_slices\/'$/;"	v
+location_ForPlots	Symmetrize_H_K.py	/^location_ForPlots='E:\/Data_IPTS-12942_UD55_55meV_10K\/BendingXDist\/temp\/'$/;"	v
+location_ForPlots	TDepPlot.py	/^location_ForPlots='E:\/Data_LSNO_120meV\/plots\/'$/;"	v
+location_ForPlots	compare_data.py	/^location_ForPlots='E:\/Data_LSNO_120meV_240K\/'+ProjectDir + '\/temp450\/'$/;"	v
+makeRawSlice	Data.py	/^    def makeRawSlice(self, bin_h, bin_k, bin_l, bin_e,folder,file,minPoints,mult=1):$/;"	m	class:Dataset
+msg	Load_MD.py	/^        '\\n\\n crashing!\\n'$/;"	v
+offs	TDepPlot.py	/^offs=[0,0.0008,0.0008,0.0008,0.0008,0.0008]$/;"	v
+offset	DispPlot.py	/^offset=3000.000$/;"	v
+offset	TDepPlot.py	/^    offset=offset+offs[i]$/;"	v
+offset	TDepPlot.py	/^offset=0$/;"	v
+paramFileName	MultiFit.py	/^        paramFileName='_'+RSE_Constants.FITTING_PARAM_FILE$/;"	v
+paramFileName	MultiFit.py	/^        paramFileName='_'+RSE_Constants.FITTING_PARAM_FILE+'_'+str(params.qh)+'_'+str(params.qk)+'_'+str(params.ql)+'.txt'$/;"	v
+params	BackgroundAdjustment.py	/^params=Parameters(RSE_Constants.INPUTS_PATH,RSE_Constants.INPUTS_FILENAME)$/;"	v
+params	BackgroundAdjustmentLine.py	/^params=Parameters(RSE_Constants.INPUTS_PATH,RSE_Constants.INPUTS_FILENAME)$/;"	v
+params	BackgroundAdjustmentLine2.py	/^params=Parameters(RSE_Constants.INPUTS_PATH,RSE_Constants.INPUTS_FILENAME)$/;"	v
+params	GenerateConstQCuts.py	/^params=Parameters(RSE_Constants.INPUTS_PATH, RSE_Constants.INPUTS_FILENAME)$/;"	v
+params	Load_MD.py	/^params=Parameters(RSE_Constants.INPUTS_PATH_MAIN,RSE_Constants.INPUTS_FILENAME)$/;"	v
+params	MakeAdjustmentList.py	/^params=Parameters(RSE_Constants.INPUTS_PATH,RSE_Constants.INPUTS_FILENAME)$/;"	v
+params	MultiFit.py	/^params=Parameters(RSE_Constants.INPUTS_PATH_MAIN,RSE_Constants.INPUTS_FILENAME_MAIN)$/;"	v
+params	SubtractBackground.py	/^params=Parameters(RSE_Constants.INPUTS_PATH,RSE_Constants.INPUTS_FILENAME)$/;"	v
+params	SubtractBackground_old.py	/^params=Parameters(RSE_Constants.INPUTS_PATH,RSE_Constants.INPUTS_FILENAME)$/;"	v
+plot	GenerateConstQCuts.py	/^    plot=Plot(params)$/;"	v
+plotDataset	plotDataWithFit.py	/^    def plotDataset(self,data,indx,fitResults=0):$/;"	m	class:Plot
+plotSingle	plotDataWithFit.py	/^    def plotSingle(self,folder,plotsFolder,filenames,FitResultsArray=0,title=0):$/;"	m	class:Plot
+plot_all_in_one	GaussianSmooth.py	/^    def plot_all_in_one(self,params,raw_file_name):$/;"	m	class:SmoothedBackground
+plot_raw_cut	GaussianSmooth.py	/^    def plot_raw_cut(self,params,raw_file_name):$/;"	m	class:SmoothedBackground
+plot_subtr_cut	GaussianSmooth.py	/^    def plot_subtr_cut(self,params,raw_file_name):$/;"	m	class:SmoothedBackground
+plot_with_smooth	SubtractBackground.py	/^    plot_with_smooth = PlotDataWithGaussianSmoothedBG(params,folder,files)$/;"	v
+rawData	SubtractBackground_old.py	/^    rawData=Dataset(params.path_data,[rawFileName])$/;"	v
+rawFileName	SubtractBackground.py	/^    rawFileName=folder[folder.index('_' + RSE_Constants.STARTS_WITH)+1:-1] # the Q point file$/;"	v
+rawFileName	SubtractBackground_old.py	/^    rawFileName=folder[folder.index('_' + RSE_Constants.STARTS_WITH)+1:-1]$/;"	v
+readFromFile	FitParameters.py	/^    def readFromFile(self,locationForOutputParam):$/;"	m	class:FitParameters
+removeNAN	Data.py	/^    def removeNAN(self):$/;"	m	class:Dataset
+signVar	Data.py	/^    def signVar(self,q):$/;"	m	class:DataSmall_q
+smooth	Data.py	/^    def smooth(self):$/;"	m	class:Dataset
+smooth_bg	SubtractBackground.py	/^    smooth_bg = SmoothedBackground(folder)$/;"	v
+smooth_cuts_for_this_Q	GaussianSmooth.py	/^    def smooth_cuts_for_this_Q(self,params,rawFileName):$/;"	m	class:SmoothedBackground
+string	DispPlot.py	/^    string=str(energy0[j])$/;"	v
+string	TDepPlot.py	/^    string=str(energy0[j])$/;"	v
+subtract_background	GaussianSmooth.py	/^    def subtract_background(self,params,raw_file_name):$/;"	m	class:SmoothedBackground
+testData	GenerateConstQCuts.py	/^    testData=CollectionOfQs(params)$/;"	v
+testData	GenerateConstQCuts.py	/^    testData=DataSmall_q(params, params.path_data)$/;"	v
+writeToFile	FitParameters.py	/^    def writeToFile(self,params,filename):$/;"	m	class:FitParameters
+writeToFile	WriteFinalParamToFile.py	/^    def writeToFile(self,folder,filename,fitParams):$/;"	m	class:WriteFinalParamToFile

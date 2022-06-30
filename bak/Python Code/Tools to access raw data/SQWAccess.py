@@ -7,30 +7,19 @@
 #    Office of Science, under Contract No. DE-SC0006939                  %                  
 #________________________________________________________________________%
 
-# -------------------------------------------------------------------------
-# changing Horace threads added by Tyler Sterling Apr 2022
-# -------------------------------------------------------------------------
-
 import math
 import sys
 import os
 import io
 import numpy as np  # !!!!
 from RSE_Constants import *
-#import matlab.engine
 
-class RawData: 
-
-    """
-    Dataset can be either a single cut at one Q or several cuts put together for the purposes of multizone fitting,
-    """
-    
-    # ----------------------------------------------------------------------------------------------
+class RawData: #Dataset can be either a single cut at one Q or several cuts put together for the purposes of multizone fitting,
 
     def __init__(self, params):
 
-        import matlab.engine # -- better to import this once when module is imported (T.S.)
 
+        import matlab.engine
         RSE_Constants.fileHandle=matlab.engine.start_matlab()
         RSE_Constants.fileHandle.addpath(os.getcwd()+'/Tools to access raw data/') # !!!!
         self.sqw_path=params.sqw_path # !!!!
@@ -44,34 +33,15 @@ class RawData:
             RSE_Constants.fileHandle.horace_on()
         except Exception as e:
             print("IGNORE THIS ERROR UNLESS RUNNING ON LINUX:", e)
-
-        # ------------ added by T.S. Apr 2022 -------------
-        # get number of threads horace is currently using
-        _thds = int(RSE_Constants.fileHandle.getfield(RSE_Constants.fileHandle.hor_config(),'threads'))
-        print(f' Horace is currently set to use {_thds:g} threads')
-        if _thds != params.horace_threads:
-            try:        
-                RSE_Constants.fileHandle.set(RSE_Constants.fileHandle.hor_config(),'threads',params.horace_threads)
-                print(f' Resetting Horace to use {params.horace_threads:g} threads')
-            except:
-                msg = '\n WARNING: Unable to reset the number of threads used by Horace.\n  ' \
-                    f'using the current setting: {_thds:g}\n'
-                print(msg)
-        # -------------------------------------------------
-
         return
+       
 
-    # ----------------------------------------------------------------------------------------------
 
     def GetSlice(self, bin_h, bin_k, bin_l, bin_e, Projection_u, Projection_v):
-
-        """
         #Projection_u , v are passed as strings
         # RETURNS 1 if slice is not written, 0 if SUCCESS
-        """
-
         #eng = matlab.engine.start_matlab();
-        import matlab.engine # -- better to import this once when module is imported (T.S.
+        import matlab.engine
 
         proj = dict(
             u=matlab.double(list(Projection_u)),
@@ -87,10 +57,10 @@ class RawData:
             out = io.StringIO()
             err = io.StringIO()
 
+        
         self.Energy=[]
         self.Intensity=[]
         self.Error=[]
-
 # The eval is to prevent the program from crashing when running with Python 2.7
 
 #        bin_h_m = eval('matlab.double([*bin_h])')
@@ -112,8 +82,8 @@ class RawData:
                 bin_l_m,
                 bin_e_m,
                 '-nopix',
-               stdout=out,
-               stderr=err)
+                stdout=out,
+                stderr=err)
         except Exception as e:
             print("I am here")
             print(e)
@@ -141,6 +111,3 @@ class RawData:
             self.Error[i]=ourCut['e'][i][0]
 #        print(bin_h, bin_k, bin_l)
         return 0
-
-        # ----------------------------------------------------------------------------------------------
-

@@ -15,7 +15,7 @@ import os.path
 class RSE_Constants():
 
 
-    INPUTS_PATH_MAIN = os.path.normpath('/home/ty/Desktop/Phonon-Explorer_v1.2.2/Phonon-Explorer/Input_Files')
+    INPUTS_PATH_MAIN = os.path.normpath('C:/Users/Dmitry/Desktop/neutron/Phonon Explorer/Input_Files')
     INPUTS_FILENAME_MAIN = r'InputParameters.txt'
     FITTING_PARAM_FILE = r'FittingParam'
     
@@ -38,16 +38,11 @@ class RSE_Constants():
     E_MIN = -50
     SMOOTHED_STARTS_WITH = 'smooth_'
     OUTPUT_DATA_PRECISION = '%.6f'
-
-    # Tys stuff for parallel implementation
-    MD_WORKSPACE='_mantid_workspace_'
     
     #Plots
     X_LABEL = r'Energy'
     Y_LABEL = r'Intensity'
-    SYMBOL = ['bo','ro','go','b*','r*','g*','b+','r+','g+','b^','r^','g^','bo','ro','go','b*','r*','g*','b+', \
-                        'r+','g+','b^','r^','g^','bo','ro','go','b*','r*','g*','b+','r+','g+','b^','r^','g^', \
-                        'bo','ro','go','b*','r*','g*','b+','r+','g+','b^','r^','g^']
+    SYMBOL = ['bo','ro','go','b*','r*','g*','b+','r+','g+','b^','r^','g^','bo','ro','go','b*','r*','g*','b+','r+','g+','b^','r^','g^','bo','ro','go','b*','r*','g*','b+','r+','g+','b^','r^','g^','bo','ro','go','b*','r*','g*','b+','r+','g+','b^','r^','g^']
     
     #Raw Slices
     SLICE_TEMP_DIRECTORY = os.path.normpath('E:/TestData/450K_Data/Temp') #Not used in this version

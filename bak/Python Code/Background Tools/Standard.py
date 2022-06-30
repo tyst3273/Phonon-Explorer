@@ -33,16 +33,12 @@ class BackgroundQ:
 
         Pperp=np.cross(params.Projection_u,params.Projection_v)
         
-        uA=2*math.pi*(params.Projection_u[0]*h/self.params.a+params.Projection_u[1]* \
-            k/self.params.b+params.Projection_u[2]*l/self.params.c)
-        vA=2*math.pi*(params.Projection_v[0]*h/self.params.a+params.Projection_v[1]* \
-            k/self.params.b+params.Projection_v[2]*l/self.params.c)
+        uA=2*math.pi*(params.Projection_u[0]*h/self.params.a+params.Projection_u[1]*k/self.params.b+params.Projection_u[2]*l/self.params.c)
+        vA=2*math.pi*(params.Projection_v[0]*h/self.params.a+params.Projection_v[1]*k/self.params.b+params.Projection_v[2]*l/self.params.c)
         pA=2*math.pi*(Pperp[0]*h/self.params.a+Pperp[1]*k/self.params.b+Pperp[2]*l/self.params.c)
 
-        self.a_star=2*math.pi*(params.Projection_u[0]/self.params.a+params.Projection_u[1]/ \
-            self.params.b+params.Projection_u[2]/self.params.c)
-        self.b_star=2*math.pi*(params.Projection_v[0]/self.params.a+params.Projection_v[1]/ \
-            self.params.b+params.Projection_v[2]/self.params.c)
+        self.a_star=2*math.pi*(params.Projection_u[0]/self.params.a+params.Projection_u[1]/self.params.b+params.Projection_u[2]/self.params.c)
+        self.b_star=2*math.pi*(params.Projection_v[0]/self.params.a+params.Projection_v[1]/self.params.b+params.Projection_v[2]/self.params.c)
         self.c_star=2*math.pi*(Pperp[0]/self.params.a+Pperp[1]/self.params.b+Pperp[2]/self.params.c)
         Angles=self.GeneratePhiTheta()
         Phi=Angles[0]
@@ -51,18 +47,13 @@ class BackgroundQ:
         thetaInDegrees=Theta*180/math.pi
 
         self.flag=0 #Setting the flag to 1 will stop background file generation, inactive in the Standard algorithm
-        # Allows to set the multiplyer for intensity and error in backgound files (Typically to apply Q^2)
-        # inactive in the Standard algorithm
-        self.mult=1
+        self.mult=1 #Allows to set the multiplyer for intensity and error in backgound files (Typically to apply Q^2), inactive in the Standard algorithm
         
-        # CalcQslash takes input in reciprocal angstoms, result returned in r.l.u
-        #self.Qslash=self.CalcQslash(self.H*2*math.pi/self.params.a,self.K*2*math.pi/ \
-        #       self.params.b,self.L*2*math.pi/self.params.c,Phi,Theta)
+        #CalcQslash takes input in reciprocal angstoms, result returned in r.l.u
+#        self.Qslash=self.CalcQslash(self.H*2*math.pi/self.params.a,self.K*2*math.pi/self.params.b,self.L*2*math.pi/self.params.c,Phi,Theta)
         self.Qslash=self.CalcQslash(uA,vA,pA,Phi,Theta)
 
-        self.fileName=str("H%5.2f K%5.2f L%5.2f Phi%5.2f Theta%5.2f" % \
-            (self.Qslash[0],self.Qslash[1],self.Qslash[2],phiInDegrees,thetaInDegrees))
-
+        self.fileName=str("H%5.2f K%5.2f L%5.2f Phi%5.2f Theta%5.2f" % (self.Qslash[0],self.Qslash[1],self.Qslash[2],phiInDegrees,thetaInDegrees))
 #        print (self.fileName)
 #  REPLACE this line with the following that is commented out
 #        fileName=str(RSE_Constants.FILENAME_FORMAT % (self.H,self.K,self.L))    
