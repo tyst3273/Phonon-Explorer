@@ -26,9 +26,10 @@ horace_threads=8
 # -----------------------------------------------------------------
 
 
-#Name and directory for the sqw file or nxs file
+#Name and directory for the sqw file, nxs file, or hdf5 file (Tys custom interface)
 #sqw_path=/media/ty/hitachi/LSNO/merged_mde/LSNO25_Ei_120meV_220K.nxs
-sqw_path=/media/ty/hitachi/LSNO/sqw/LSNO_120meV_10K_Sep.sqw
+#sqw_path=/media/ty/hitachi/LSNO/sqw/LSNO_120meV_10K_Sep.sqw
+sqw_path=/home/ty/research/repos/effective-potato/custom_phonx_interface/LSNO25_300K_parallel.hdf5
 
 #HoracePath -- Needed on Linux only!! --  path to where the horace_on.m and herbert_on.m files are. not needed 
 #if rawDataClassFile != SQWAccess. It will be ignored on non-Linux OS.
