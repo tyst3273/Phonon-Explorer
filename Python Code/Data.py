@@ -98,8 +98,7 @@ class Dataset:
         
         sys.path.insert(0,"Tools to access raw data")
         R=__import__(self.params.rawDataClassFile)
-        RSE_Constants.rawData=R.RawData(self.params);
-
+        RSE_Constants.rawData=R.RawData(self.params)
         RSE_Constants.FLAG=1
 
     # ----------------------------------------------------------------------------------------------

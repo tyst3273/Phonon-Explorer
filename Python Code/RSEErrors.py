@@ -1,4 +1,4 @@
-ls -lah#Custom errors for RSE
+#Custom errors for RSE
 
 #Errors specific to input parameter parsing
 class InputValidationError(Exception):

@@ -13,32 +13,30 @@
 
 from TextFile import *
 from Data import *
-#import matlab.engine
 from RSE_Constants import *
 from plotDataWithFit import *
 from Display import *
 import os
-from Utils import timer, arg_parser
+from Utils import timer
+
 
 # --------------------------------------------------------------------------------------------------
 # initialize stuff 
 
-_args = arg_parser()
-_args.get_input_file()
-print(_args.input_file)
-print(_args.input_path)
+params=Parameters()
 
-
-params=Parameters(RSE_Constants.INPUTS_PATH, RSE_Constants.INPUTS_FILENAME)
-
-if params.QMode==0: # generate data on uniform grid of Q-points
+# generate data on uniform grid of Q-points
+if params.QMode==0: 
     testData=DataSmall_q(params, params.path_data)
-if params.QMode==1: # generate data on set of Q-points read from file
+
+# generate data on set of Q-points read from file
+if params.QMode==1: 
     testData=CollectionOfQs(params)
 
 
 # --------------------------------------------------------------------------------------------------
 # generate the data
+
 _t = timer('const. Q cuts')
 
 print('\n now getting const. Q cuts from file.\n  this might take a while...\n\n')
@@ -55,7 +53,7 @@ _t.stop()
 
 
 # --------------------------------------------------------------------------------------------------
-# otherwise, get the background cuts
+# get the background cuts
 
 if params.BkgMode==1:
 

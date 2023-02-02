@@ -18,7 +18,8 @@ from Display import *
 
 # --------------------------------------------------------------------------------------------------
 
-params=Parameters(RSE_Constants.INPUTS_PATH, RSE_Constants.INPUTS_FILENAME)
+# the filename is now gotten INSIDE parameters; can pass thru cmd line args as '-i input_file_path'
+params = Parameters()
 
 plot=Plot(params)
 plot.Plot()

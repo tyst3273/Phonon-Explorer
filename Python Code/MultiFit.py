@@ -23,7 +23,11 @@ from Display import *
 print(datetime.datetime.now())
 
 print("Parameters")
-params=Parameters(RSE_Constants.INPUTS_PATH_MAIN,RSE_Constants.INPUTS_FILENAME_MAIN)
+#params=Parameters(RSE_Constants.INPUTS_PATH_MAIN,RSE_Constants.INPUTS_FILENAME_MAIN)
+
+# the filename is now gotten INSIDE parameters; can pass thru cmd line args as '-i input_file_path'
+params = Parameters()
+
 params.ReadMultizoneFitParams()
 params.locationForOutputParam=params.folderForBkgSubtractedFiles
 

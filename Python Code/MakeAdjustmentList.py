@@ -8,8 +8,10 @@ import time
 from numpy import *
 from RSE_Constants import *
 
+# the filename is now gotten INSIDE parameters; can pass thru cmd line args as '-i input_file_path'
+params = Parameters()
 
-params=Parameters(RSE_Constants.INPUTS_PATH,RSE_Constants.INPUTS_FILENAME)
+#params=Parameters(RSE_Constants.INPUTS_PATH,RSE_Constants.INPUTS_FILENAME)
 
 folder=params.folderForBkgSubtractedFiles
 #folder=params.path_data

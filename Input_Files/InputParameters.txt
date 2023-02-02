@@ -17,7 +17,7 @@ QMode=1
 
 # ------------------------ paralellism ----------------------------
 #num_processes=2 -- number of processes to use for parallel constant-Q cuts. NOTE: only GenerateConstQ.py is parallelized
-num_processes=4
+num_processes=1
 
 # horace_threads=2 -- Horace cuts/reduces the data using multithreaded parallelism. the default is 8 threads (i think)
 # if you use multiple processes to access data, it is easy to over-utilize the computer if horace uses multiple threads. 
@@ -27,8 +27,6 @@ horace_threads=8
 
 
 #Name and directory for the sqw file, nxs file, or hdf5 file (Tys custom interface)
-#sqw_path=/media/ty/hitachi/LSNO/merged_mde/LSNO25_Ei_120meV_220K.nxs
-#sqw_path=/media/ty/hitachi/LSNO/sqw/LSNO_120meV_10K_Sep.sqw
 sqw_path=/home/ty/research/repos/effective-potato/custom_phonx_interface/LSNO25_300K_parallel.hdf5
 
 #HoracePath -- Needed on Linux only!! --  path to where the horace_on.m and herbert_on.m files are. not needed 
@@ -54,7 +52,7 @@ ErrorToIntensityMaxRatio=1.0
 #Directory where all input files except this file are stored. E.g. the text file listing 
 #Q-values to be explored.
 #InputFilesDir=/SNS/ARCS/IPTS-24081/shared/test/work-110meV-5K_00L/Input/
-InputFilesDir=/home/ty/Desktop/Phonon-Explorer_v1.2.2/dev/
+InputFilesDir=/home/ty/research/repos/Phonon-Explorer/dev/_cuts/
 
 #Energy start, end and step for contant Q cuts in Horace. Note that randomly generated 
 #cuts for background calculation will automatically have a bigger range.

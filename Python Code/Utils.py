@@ -43,7 +43,6 @@ class timer:
 
 
 
-
 # --------------------------------------------------------------------------------------------------
 
 class arg_parser:
@@ -71,9 +70,15 @@ class arg_parser:
         get input file from cmd line parser
         """
         input_file = self.args.input_file
-        input_file =  os.path.abspath(input_file)
-        print(input_file)
-        print(os.path.dirname(input_file))
+        
+        if input_file is None:
+            self.input_file = None
+            self.input_path = None
+            return
+
+        input_file = os.path.abspath(input_file)
+        self.input_path = os.path.dirname(input_file)
+        self.input_file = os.path.basename(input_file)
 
 # --------------------------------------------------------------------------------------------------
 

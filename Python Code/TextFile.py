@@ -13,18 +13,32 @@ import numpy as np
 import math
 import os
 import sys
+from RSE_Constants import RSE_Constants
+from Utils import arg_parser
+
+
+# --------------------------------------------------------------------------------------------------
 
 class TextFile():
-      
+
     def __init__(self,FolderName,FileName):
         self.filename = FileName
         self.foldername = FolderName
+
+    # ----------------------------------------------------------------------------------------------
             
     def getFileName(self):
         return self.filename
 
+    # ----------------------------------------------------------------------------------------------
+
     def getFolderName(self):
         return self.foldername
+
+    # ----------------------------------------------------------------------------------------------
+
+
+# --------------------------------------------------------------------------------------------------
 
 class Parameters(TextFile):
 
@@ -33,19 +47,24 @@ class Parameters(TextFile):
         a new interface to parameters that optionally gets the filename from cmd line args. if none
         are give, gets them from 'RSE_constants' ...
         """
-        
 
-    def _init__(self,FolderName,FileName):
+        _args = arg_parser()
+        _args.get_input_file()
+        if _args.input_file is None:
+            self._init_parameters(RSE_Constants.INPUTS_PATH,RSE_Constants.INPUTS_FILENAME)
+        else:
+            self._init_parameters(_args.input_path,_args.input_file)
+
+    # ----------------------------------------------------------------------------------------------
+
+    def _init_parameters(self,FolderName,FileName):
+
         TextFile.__init__(self,FolderName,FileName)
-#        print(self.foldername)
-#        print(self.filename)
+
         with open(os.path.join(self.foldername,self.filename)) as f:
              parameters = f.read().splitlines()
         f.close()
         
-#        for i in range(0,len(parameters)):
-#            print i,parameters[i]
-#        self.sqw_path=self.Parse(parameters[0])
         self.keyword=''
         self.num_processes = self.evalIntWarning(self.ParseByKeyword('num_processes',parameters),1)
         self.horace_threads = self.evalIntWarning(self.ParseByKeyword('horace_threads',parameters),4) # 4 is probably safe 
@@ -55,29 +74,28 @@ class Parameters(TextFile):
         self.dataFileType=self.sqw_path[self.sqw_path.rfind('.')+1:].lower()
         self.projectRootDir=self.evalError(self.ParseByKeyword("projectRootDir",parameters))
 
-#        self.dataAccessLibraryFolder=self.evalWarning(self.ParseByKeyword("dataAccessLibraryFolder",parameters),"")
-#        self.rawDataClassFile=self.evalError(self.ParseByKeyword("rawDataClassFile",parameters))
-
         if self.dataFileType=="sqw":
             self.rawDataClassFile="SQWAccess"
             from sys import platform
             if platform == "linux" or platform == "linux2":
                 print(platform)
                 self.HoracePath=self.evalError(self.ParseByKeyword("HoracePath",parameters))
+        elif self.dataFileType=="nxs":
+            self.rawDataClassFile="NXSAccess"
+        elif self.dataFileType == 'hdf5':
+            self.rawDataClassFile='hdf5Access'
         else:
-            if self.dataFileType=="nxs":
-                self.rawDataClassFile="NXSAccess"
-            else:
-                print ("Raw data file extension is not valid. Must be either SQW or NXS")
-                raise Exception("Raw data file extension is not valid. Must be either SQW or NXS")
-                return
+            print ("Raw data file extension is not valid. Must be either SQW or NXS")
+            raise Exception("Raw data file extension is not valid. Must be either SQW or NXS")
+            return
+
         self.ProcessedDataName=self.evalError(self.ParseByKeyword("ProcessedDataName",parameters))
         self.path_data=self.evalError(self.ParseByKeyword("projectRootDir",parameters))+self.ProcessedDataName+'/good_slices/'
         print(os.getcwd())
         print(self.path_data)
         if not os.path.isdir(self.path_data):
             os.makedirs(self.path_data)
-        #print(self.path_data)
+
         self.Projection_u=np.asarray(self.evalError(self.ParseByKeyword("Projection_u",parameters)).split(",")).astype(np.float)
         self.Projection_v=np.asarray(self.evalError(self.ParseByKeyword("Projection_v",parameters)).split(",")).astype(np.float)
         self.path_InputFiles=self.evalError(self.ParseByKeyword("InputFilesDir",parameters))
@@ -120,6 +138,8 @@ class Parameters(TextFile):
         self.folderForBkgSubtractedFiles=self.projectRootDir+self.ProcessedDataName+'/subtr_background/'
         self.SmallqAlgorithm=self.evalError(self.ParseByKeyword("SmallqAlgorithm",parameters))
         
+    # ----------------------------------------------------------------------------------------------
+
     def ReadBackgroundParams(self):
         with open(os.path.join(self.foldername,self.filename)) as f:
              parameters = f.read().splitlines()
@@ -141,6 +161,8 @@ class Parameters(TextFile):
 #            self.maxFiles=2
         self.NumberofPeaks=0
         self.ReadSharedParams(parameters)
+
+    # ----------------------------------------------------------------------------------------------
 
     def ReadMultizoneFitParams(self):
         with open(os.path.join(self.foldername,self.filename)) as f:
@@ -172,11 +194,15 @@ class Parameters(TextFile):
         print(self.positionGuessesList)
         self.ReadSharedParams(parameters)
 
+    # ----------------------------------------------------------------------------------------------
+
     def ReadSharedParams(self,parameters): #multizone and background
         self.locationForOutputParam=self.path_data
         self.InitAmplitudes=eval(self.ParseByKeyword("InitialAmplitude",parameters))
         self.NumberofFitIter=self.evalIntWarning(self.ParseByKeyword("NumberofIter",parameters),3)
-        
+    
+    # ----------------------------------------------------------------------------------------------
+
     def getIndex(self,keyword,parameters):
         for i in range(0,len(parameters)):
             try:
@@ -185,6 +211,9 @@ class Parameters(TextFile):
             except:
                 d=1
         return -1
+
+    # ----------------------------------------------------------------------------------------------
+
     def ParseByKeyword(self,keyword,parameters):
         Index=self.getIndex(keyword,parameters)
         self.keyword=keyword
@@ -199,24 +228,34 @@ class Parameters(TextFile):
             return default
         else:
             return eval(string)
+
+    # ----------------------------------------------------------------------------------------------
+
     def evalReaNoWarning(self,string,default):
         if string=="None":
             return default
         else:
             return eval(string)
  
+    # ----------------------------------------------------------------------------------------------
+
     def evalIntWarning(self,string,default):
         if string=="None":
             print("WARNING: "+self.keyword+" not specified")
             return default
         else:
             return int(string)
+
+    # ----------------------------------------------------------------------------------------------
+
     def evalWarning(self,string,default):
         if string=="None":
             print("WARNING: "+self.keyword+" not specified")
             return default
         else:
             return string
+
+    # ----------------------------------------------------------------------------------------------
 
     def evalError(self,string):
         if string=="None":
@@ -225,16 +264,25 @@ class Parameters(TextFile):
             raise Exception(strErr)
         else:
             return string
-        
+    
+# ----------------------------------------------------------------------------------------------
+
 class DataTextFile(TextFile):
+    
+    # ----------------------------------------------------------------------------------------------
+
     def __init__(self,FolderName,FileName):
         TextFile.__init__(self,FolderName,FileName)
-        
+    
+    # ----------------------------------------------------------------------------------------------
+
     def Read(self):
 #        print (self.foldername+self.filename)
         data=np.genfromtxt(self.foldername+self.filename)
         return data
     
+    # ----------------------------------------------------------------------------------------------
+
     def Write(self, Energy, Intensity, Error):
 
 #        print os.path.isdir("E:/")
@@ -246,14 +294,25 @@ class DataTextFile(TextFile):
             TxtFile.write(str(Energy[i])+'  '+str(Intensity[i])+'  '+str(Error[i])+'\n')
         TxtFile.close()
 
+    # ----------------------------------------------------------------------------------------------
+
+
+
+# --------------------------------------------------------------------------------------------------
+
 class FitTextFile(TextFile):
+
     def __init__(self,FolderName,FileName):
         TextFile.__init__(self,FolderName,FileName)
+
+    # ----------------------------------------------------------------------------------------------
         
     def Read(self):
 #        print ('HERE  '+self.foldername+self.filename)
         data=np.genfromtxt(self.foldername+self.filename)
         return data
+
+    # ----------------------------------------------------------------------------------------------
     
     def Write(self, FitResultsArray):
 
@@ -268,4 +327,6 @@ class FitTextFile(TextFile):
                 writeString=writeString+str(FitResultsArray[j][i]        
             TxtFile.write(writeString+'\n')
         TxtFile.close()'''
+
+    # ----------------------------------------------------------------------------------------------
 

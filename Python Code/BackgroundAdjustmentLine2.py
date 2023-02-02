@@ -38,7 +38,9 @@ def Adjust(H,K,L,Intercept,slope, maxY, inFolder,T=0.1):
 
 #factor=input('Enter factor (1 or -1):')
 
-params=Parameters(RSE_Constants.INPUTS_PATH,RSE_Constants.INPUTS_FILENAME)
+# the filename is now gotten INSIDE parameters; can pass thru cmd line args as '-i input_file_path'
+params = Parameters()
+
 inFolder=params.folderForBkgSubtractedFiles
 Qs=np.genfromtxt(inFolder+"BackgroundAdjustment.txt")
 print(inFolder+"BackgroundAdjustment.txt")
@@ -59,3 +61,5 @@ folder=params.folderForBkgSubtractedFiles
 #PlotDataWithFitting=PlotDataWithFitParamCustomFolder(params,folder,folder,folder)
 Disp=Display()
 Disp.MakePlotSummary(folder,params.ProcessedDataName)
+
+
