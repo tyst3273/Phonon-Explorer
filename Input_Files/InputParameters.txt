@@ -5,7 +5,7 @@
 
 #BkgMode = 0 -- Generate cuts without subtracting background
 #BkgMode = 1 -- Generate cuts including cuts for background determination
-BkgMode=1
+BkgMode=0
 
 
 

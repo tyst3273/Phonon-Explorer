@@ -102,9 +102,12 @@ class RawData:
         # actual binning args and energy arent used 
         # really should just error check these vs whats in the file 
         # and print an error if they dont agree.
+        print(bin_e)
 
         Q = [np.array(bin_h).mean(),np.array(bin_l).mean(),np.array(bin_l).mean()]
         self.Energy, self.Intensity, self.Error = self._data_access.get_signal_and_error(Q)
+        self.Intensity *= 1000
+        self.Error *= 1000
 
     # ----------------------------------------------------------------------------------------------
 
