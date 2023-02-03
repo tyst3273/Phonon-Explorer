@@ -70,7 +70,7 @@ e_step=0.5
 #Binning
 Deltah=0.1
 Deltak=0.1
-Deltal=0.1
+Deltal=0.25
 
 #UV matrix
 Projection_u=1,0,0
@@ -84,7 +84,7 @@ MinPointsInDataFile=5
 
 #Maximum of the Y-axis (scattering intensity) for plots
 #maxY=0.04
-maxY=6e-5
+maxY=1
 
 #Name of the file with RawData class that reads data from the raw data file. NOT USED IN THIS VERSION!!
 #rawDataClassFile=SQWAccess

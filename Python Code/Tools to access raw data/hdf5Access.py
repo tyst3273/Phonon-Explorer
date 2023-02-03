@@ -91,23 +91,48 @@ class RawData:
 
         # load Qpts and other meta data from file
         self._data_access = access_data_in_hdf5(file_name,u,v)
+        self._check_binning()
+
+    # ----------------------------------------------------------------------------------------------
+
+    def _check_binning(self):
+        """
+        check binning vs what is in file
+        """
+        _dh = self.params.Deltah
+        _dk = self.params.Deltak
+        _dl = self.params.Deltal
+        _e_lo = self.e_start
+        _e_hi = self.e_end
+        _de = self.e_step 
+
+        print(_dh,_dk,_dl,_e_lo,_e_hi,_de)
+
+        _H = self._data_access.H_bins
+        _K = self._data_access.K_bins
+        _L = self._data_access.L_bins
+        _E = self._data_access.E_bins
+
+        print(_h,_k,_l,_E)
 
     # ----------------------------------------------------------------------------------------------
 
     def GetSlice(self,bin_h, bin_k, bin_l, bin_e, Projection_u, Projection_v):
         """
         get signal, error from file at requested Qpt
+        NOTE: projections, binning size (dH, etc), and bin_e are all ignored here. 
+            this is all fixed by what is in the file already and is checked earlier.
         """
-
-        # actual binning args and energy arent used 
-        # really should just error check these vs whats in the file 
-        # and print an error if they dont agree.
-        print(bin_e)
-
+        
+        # requested bin center 
         Q = [np.array(bin_h).mean(),np.array(bin_l).mean(),np.array(bin_l).mean()]
+
+        # get the data
         self.Energy, self.Intensity, self.Error = self._data_access.get_signal_and_error(Q)
         self.Intensity *= 1000
         self.Error *= 1000
+
+        return 1
 
     # ----------------------------------------------------------------------------------------------
 
@@ -125,7 +150,7 @@ class access_data_in_hdf5:
         check_file(file_name)
         self.file_name = file_name
 
-        msg = '----------------------------------------------------------------------------\n'
+        msg = '-------------------------------------------------------------------------\n'
         msg += 'cutting data from hdf5 file using custom interface\n'
         print(msg)
 
@@ -178,6 +203,7 @@ class access_data_in_hdf5:
         print(msg)
 
         _t.stop()
+        print('')
 
     # ----------------------------------------------------------------------------------------------
 
@@ -216,21 +242,21 @@ class access_data_in_hdf5:
         compare projection vectors and print warning if they dont agree
         """
         msg = f'projection vector \'{label}\' in file: ['+', '.join([f'{_: .3f}' for _ in db])+']'
+        print(msg)
+
         if user is None:
-            print(msg)
             return
 
         for ii in range(3):
             if np.round(user[ii],3) != np.round(db[ii],3):
-                msg = '*** WARNING ***\n'
-                msg += f'user specified projection for the \'{label}\' vector doesnt match what\n' \
-                       'is in the file. I will continue, but I hope you know what you are doing!\n'
+                msg = f'user specified projection for the \'{label}\' vector doesnt match whats\n' \
+                       'in the file. you cant change the projection without creating a new\n' \
+                       '\'prebinned\' hdf5 file! make a the new file and use it or change the\n' \
+                       '\'Projection_u\', \'Projection_v\' arguments to what is in the hdf5 file!' \
+                       '\n\nsee the message below for what u and v are in the file. Bye! \n\n'
                 msg += 'user: ['+', '.join([f'{_: .3f}' for _ in user])+']\n'
                 msg += 'file: ['+', '.join([f'{_: .3f}' for _ in db])+']\n'
-                print(msg)
-                return
-
-        print(msg)
+                crash(msg)
 
     # ----------------------------------------------------------------------------------------------
 
@@ -245,8 +271,8 @@ class access_data_in_hdf5:
         if cutoff is None:
             cutoff = 0.05
         
-        msg = f'\n-------------------------------------------------------------------------\n'
-        msg += f'attempting to get data at Q = ({Q[0]: .3f},{Q[1]: .3f},{Q[2]: .3f})\n'
+        #msg = '\n-------------------------------------------------------------------------\n'
+        msg = f'\nattempting to get data at Q = ({Q[0]: .3f},{Q[1]: .3f},{Q[2]: .3f})\n'
         print(msg)
 
         # get distance from user Q to all Qpts in file
@@ -267,6 +293,9 @@ class access_data_in_hdf5:
             print(msg)
             _t.stop()
 
+            msg = '\n-------------------------------------------------------------------------\n'
+            print(msg)
+
             # return signal and err arrays filled with nans
             return self.E, np.full(self.num_E_in_file,np.nan), np.full(self.num_E_in_file,np.nan)
 
@@ -285,6 +314,9 @@ class access_data_in_hdf5:
         sig, err = self._get_cut_from_hdf5(Q_ind)
 
         _t.stop()
+
+        msg = '\n-------------------------------------------------------------------------\n'
+        print(msg)
 
         return self.E, sig, err
 
