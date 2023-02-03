@@ -91,13 +91,6 @@ class RawData:
         self.Intensity=[]
         self.Error=[]
 
-# The eval is to prevent the program from crashing when running with Python 2.7
-
-#        bin_h_m = eval('matlab.double([*bin_h])')
-#        bin_k_m = eval('matlab.double([*bin_k])')
-#        bin_l_m = eval('matlab.double([*bin_l])')
-#        bin_e_m = eval('matlab.double([*bin_e])')
-
         bin_h_m = matlab.double([bin_h])
         bin_k_m = matlab.double([bin_k])
         bin_l_m = matlab.double([bin_l])
@@ -123,14 +116,8 @@ class RawData:
         print("cut done")
         print(out.getvalue())
         print(err.getvalue())
-#        print(ourCut)
-
-#        print(ourCut['s'][2][0])
-#        print(ourCut['p'][2][0])
-#        print(ourCut['e'][2][0])
 
         NumPoints=len(ourCut['p'])
-#        print(NumPoints) 
         self.Intensity=np.zeros(NumPoints) # !!!!
         self.Error=np.zeros(NumPoints) # !!!!
         self.Energy=np.zeros(NumPoints) # !!!!
@@ -139,7 +126,7 @@ class RawData:
             self.Energy[i]=ourCut['p'][i][0]
             self.Intensity[i]=ourCut['s'][i][0]
             self.Error[i]=ourCut['e'][i][0]
-#        print(bin_h, bin_k, bin_l)
+
         return 0
 
         # ----------------------------------------------------------------------------------------------

@@ -57,9 +57,9 @@ InputFilesDir=/home/ty/research/repos/Phonon-Explorer/dev/_cuts/
 #Energy start, end and step for contant Q cuts in Horace. Note that randomly generated 
 #cuts for background calculation will automatically have a bigger range.
 
-e_start=2
-e_end=80
-e_step=0.5
+e_start=20
+e_end=100
+e_step=0.50
 
 #0 0 -6
 #Offset_H=-0.02

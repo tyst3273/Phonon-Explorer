@@ -68,9 +68,11 @@ class c_timer:
         elapsed_time = default_timer()-self.start_time
         elapsed_time *= self.scale
         msg = f'timing:   {self.label} {elapsed_time:9.5f} [{self.units}]'
+        msg += '\n-------------------------------------------------------------------------\n'
         print(msg)
 
 # --------------------------------------------------------------------------------------------------
+
 
 
 
@@ -102,18 +104,56 @@ class RawData:
         _dh = self.params.Deltah
         _dk = self.params.Deltak
         _dl = self.params.Deltal
-        _e_lo = self.e_start
-        _e_hi = self.e_end
-        _de = self.e_step 
+        _e_lo = self.params.e_start
+        _e_hi = self.params.e_end
+        _de = self.params.e_step 
 
-        print(_dh,_dk,_dl,_e_lo,_e_hi,_de)
+        _H = self._data_access.H_bins[1]
+        _K = self._data_access.K_bins[1]
+        _L = self._data_access.L_bins[1]
+        _E = self._data_access.E_bins[1]
 
-        _H = self._data_access.H_bins
-        _K = self._data_access.K_bins
-        _L = self._data_access.L_bins
-        _E = self._data_access.E_bins
+        self._check_bin_args(_dh,_H,'H')
+        self._check_bin_args(_dk,_K,'K')
+        self._check_bin_args(_dl,_L,'L')
+        self._check_bin_args(_de,_E,'E')
+        
+        _E_bins = self._data_access.E_bins
+        if _e_hi < _E_bins[0] or _e_lo > _E_bins[2]: 
+            msg = 'the prebinned hdf5 file doesnt include the requested energy range.\n' \
+                  'either make a new prebinned hdf5 file or pick a different range.' \
+                  '\n\nsee the message below for what energy range to use. Bye!\n\n'
+            msg += f'user: {_e_lo:.3f}, {_de:.3f}, {_e_hi:.3f} meV\n'
+            msg += f'file: {_E_bins[0]:.3f}, {_E:.3f}, {_E_bins[2]:.3f} meV\n'
+            crash(msg)
 
-        print(_h,_k,_l,_E)
+        if _e_lo < _E_bins[0] or _e_hi > _E_bins[2]:
+            msg = '\n*** WARNING ***\n'
+            msg += 'part of the requested energy range is outside what is in the file!\n' \
+                   'continuing, but be aware that not all of the data you want will be\n' \
+                   'returned. to avoid this warning, either make a new prebinned hdf5\n' \
+                   'file or pick a different range.' \
+                   '\n\nsee the message below for what energy range to use.\n\n'
+            msg += f'user: {_e_lo:.3f}, {_de:.3f}, {_e_hi:.3f} meV\n'
+            msg += f'file: {_E_bins[0]:.3f}, {_E:.3f}, {_E_bins[2]:.3f} meV\n\n'
+            print(msg)
+
+    # ----------------------------------------------------------------------------------------------
+
+    def _check_bin_args(self,d_user,d_file,label):
+        """
+        check binning vs what is in file
+        """
+        if np.abs(d_user-d_file) > 1e-5:
+            msg = f'user specified binning along the \'{label}\' axis doesnt match whats in the\n' \
+                   'file. you cant change the binning without creating a new prebinned\n' \
+                   f'hdf5 file! make a the new file and use it or change the \'{label}\' binning\n' \
+                   'argument to what is in the hdf5 file!' \
+                   '\n\nsee the message below for what binning is in the file. Bye! \n\n'
+            msg += f'user: {d_user:.3}\n'
+            msg += f'file: {d_file:.3}\n'
+            crash(msg)
+
 
     # ----------------------------------------------------------------------------------------------
 
@@ -125,12 +165,19 @@ class RawData:
         """
         
         # requested bin center 
-        Q = [np.array(bin_h).mean(),np.array(bin_l).mean(),np.array(bin_l).mean()]
+        Q = [np.array(bin_h).mean(),np.array(bin_k).mean(),np.array(bin_l).mean()]
 
         # get the data
         self.Energy, self.Intensity, self.Error = self._data_access.get_signal_and_error(Q)
         self.Intensity *= 1000
         self.Error *= 1000
+
+        # down sample to the data onto the requested energy grid
+        _E_inds = np.intersect1d(np.flatnonzero(self.Energy >= bin_e[0]),
+                    np.flatnonzero(self.Energy <= bin_e[2]))
+        self.Energy = self.Energy[_E_inds]
+        self.Intensity = self.Intensity[_E_inds]
+        self.Error = self.Error[_E_inds]
 
         return 1
 
@@ -186,6 +233,9 @@ class access_data_in_hdf5:
                   'check the file and the h5py installation and try again.\n\n' \
                   'see the exception below for more hints.\n'
             crash(msg,ex)
+
+        # use mean of binning as default cutoff
+        self.default_cutoff = (self.H_bins[1]+self.K_bins[1]+self.L_bins[1])/3
 
         _H_bins = self.H_bins; _K_bins = self.K_bins; _L_bins = self.L_bins; _E_bins = self.E_bins
         _Q_max = self.Q_points.max(axis=0); _Q_min = self.Q_points.min(axis=0)
@@ -251,7 +301,7 @@ class access_data_in_hdf5:
             if np.round(user[ii],3) != np.round(db[ii],3):
                 msg = f'user specified projection for the \'{label}\' vector doesnt match whats\n' \
                        'in the file. you cant change the projection without creating a new\n' \
-                       '\'prebinned\' hdf5 file! make a the new file and use it or change the\n' \
+                       'prebinned hdf5 file! make a the new file and use it or change the\n' \
                        '\'Projection_u\', \'Projection_v\' arguments to what is in the hdf5 file!' \
                        '\n\nsee the message below for what u and v are in the file. Bye! \n\n'
                 msg += 'user: ['+', '.join([f'{_: .3f}' for _ in user])+']\n'
@@ -269,9 +319,8 @@ class access_data_in_hdf5:
 
         _prec = 4; _eps = 0.005
         if cutoff is None:
-            cutoff = 0.05
+            cutoff = self.default_cutoff
         
-        #msg = '\n-------------------------------------------------------------------------\n'
         msg = f'\nattempting to get data at Q = ({Q[0]: .3f},{Q[1]: .3f},{Q[2]: .3f})\n'
         print(msg)
 
@@ -287,17 +336,10 @@ class access_data_in_hdf5:
         # find the closest Q-point
         Q_ind = np.argsort(_d)[0]
 
-        # return empty arrays if no Q-point within distance cutoff of Q
+        # raise Exception if empty slice (i.e. no data at Q-pt within distance cutoff of requested Q)
         if _d[Q_ind] >= cutoff:
-            msg = 'no slice. continuing ...\n'
-            print(msg)
             _t.stop()
-
-            msg = '\n-------------------------------------------------------------------------\n'
-            print(msg)
-
-            # return signal and err arrays filled with nans
-            return self.E, np.full(self.num_E_in_file,np.nan), np.full(self.num_E_in_file,np.nan)
+            raise Exception
 
         # print a warning if this Q-point isnt exaclty the same as requested by user
         _Q = _Qpts[Q_ind]
@@ -314,9 +356,6 @@ class access_data_in_hdf5:
         sig, err = self._get_cut_from_hdf5(Q_ind)
 
         _t.stop()
-
-        msg = '\n-------------------------------------------------------------------------\n'
-        print(msg)
 
         return self.E, sig, err
 
