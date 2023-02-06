@@ -20,7 +20,9 @@ from plotDataWithFit import *
 import datetime
 from RSE_Constants import *
 from Display import *
+
 print(datetime.datetime.now())
+
 
 print("Parameters")
 #params=Parameters(RSE_Constants.INPUTS_PATH_MAIN,RSE_Constants.INPUTS_FILENAME_MAIN)
