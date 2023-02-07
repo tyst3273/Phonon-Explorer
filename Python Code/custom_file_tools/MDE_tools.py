@@ -3,9 +3,9 @@
 Author: Tyler C. Sterling
 Email: ty.sterling@colorado.edu
 Affil: University of Colorado Boulder, Raman Spectroscopy and Neutron Scattering Lab
-Date: 02/06/2022
+Date: 01/24/2022
 Description:
-    tools to programatically get data from mantid MDE files (in nexus format) using mantid.
+    tools to programatically get data from mantid MDE files (in nexus format) using mantid
 """
 
 from timeit import default_timer
@@ -555,7 +555,7 @@ class c_MDE_tools:
 
     # ----------------------------------------------------------------------------------------------
 
-    def get_arrays_from_histo_ws(self):
+    def get_arrays_from_histo_ws(self,squeeze=False):
         """
         strip the data in the histo workspace in numpy arrays
         NOTE: see input arg NumEvNorm and effects in 'SaveMDToAscii' provided by A. Savici
@@ -568,8 +568,17 @@ class c_MDE_tools:
         self.err = np.sqrt(ws.getErrorSquaredArray())
         self.num_events = ws.getNumEventsArray()
 
-        # get bin center arrays for all dimensions
-        _dims = [ws.getDimension(ii) for ii in range(ws.getNumDims())]
+        # get bin center arrays for non-integrated dimensions
+        if squeeze:
+            _dims = ws.getNonIntegratedDimensions()
+            self.signal = self.signal.squeeze()
+            self.err = self.err.squeeze()
+            self.num_events = self.num_events.squeeze()
+
+        # get bin center arrays for all dimensions      
+        else:
+            _dims = [ws.getDimension(ii) for ii in range(ws.getNumDims())]
+
         _dim_arrays = [self.get_dim_array(d) for d in _dims]
         _dim_mesh = self.get_dim_mesh(_dim_arrays)
         _dim_names = [d.getName() for d in _dims]
@@ -582,6 +591,58 @@ class c_MDE_tools:
         self.dim_names = _dim_names
         self.Q_names = _Q_names
         self.Q_mesh = _Q_mesh
+
+    # ----------------------------------------------------------------------------------------------
+
+    def save_to_hdf5(self,output_file_name):
+        """
+        write histogram data to hdf5 file
+        """
+
+        _t = c_timer('write_to_hdf5')
+
+        # get the sparse data 
+        self.get_arrays_from_histo_ws(squeeze=True)
+
+        print(self.dims)
+
+        msg = f'\nwriting histo. data to hdf5 file:\n  \'{output_file_name}\'\n'
+        print(msg)
+
+        _exists = os.path.exists(output_file_name)
+        if _exists:
+            msg = 'file already exists. removing it ...\n'
+            print(msg)
+
+        with h5py.File(output_file_name,'w') as db:
+
+            db.create_dataset('u',data=self.proj_str[0])
+            db.create_dataset('v',data=self.proj_str[1])
+            db.create_dataset('w',data=self.proj_str[2])
+            
+            db.create_dataset('H_bins',data=self.bin_str[0])
+            db.create_dataset('K_bins',data=self.bin_str[1])
+            db.create_dataset('L_bins',data=self.bin_str[2])
+            db.create_dataset('E_bins',data=self.bin_str[3])
+
+            db.create_dataset('lattice_vectors',data=self.lattice_vectors)
+            db.create_dataset('recip_lattice_vectors',data=self.recip_lattice_vectors)
+            db.create_dataset('a',data=self.a)
+            db.create_dataset('b',data=self.b)
+            db.create_dataset('c',data=self.c)
+            db.create_dataset('alpha',data=self.alpha)
+            db.create_dataset('beta',data=self.beta)
+            db.create_dataset('gamma',data=self.gamma)
+
+            for ii, name in enumerate(self.dim_names):
+                db.create_dataset(f'Dim_{ii}_name',data=name)
+                db.create_dataset(f'Dim_{ii}',data=self.dims[ii])
+                print(name)
+
+            db.create_dataset('signal',data=self.signal)
+            db.create_dataset('error',data=self.err)
+
+        _t.stop()
 
     # ----------------------------------------------------------------------------------------------
 
@@ -667,6 +728,9 @@ class c_MDE_tools:
         L_bins = self.get_bin_str(L_bins)
         E_bins = self.get_bin_str(E_bins)
 
+        self.bin_str = [H_bins,K_bins,L_bins,E_bins]
+        self.proj_str = [u,v,w]
+
         msg = 'binning MDE workspace\n\n'
         msg += f'u: {u:>9}\n'
         msg += f'v: {v:>9}\n'
@@ -720,36 +784,30 @@ if __name__ == '__main__':
 
     # temp and projection
     proj = 'parallel'
-    T = 5
+    T = 300
 
-    MDE_file_name = f'../LSNO25_Ei_120meV_{T}K.nxs'
-    out_file_name = f'LSNO25_{T}K_{proj}_more_coarse.hdf5'
+    MDE_file_name = f'../merged_mde/LSNO25_Ei_120meV_{T}K.nxs'
+    out_file_name = f'tmp.hdf5'
 
     _t = c_timer('MDE_tools',units='m')
     
-    if proj == 'parallel':
-        u = [ 1, 0, 0]
-        v = [ 0, 1, 0]
-        w = [ 0, 0, 1]
-        H_bins = [   -5,   0.1,   15]
-        K_bins = [  -12,   0.1,  7.5]
-        L_bins = [   -8,   1.0,    8]
-        E_bins = [  -20,   0.5,  100]
-        num_Q_mesh = [4,4,4]
+    # these u,v,w make it go 
+    u = [ 1, 0, 0]
+    v = [ 0, 1, 0]
+    w = [ 0, 0, 1]
 
-    elif proj == 'perp':
-        u = [ 1, 1, 0]
-        v = [ 1,-1, 0]
-        w = [ 0, 0, 1]
-        H_bins = [ -8.5,   0.1,  11.5]
-        K_bins = [ -6.5,   0.1,  13.5]
-        L_bins = [ -7.5,  0.25,   7.5]
-        E_bins = [   10,   0.5,   100]
-        num_Q_mesh = [4,4,4]
+    H_bins = [ 3, 0.05, 10]
+    K_bins = [ -0.1, 0.1]
+    L_bins = [ -5, 5]
+    E_bins = [ 50, 0.5, 100]
 
     # class to do the stuff
     MDE_tools = c_MDE_tools(MDE_file_name)
-    MDE_tools.bin_MDE_chunks(H_bins,K_bins,L_bins,E_bins,num_Q_mesh,out_file_name,u,v,w)
+    MDE_tools.bin_MDE(H_bins,K_bins,L_bins,E_bins,u,v,w)
+
+    MDE_tools.save_to_hdf5(out_file_name)
+
+    
 
     _t.stop()
 
