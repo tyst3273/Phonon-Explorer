@@ -325,10 +325,6 @@ class c_MDE_tools:
         self.L_bins = L_bins
         self.L_edges, self.L_range, self.dL = self._get_bin_edges(L_bins)
 
-        print(self.H_edges)
-        print(self.K_edges)
-        print(self.L_edges)
-
         self.E_bins = E_bins
         self.E_edges, self.E_range, self.dE = self._get_bin_edges(E_bins)
         self.E_bins[0] -= self.E_bins[1]/2
@@ -604,8 +600,6 @@ class c_MDE_tools:
         # get the sparse data 
         self.get_arrays_from_histo_ws(squeeze=True)
 
-        print(self.dims)
-
         msg = f'\nwriting histo. data to hdf5 file:\n  \'{output_file_name}\'\n'
         print(msg)
 
@@ -637,7 +631,6 @@ class c_MDE_tools:
             for ii, name in enumerate(self.dim_names):
                 db.create_dataset(f'Dim_{ii}_name',data=name)
                 db.create_dataset(f'Dim_{ii}',data=self.dims[ii])
-                print(name)
 
             db.create_dataset('signal',data=self.signal)
             db.create_dataset('error',data=self.err)
