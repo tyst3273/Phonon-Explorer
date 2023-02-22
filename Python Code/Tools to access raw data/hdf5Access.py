@@ -108,9 +108,9 @@ class RawData:
         _e_hi = self.params.e_end
         _de = self.params.e_step 
 
-        _H = self._data_access.H_bins[1]
-        _K = self._data_access.K_bins[1]
-        _L = self._data_access.L_bins[1]
+        _H = self._data_access.H_bins[1]/2
+        _K = self._data_access.K_bins[1]/2
+        _L = self._data_access.L_bins[1]/2
         _E = self._data_access.E_bins[1]
 
         self._check_bin_args(_dh,_H,'H')
@@ -168,7 +168,8 @@ class RawData:
         Q = [np.array(bin_h).mean(),np.array(bin_k).mean(),np.array(bin_l).mean()]
 
         # get the data
-        self.Energy, self.Intensity, self.Error = self._data_access.get_signal_and_error(Q)
+        cutoff = 0.5
+        self.Energy, self.Intensity, self.Error = self._data_access.get_signal_and_error(Q,cutoff)
         self.Intensity *= 1000
         self.Error *= 1000
 
@@ -338,6 +339,7 @@ class access_data_in_hdf5:
 
         # raise Exception if empty slice (i.e. no data at Q-pt within distance cutoff of requested Q)
         if _d[Q_ind] >= cutoff:
+            print('*** NOTE ***\nno slice at requested Q!\n')
             _t.stop()
             raise Exception
 
