@@ -38,8 +38,6 @@ def check_file(file_name):
         msg = f'the file:\n  \'{file_name}\' \nwas not found!'
         crash(msg)
 
-
-
 # --------------------------------------------------------------------------------------------------
 
 
@@ -58,7 +56,10 @@ class c_timer:
         self.label = label
         if units == 'm':
             self.units = 'm'
-            self.scale = 1/60
+            self.scale = 1/60  
+        elif units == 'ms':
+            self.units = 'ms'
+            self.scale = 1000
         else:
             self.units = 's'
             self.scale = 1      
@@ -95,17 +96,18 @@ class c_MDE_tools:
         self.import_mantid()
         
         if MDE_file_name.endswith('.nxs'):
-            self.MDE_ws_name = MDE_file_name[:-len('.nxs')].strip('./')
+            self.MDE_ws_name = MDE_file_name[:-len('.nxs')]
+            self.MDE_ws_name = os.path.basename(self.MDE_ws_name)
         else:
             _type = MDE_file_name.split('.')[-1].strip()
             msg = f'unknown filetype \'{_type}\'. use a *.nxs file!\n'
             crash(msg) 
-
-        self.V_ws_name = 'V_ws'
+        
         self.histo_ws_name = 'histo_ws'
 
-        if MDE_file_name is not None:
-            self.load_MDE(MDE_file_name)
+        self.load_MDE(MDE_file_name)
+        self.print_dimensions(self.MDE_ws_name)
+        self.get_lattice(self.MDE_ws_name)
 
     # ----------------------------------------------------------------------------------------------
 
@@ -130,8 +132,6 @@ class c_MDE_tools:
         _t = c_timer('load_MDE',units='m')
         check_file(file_name)
         self.load_ws(file_name=file_name,ws_name=self.MDE_ws_name)
-        self.print_dimensions(self.MDE_ws_name)
-        self.get_lattice(self.MDE_ws_name)
         _t.stop()
 
     # ----------------------------------------------------------------------------------------------
@@ -201,7 +201,7 @@ class c_MDE_tools:
             _min = _dim.getMinimum()
             _max = _dim.getMaximum()
             _num_bins = _dim.getNBins()
-            _name = _dim.getName()
+            _name = _dim.name
             _units = _dim.getUnits()
 
             dim_names[ii] = _name
@@ -271,6 +271,8 @@ class c_MDE_tools:
         """
         take lattice params (cell lenghts/angles) and return lattice vector array
         note, lengths should be in Angstrom, angles in radians
+
+        note, lattice_vectors are ROW vectors
         """
         lattice_vectors = np.zeros((3,3))
         lattice_vectors[0,:] = [self.a,0,0]
@@ -288,22 +290,16 @@ class c_MDE_tools:
         I cant figure out how to use them. I hate mantid.
         """
         lattice_vectors = self.lattice_vectors
-        recip_lattice_vectors = np.zeros((3,3),dtype=float)
-        cell_vol = lattice_vectors[0,:].dot(np.cross(lattice_vectors[1,:],lattice_vectors[2,:]))
-        recip_lattice_vectors[0,:] = 2*np.pi*np.cross(lattice_vectors[1,:], \
-                lattice_vectors[2,:])/cell_vol
-        recip_lattice_vectors[1,:] = 2*np.pi*np.cross(lattice_vectors[2,:], \
-                lattice_vectors[0,:])/cell_vol
-        recip_lattice_vectors[2,:] = 2*np.pi*np.cross(lattice_vectors[0,:], \
-                lattice_vectors[1,:])/cell_vol
-        self.recip_lattice_vectors = recip_lattice_vectors
+        _2pi = np.array([[1,0,0],[0,1,0],[0,0,1]],dtype=float)*2*np.pi
+        self.recip_lattice_vectors = np.linalg.solve(lattice_vectors,_2pi).T
 
     # ----------------------------------------------------------------------------------------------
 
-    def bin_MDE_chunks(self,H_bins,K_bins,L_bins,E_bins,num_Q_mesh=[1,1,1],
+    def bin_MDE_chunks(self,H_bin_args,K_bin_args,L_bin_args,E_bin_args,num_chunks=[1,1,1],
         merged_file_name='merged_sparse_histo.hdf5',u=[1,0,0],v=[0,1,0],w=None):
+
         """
-        split requested binning into chuncks and bin over small chunks separately. merge the 
+        split requested binning into chunks and bin over small chunks separately. merge the 
         results of them all into a single file
         """
         
@@ -311,27 +307,33 @@ class c_MDE_tools:
 
         self.merged_file_name = merged_file_name
         if os.path.exists(merged_file_name):
-            msg = 'merged file alread exists. removing it ...\n'
+            msg = 'merged file already exists. removing it ...\n'
             print(msg)
             os.remove(merged_file_name)
         
-        self.u_chunks = u; self.v_chunks = v; self.w_chunks = w
+        self.u = u; self.v = v; self.w = w
     
         # get bin edges; needed to for my algorithm to partion array into chunks
-        self.H_bins = H_bins
-        self.H_edges, self.H_range, self.dH = self._get_bin_edges(H_bins)
-        self.K_bins = K_bins
-        self.K_edges, self.K_range, self.dK = self._get_bin_edges(K_bins)
-        self.L_bins = L_bins
-        self.L_edges, self.L_range, self.dL = self._get_bin_edges(L_bins)
+        self.H_bin_args = H_bin_args
+        self.H_bin_edges, self.H_range, self.dH = self._get_bin_edges(H_bin_args)
+        self.K_bin_args = K_bin_args
+        self.K_bin_edges, self.K_range, self.dK = self._get_bin_edges(K_bin_args)
+        self.L_bin_args = L_bin_args
+        self.L_bin_edges, self.L_range, self.dL = self._get_bin_edges(L_bin_args)
+        self.E_bin_args = E_bin_args
+        self.E_bin_edges, self.E_range, self.dE = self._get_bin_edges(E_bin_args)
 
-        self.E_bins = E_bins
-        self.E_edges, self.E_range, self.dE = self._get_bin_edges(E_bins)
-        self.E_bins[0] -= self.E_bins[1]/2
-        self.E_bins[2] += self.E_bins[1]/2
+        H_bin_centers = np.round((self.H_bin_edges[:-1]+self.H_bin_edges[1:])/2,2)
+        K_bin_centers = np.round((self.K_bin_edges[:-1]+self.K_bin_edges[1:])/2,2)
+        L_bin_centers = np.round((self.L_bin_edges[:-1]+self.L_bin_edges[1:])/2,2)
+        E_bin_centers = np.round((self.E_bin_edges[:-1]+self.E_bin_edges[1:])/2,2)
+        print('H_bin_centers\n',H_bin_centers)
+        print('K_bin_centers\n',K_bin_centers)
+        print('L_bin_centers\n',L_bin_centers)
+        print('E_bin_centers\n',E_bin_centers)
 
         # split bin edges (well actually bin list args) into chunks
-        self.num_Q_mesh = num_Q_mesh        
+        self.num_chunks = num_chunks        
         self._split_bins_on_chunks()
 
         # get the data for each voxel
@@ -351,9 +353,9 @@ class c_MDE_tools:
 
         count = 0
         # loop over grid voxels
-        for ii, H_bins in enumerate(self.H_chunk_bins):
-            for ii, K_bins in enumerate(self.K_chunk_bins):
-                for ii, L_bins in enumerate(self.L_chunk_bins):
+        for ii, H_bins in enumerate(self.H_chunk_bin_args):
+            for ii, K_bins in enumerate(self.K_chunk_bin_args):
+                for ii, L_bins in enumerate(self.L_chunk_bin_args):
 
                     _vt = c_timer(f'chunk[{count}]')
 
@@ -366,8 +368,8 @@ class c_MDE_tools:
                     print(msg)
 
                     # get the data for this voxel
-                    self.bin_MDE(H_bins,K_bins,L_bins,self.E_bins,
-                            self.u_chunks,self.v_chunks,self.w_chunks)
+                    self.bin_MDE(H_bins,K_bins,L_bins,self.E_bin_args,
+                            self.u,self.v,self.w)
 
                     # append all the non-empty bins to the file
                     self.append_sparse_to_hdf5(self.merged_file_name)
@@ -397,6 +399,61 @@ class c_MDE_tools:
         take list of arrays containing bin centers and convert to an Ndim coordinate grid
         """
         return np.meshgrid(*dim_array_list,indexing='ij')
+    
+    # ----------------------------------------------------------------------------------------------
+
+    def get_cartesian_coords(self):
+        """
+        go from rlu to cartesian coords; vectorized method below is ~ 10x faster than looping,
+        but neither are slow
+        """
+
+        _t = c_timer('get_cartesian_coords',units='s')
+
+        _r_lat_vecs = self.recip_lattice_vectors
+        _nQ = self.Q_mesh.shape[0]
+
+        self.cartesian_Q_mesh = np.zeros((_nQ,3),dtype=float)
+        
+        for ii in range(3):
+            _b = _r_lat_vecs[ii,:].reshape(1,3) # row vectors
+            _b = np.tile(_b,reps=(_nQ,1))
+            _Q = self.Q_mesh[:,ii].reshape(_nQ,1)
+            _Q = np.tile(_Q,reps=(1,3))
+            self.cartesian_Q_mesh += _Q*_b
+
+        _t.stop()
+
+    # ----------------------------------------------------------------------------------------------
+
+    def get_polar_coords(self):
+        """
+        go from cartesian coords to polar. 0th column is magnitude of |Q|, 1st is polar angle, 2nd
+        is azimuthal angle. the "z-axis" is the polar axis. 
+        """
+
+        _t = c_timer('get_polar_coords',units='s')
+
+        _cart_Q = self.cartesian_Q_mesh
+        _nQ = _cart_Q.shape[0]
+
+        self.polar_Q_mesh = np.zeros((_nQ,3),dtype=float)
+
+        # magnitude of Q
+        self.polar_Q_mesh[:,0] = np.sqrt(np.sum(_cart_Q**2,axis=1))
+
+        # mask where |Q| = 0; 
+        # note, this will make the angle ~0 degrees but since |Q| ~ 0, it doesnt matter
+        _mag_Q = np.copy(self.polar_Q_mesh[:,0])
+        _mag_Q[np.flatnonzero(_mag_Q < 1e-6)] = 1.0
+
+        # polar angle
+        self.polar_Q_mesh[:,1] = np.arccos(_cart_Q[:,2]/_mag_Q)
+
+        # azimuthal angle
+        self.polar_Q_mesh[:,2] = np.arctan2(_cart_Q[:,1],_cart_Q[:,0])
+
+        _t.stop()
 
     # ----------------------------------------------------------------------------------------------
     
@@ -410,6 +467,12 @@ class c_MDE_tools:
         # get the sparse data 
         self.get_sparse_arrays_from_histo_ws()
 
+        # get Qpts in cartesian coords
+        self.get_cartesian_coords()
+
+        # get Qpts in polar coords of data
+        self.get_polar_coords()
+    
         msg = f'\nwriting sparse data to hdf5 file:\n  \'{output_file_name}\'\n'
         print(msg)
 
@@ -433,7 +496,7 @@ class c_MDE_tools:
         create datasets in file if it doesnt already exits
         """
 
-        _nE = self.dims[3].size
+        _nE = self.dim_arrays[3].size
 
         # see below... i used 'chunks=True' to let h5py estimate these sizes
         _chunks = (125,12) # chunk size nQxnE arrays (resizable along 1st dim)
@@ -456,23 +519,45 @@ class c_MDE_tools:
         db.create_dataset('Dim_2_name',data=self.dim_names[2])
         db.create_dataset('Dim_3_name',data=self.dim_names[3])
 
-        db.create_dataset('H_bins',data=np.array([self.H_range[0],self.dH,self.H_range[1]]))
-        db.create_dataset('K_bins',data=np.array([self.K_range[0],self.dK,self.K_range[1]]))
-        db.create_dataset('L_bins',data=np.array([self.L_range[0],self.dL,self.L_range[1]]))
-        db.create_dataset('E_bins',data=np.array([self.E_range[0],self.dE,self.E_range[1]]))
-        db.create_dataset('DeltaE',data=self.dims[3],dtype=np.float32)
+        db.create_dataset('H_bin_args',data=np.array([self.H_range[0],self.dH,self.H_range[1]]))
+        db.create_dataset('K_bin_args',data=np.array([self.K_range[0],self.dK,self.K_range[1]]))
+        db.create_dataset('L_bin_args',data=np.array([self.L_range[0],self.dL,self.L_range[1]]))
+        db.create_dataset('E_bin_args',data=np.array([self.E_range[0],self.dE,self.E_range[1]]))
+        db.create_dataset('DeltaE',data=self.dim_arrays[3],dtype=np.float32)
 
         # resizable arrays
-        db.create_dataset('H',data=self.Q_mesh[0],
+    
+        # Q rlu
+        db.create_dataset('H_rlu',data=self.Q_mesh[:,0],
                                 maxshape=(None,),dtype=np.float32,chunks=_flat_chunks)
-        db.create_dataset('K',data=self.Q_mesh[1],
+        db.create_dataset('K_rlu',data=self.Q_mesh[:,1],
                                 maxshape=(None,),dtype=np.float32,chunks=_flat_chunks)
-        db.create_dataset('L',data=self.Q_mesh[2],
+        db.create_dataset('L_rlu',data=self.Q_mesh[:,2],
                                 maxshape=(None,),dtype=np.float32,chunks=_flat_chunks)
+
+        # Q cartesian
+        db.create_dataset('H_cartesian',data=self.cartesian_Q_mesh[:,0],
+                                maxshape=(None,),dtype=np.float32,chunks=_flat_chunks)
+        db.create_dataset('K_cartesian',data=self.cartesian_Q_mesh[:,1],
+                                maxshape=(None,),dtype=np.float32,chunks=_flat_chunks)
+        db.create_dataset('L_cartesian',data=self.cartesian_Q_mesh[:,2],
+                                maxshape=(None,),dtype=np.float32,chunks=_flat_chunks)
+
+        # Q polar
+        db.create_dataset('Q_len',data=self.polar_Q_mesh[:,0],
+                                maxshape=(None,),dtype=np.float32,chunks=_flat_chunks)
+        db.create_dataset('polar_angle',data=self.polar_Q_mesh[:,1],
+                                maxshape=(None,),dtype=np.float32,chunks=_flat_chunks)
+        db.create_dataset('azimuthal_angle',data=self.polar_Q_mesh[:,2],
+                                maxshape=(None,),dtype=np.float32,chunks=_flat_chunks)
+
+        # the data
         db.create_dataset('signal',data=self.signal,
                                 maxshape=(None,_nE),dtype=np.float64,chunks=_chunks)
-        db.create_dataset('error',data=self.err,
+        db.create_dataset('error',data=self.error,
                                 maxshape=(None,_nE),dtype=np.float64,chunks=_chunks)
+        db.create_dataset('num_events',data=self.num_events,
+                                maxshape=(None,_nE),dtype=int,chunks=_chunks)
 
     # ----------------------------------------------------------------------------------------------
 
@@ -481,22 +566,41 @@ class c_MDE_tools:
         append datasets to file if it already exists
         """
 
-        _nE = self.dims[3].size
-        _nQ = self.Q_mesh[0].size
+        _nE = self.dim_arrays[3].size
+        _nQ = self.Q_mesh[:,0].size
         _nfile = db['signal'].shape[0]
         msg = f'resizing arrays from ({_nfile},{_nE}) to ({_nQ+_nfile},{_nE})\n'
         print(msg)
 
-        db['H'].resize(_nQ+_nfile,axis=0)
-        db['H'][_nfile:] = self.Q_mesh[0][...]
-        db['K'].resize(_nQ+_nfile,axis=0)
-        db['K'][_nfile:] = self.Q_mesh[1][...]
-        db['L'].resize(_nQ+_nfile,axis=0)
-        db['L'][_nfile:] = self.Q_mesh[2][...]
+        # rlu
+        db['H_rlu'].resize(_nQ+_nfile,axis=0)
+        db['H_rlu'][_nfile:] = self.Q_mesh[:,0]
+        db['K_rlu'].resize(_nQ+_nfile,axis=0)
+        db['K_rlu'][_nfile:] = self.Q_mesh[:,1]
+        db['L_rlu'].resize(_nQ+_nfile,axis=0)
+        db['L_rlu'][_nfile:] = self.Q_mesh[:,2]
+
+        # cartesian
+        db['H_cartesian'].resize(_nQ+_nfile,axis=0)
+        db['H_cartesian'][_nfile:] = self.cartesian_Q_mesh[:,0]
+        db['K_cartesian'].resize(_nQ+_nfile,axis=0)
+        db['K_cartesian'][_nfile:] = self.cartesian_Q_mesh[:,1]
+        db['L_cartesian'].resize(_nQ+_nfile,axis=0)
+        db['L_cartesian'][_nfile:] = self.cartesian_Q_mesh[:,2]
+        
+        # polar
+        db['Q_len'].resize(_nQ+_nfile,axis=0)
+        db['Q_len'][_nfile:] = self.polar_Q_mesh[:,0]
+        db['polar_angle'].resize(_nQ+_nfile,axis=0)
+        db['polar_angle'][_nfile:] = self.polar_Q_mesh[:,1]
+        db['azimuthal_angle'].resize(_nQ+_nfile,axis=0)
+        db['azimuthal_angle'][_nfile:] = self.polar_Q_mesh[:,2]
+
+        # data
         db['signal'].resize(_nQ+_nfile,axis=0)
         db['signal'][_nfile:,:] = self.signal[...]
         db['error'].resize(_nQ+_nfile,axis=0)
-        db['error'][_nfile:,:] = self.err[...]
+        db['error'][_nfile:,:] = self.error[...]
 
     # ----------------------------------------------------------------------------------------------
 
@@ -517,7 +621,7 @@ class c_MDE_tools:
         _nE = _shape[-1]
 
         self.signal = np.reshape(self.signal,(_nQ,_nE))
-        self.err = np.reshape(self.err,(_nQ,_nE))
+        self.error = np.reshape(self.error,(_nQ,_nE))
         self.num_events = np.reshape(self.num_events,(_nQ,_nE))
 
         # find Q-pts where whole array (along E) is nans
@@ -530,16 +634,22 @@ class c_MDE_tools:
         if zero_nans:
             self.signal[(_nans)] = 0.0
             self.signal[(_infs)] = 0.0
-            self.err[(_nans)] = 0.0
-            self.err[(_infs)] = 0.0
+            self.error[(_nans)] = 0.0
+            self.error[(_infs)] = 0.0
             self.num_events[(_nans)] = 0.0
             self.num_events[(_infs)] = 0.0
 
-        # strip emptys
+        # strip empties
         self.signal = self.signal[_inds,:]
-        self.err = self.err[_inds,:]
+        self.error = self.error[_inds,:]
         self.num_events = self.num_events[_inds,:]
-        self.Q_mesh = [_Q.flatten()[_inds] for _Q in self.Q_mesh]
+
+        # flatten Q mesh after stripping empties        
+        _Q_mesh = [_Q.flatten()[_inds] for _Q in self.Q_mesh]
+        self.Q_mesh = np.zeros((_Q_mesh[0].size,3),dtype=float)
+        self.Q_mesh[:,0] = _Q_mesh[0][...]
+        self.Q_mesh[:,1] = _Q_mesh[1][...]
+        self.Q_mesh[:,2] = _Q_mesh[2][...]
 
         # print info 
         msg = 'original shape: '+'x'.join([str(_) for _ in _shape])
@@ -551,7 +661,7 @@ class c_MDE_tools:
 
     # ----------------------------------------------------------------------------------------------
 
-    def get_arrays_from_histo_ws(self,squeeze=False):
+    def get_arrays_from_histo_ws(self):
         """
         strip the data in the histo workspace in numpy arrays
         NOTE: see input arg NumEvNorm and effects in 'SaveMDToAscii' provided by A. Savici
@@ -561,81 +671,23 @@ class c_MDE_tools:
         ws = self.get_ws(self.histo_ws_name)
 
         self.signal = ws.getSignalArray()
-        self.err = np.sqrt(ws.getErrorSquaredArray())
+        self.error = np.sqrt(ws.getErrorSquaredArray())
         self.num_events = ws.getNumEventsArray()
 
-        # get bin center arrays for non-integrated dimensions
-        if squeeze:
-            _dims = ws.getNonIntegratedDimensions()
-            self.signal = self.signal.squeeze()
-            self.err = self.err.squeeze()
-            self.num_events = self.num_events.squeeze()
-
-        # get bin center arrays for all dimensions      
-        else:
-            _dims = [ws.getDimension(ii) for ii in range(ws.getNumDims())]
-
+        # get bin center arrays for all dimensions
+        _dims = [ws.getDimension(ii) for ii in range(ws.getNumDims())]
         _dim_arrays = [self.get_dim_array(d) for d in _dims]
         _dim_mesh = self.get_dim_mesh(_dim_arrays)
-        _dim_names = [d.getName() for d in _dims]
+        _dim_names = [d.name for d in _dims]
         _dim_num_bins = [d.getNBins() for d in _dims]
         _Q_mesh = self.get_dim_mesh(_dim_arrays[:-1])
-        _Q_names = [d.getName() for d in _dims[:-1]]
+        _Q_names = [d.name for d in _dims[:-1]]
 
-        self.dims = _dim_arrays
+        self.dim_arrays = _dim_arrays
         self.dim_mesh = _dim_mesh
         self.dim_names = _dim_names
         self.Q_names = _Q_names
         self.Q_mesh = _Q_mesh
-
-    # ----------------------------------------------------------------------------------------------
-
-    def save_to_hdf5(self,output_file_name):
-        """
-        write histogram data to hdf5 file
-        """
-
-        _t = c_timer('write_to_hdf5')
-
-        # get the sparse data 
-        self.get_arrays_from_histo_ws(squeeze=True)
-
-        msg = f'\nwriting histo. data to hdf5 file:\n  \'{output_file_name}\'\n'
-        print(msg)
-
-        _exists = os.path.exists(output_file_name)
-        if _exists:
-            msg = 'file already exists. removing it ...\n'
-            print(msg)
-
-        with h5py.File(output_file_name,'w') as db:
-
-            db.create_dataset('u',data=self.proj_str[0])
-            db.create_dataset('v',data=self.proj_str[1])
-            db.create_dataset('w',data=self.proj_str[2])
-            
-            db.create_dataset('H_bins',data=self.bin_str[0])
-            db.create_dataset('K_bins',data=self.bin_str[1])
-            db.create_dataset('L_bins',data=self.bin_str[2])
-            db.create_dataset('E_bins',data=self.bin_str[3])
-
-            db.create_dataset('lattice_vectors',data=self.lattice_vectors)
-            db.create_dataset('recip_lattice_vectors',data=self.recip_lattice_vectors)
-            db.create_dataset('a',data=self.a)
-            db.create_dataset('b',data=self.b)
-            db.create_dataset('c',data=self.c)
-            db.create_dataset('alpha',data=self.alpha)
-            db.create_dataset('beta',data=self.beta)
-            db.create_dataset('gamma',data=self.gamma)
-
-            for ii, name in enumerate(self.dim_names):
-                db.create_dataset(f'Dim_{ii}_name',data=name)
-                db.create_dataset(f'Dim_{ii}',data=self.dims[ii])
-
-            db.create_dataset('signal',data=self.signal)
-            db.create_dataset('error',data=self.err)
-
-        _t.stop()
 
     # ----------------------------------------------------------------------------------------------
 
@@ -647,17 +699,17 @@ class c_MDE_tools:
         """
 
         # number of chunks to split binning along each axis
-        nH = self.num_Q_mesh[0]; nK = self.num_Q_mesh[1]; nL = self.num_Q_mesh[2]
+        nH = self.num_chunks[0]; nK = self.num_chunks[1]; nL = self.num_chunks[2]
         self.num_grid = nH*nK*nL
         self.nH = nH; self.nK = nK; self.nL = nL
 
-        self.H_chunk_bins = self._get_chunk_bins(self.H_edges,self.dH,self.nH)
-        self.K_chunk_bins = self._get_chunk_bins(self.K_edges,self.dK,self.nK)
-        self.L_chunk_bins = self._get_chunk_bins(self.L_edges,self.dL,self.nL)
+        self.H_chunk_bin_args = self._get_chunk_bin_args(self.H_bin_edges,self.dH,self.nH)
+        self.K_chunk_bin_args = self._get_chunk_bin_args(self.K_bin_edges,self.dK,self.nK)
+        self.L_chunk_bin_args = self._get_chunk_bin_args(self.L_bin_edges,self.dL,self.nL)
 
     # ----------------------------------------------------------------------------------------------
 
-    def _get_chunk_bins(self,edges,d,n):
+    def _get_chunk_bin_args(self,edges,d,n):
         """
         get binning range for each 'chunk' along axis
         """
@@ -666,12 +718,12 @@ class c_MDE_tools:
                   'pick a bigger range to bin or use fewer chunks.\n'
             crash(msg)
         _split = np.array_split(edges,n)
-        chunk_bins = []
+        chunk_bin_args = []
         for ii in range(n):             
             _s = _split[ii]
             # pad by d; upper bin is too big, but will never be empty (will crash if empty)
-            chunk_bins.append([_s[0],d,_s[-1]+d])  
-        return chunk_bins
+            chunk_bin_args.append([_s[0],d,_s[-1]+d])  
+        return chunk_bin_args
 
     # ----------------------------------------------------------------------------------------------
     
@@ -686,7 +738,8 @@ class c_MDE_tools:
 
         bin_range = [bins[0],bins[2]]
         d = bins[1]
-        edges = np.arange(bin_range[0]-d/2,bin_range[1]+d,d)
+        edges = np.arange(bin_range[0],bin_range[1]+d,d)
+
         return edges, bin_range, d
 
     # ----------------------------------------------------------------------------------------------
@@ -720,9 +773,6 @@ class c_MDE_tools:
         K_bins = self.get_bin_str(K_bins)
         L_bins = self.get_bin_str(L_bins)
         E_bins = self.get_bin_str(E_bins)
-
-        self.bin_str = [H_bins,K_bins,L_bins,E_bins]
-        self.proj_str = [u,v,w]
 
         msg = 'binning MDE workspace\n\n'
         msg += f'u: {u:>9}\n'
@@ -775,32 +825,28 @@ class c_MDE_tools:
 
 if __name__ == '__main__':
 
+    _t = c_timer('MDE_tools',units='m')
+
     # temp and projection
-    proj = 'parallel'
     T = 300
 
-    MDE_file_name = f'../merged_mde/LSNO25_Ei_120meV_{T}K.nxs'
-    out_file_name = f'tmp.hdf5'
-
-    _t = c_timer('MDE_tools',units='m')
+    MDE_file_name = f'../merged_mde/LSNO25_Ei_120meV_300K.nxs'
+    out_file_name = f'LSNO25_300K_parallel.hdf5'
     
-    # these u,v,w make it go 
     u = [ 1, 0, 0]
     v = [ 0, 1, 0]
     w = [ 0, 0, 1]
 
-    H_bins = [ 3, 0.05, 10]
-    K_bins = [ -0.1, 0.1]
-    L_bins = [ -5, 5]
-    E_bins = [ 50, 0.5, 100]
+    H_bins = [  -5.025,  0.05,  15.025]
+    K_bins = [ -12.025,  0.05,   7.525]
+    L_bins = [ -10.500,   1.0,  10.500]
+    E_bins = [  -20.25,   0.5,  100.25]
+
+    num_chunks = [4,4,4]
 
     # class to do the stuff
     MDE_tools = c_MDE_tools(MDE_file_name)
-    MDE_tools.bin_MDE(H_bins,K_bins,L_bins,E_bins,u,v,w)
-
-    MDE_tools.save_to_hdf5(out_file_name)
-
-    
+    MDE_tools.bin_MDE_chunks(H_bins,K_bins,L_bins,E_bins,num_chunks,out_file_name,u,v,w)
 
     _t.stop()
 
