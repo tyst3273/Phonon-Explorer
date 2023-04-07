@@ -556,8 +556,8 @@ class c_MDE_tools:
                                 maxshape=(None,_nE),dtype=np.float64,chunks=_chunks)
         db.create_dataset('error',data=self.error,
                                 maxshape=(None,_nE),dtype=np.float64,chunks=_chunks)
-        db.create_dataset('num_events',data=self.num_events,
-                                maxshape=(None,_nE),dtype=int,chunks=_chunks)
+        #db.create_dataset('num_events',data=self.num_events,
+        #                        maxshape=(None,_nE),dtype=int,chunks=_chunks)
 
     # ----------------------------------------------------------------------------------------------
 
@@ -601,6 +601,8 @@ class c_MDE_tools:
         db['signal'][_nfile:,:] = self.signal[...]
         db['error'].resize(_nQ+_nfile,axis=0)
         db['error'][_nfile:,:] = self.error[...]
+        #db['num_events'].resize(_nQ+_nfile,axis=0)
+        #db['num_events'][_nfile:,:] = self.num_events[...]
 
     # ----------------------------------------------------------------------------------------------
 
@@ -831,18 +833,23 @@ if __name__ == '__main__':
     T = 300
 
     MDE_file_name = f'../merged_mde/LSNO25_Ei_120meV_300K.nxs'
-    out_file_name = f'LSNO25_300K_parallel.hdf5'
+    out_file_name = f'LSNO25_300K_parallel_test.hdf5'
     
     u = [ 1, 0, 0]
     v = [ 0, 1, 0]
     w = [ 0, 0, 1]
 
-    H_bins = [  -5.025,  0.05,  15.025]
-    K_bins = [ -12.025,  0.05,   7.525]
-    L_bins = [ -10.500,   1.0,  10.500]
+    #H_bins = [  -5.025,  0.05,  15.025]
+    #K_bins = [ -12.025,  0.05,   7.525]
+    #L_bins = [ -11.000,   2.0,  11.000]
+    #E_bins = [  -20.25,   0.5,  100.25]
+
+    H_bins = [  -0.025,  0.05,   8.025]
+    K_bins = [  -0.025,  0.05,   8.025]
+    L_bins = [  -2.000,   4.0,   2.000]
     E_bins = [  -20.25,   0.5,  100.25]
 
-    num_chunks = [4,4,4]
+    num_chunks = [4,4,1]
 
     # class to do the stuff
     MDE_tools = c_MDE_tools(MDE_file_name)
