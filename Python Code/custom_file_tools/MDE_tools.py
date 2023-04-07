@@ -477,7 +477,7 @@ class c_MDE_tools:
         print(msg)
 
         _exists = os.path.exists(output_file_name)
-        with h5py.File(output_file_name,'a') as db:
+        with h5py.File(output_file_name,mode='a',libver='latest') as db:
 
             # create datasets if file doesnt exist
             if not _exists:
@@ -844,9 +844,9 @@ if __name__ == '__main__':
     #L_bins = [ -11.000,   2.0,  11.000]
     #E_bins = [  -20.25,   0.5,  100.25]
 
-    H_bins = [  -0.025,  0.05,   8.025]
-    K_bins = [  -0.025,  0.05,   8.025]
-    L_bins = [  -2.000,   4.0,   2.000]
+    H_bins = [  -0.050,  0.10,   8.050]
+    K_bins = [  -0.050,  0.10,   8.050]
+    L_bins = [  -2.500,   5.0,   2.500]
     E_bins = [  -20.25,   0.5,  100.25]
 
     num_chunks = [4,4,1]
