@@ -6,6 +6,7 @@ import shutil
 import os
 from scipy.signal import convolve
 import matplotlib.pyplot as plt
+import multiprocessing as mp
 
 
 # --------------------------------------------------------------------------------------------------
@@ -33,6 +34,7 @@ def check_file(file_name):
         crash(msg)
 
 # --------------------------------------------------------------------------------------------------
+
 
 
 # --------------------------------------------------------------------------------------------------
@@ -85,20 +87,43 @@ class c_background_tools:
         Q-points in the raw file by doing "rocking scans" and taking the minimum of each. 
         """
 
-        pass
+        check_file(raw_file)
+        self.raw_file = raw_file
+
+        self.smoothed_file = self._append_suffix_to_file_name(raw_file,suffix='SMOOTHED')
+        self.background_file = self._append_suffix_to_file_name(raw_file,suffix='BACKGROUND')
+        self.background_subtracted_file = self._append_suffix_to_file_name(
+                    raw_file,suffix='BACKGROUND_SUBTRACTED')
 
     # ----------------------------------------------------------------------------------------------
 
-    def make_smoothed_file(self,raw_file,smoothed_file,smoothing_fwhm=None,num_blocks=1):
+    def _append_suffix_to_file_name(self,file_name,suffix):
+
+        """
+        remove file type from file name and append a suffix to the leading text. put filetype 
+        back on
+        """
+
+        file_type = file_name.split('.')[-1]
+        file_type = '.'+file_type
+        file_prefix = file_name[:-len(file_type)]
+        new_file_name = file_prefix+'_'+suffix+file_type
+
+        return new_file_name
+
+    # ----------------------------------------------------------------------------------------------
+
+    def make_smoothed_file(self,smoothing_fwhm=None,num_blocks=1):
 
         """
         split the Q-point set in raw file in num_blocks blocks. for each, block
         interpolate the data onto a fine energy grid and then Gaussian smooth the data. 
         """
 
-        check_file(raw_file)
+        check_file(self.raw_file)
 
-        with h5py.File(raw_file,'r') as raw_db, h5py.File(smoothed_file,'w') as smooth_db:
+        with h5py.File(self.raw_file,'r') as raw_db, \
+                h5py.File(self.smoothed_file,'w') as smooth_db:
            
             self.num_Q = raw_db['H_rlu'].size
             self.energy = raw_db['DeltaE'][...]
@@ -108,7 +133,10 @@ class c_background_tools:
             else:
                 self.smoothing_fwhm = float(smoothing_fwhm)
 
-            self._create_smooth_datasets(raw_db,smooth_db)
+            self._copy_header_datasets(raw_db,smooth_db)
+
+            # add new header info
+            smooth_db.create_dataset('smoothing_fwhm',data=self.smoothing_fwhm)
 
             # go and do the smoothing 
             self._smooth_by_looping_over_Q_blocks(num_blocks,raw_db,smooth_db)
@@ -134,7 +162,7 @@ class c_background_tools:
             
             Q_indices = Q_index_blocks[block]
             signal = raw_db['signal'][Q_indices]
-            smooth_db['smoothed_signal'][Q_indices,:] = \
+            smooth_db['signal'][Q_indices,:] = \
                     self._gaussian_smooth(self.energy,signal,self.smoothing_fwhm)
 
             _bt.stop()
@@ -143,26 +171,24 @@ class c_background_tools:
 
     # ----------------------------------------------------------------------------------------------
 
-    def _create_smooth_datasets(self,raw_db,smooth_db):
+    def _copy_header_datasets(self,source_db,dest_db):
 
         """
-        copy 'header' info from raw_db to smooth_db, e.g. Qpts, lattice_vectors, etc.
+        copy 'header' info from database_1 to database_2
         """
 
-        _t = c_timer('create_smooth_datasets')
+        _t = c_timer('copy_datasets')
 
-        print('\ncreating datasets in smoothed file\n')
+        print('\ncopying_datasets ...\n')
 
-        keys = list(raw_db.keys())
+        keys = list(source_db.keys())
        
-        # don't want to copy raw signal. will write 
-        smooth_db.create_dataset('smoothed_signal',shape=raw_db['signal'].shape)
+        # don't want to copy raw signal. will write new data later 
         keys.pop(keys.index('signal'))
+        dest_db.create_dataset('signal',shape=source_db['signal'].shape)
 
         for key in keys:
-            smooth_db.create_dataset(key,data=raw_db[key])
-
-        smooth_db.create_dataset('smoothing_fwhm',data=self.smoothing_fwhm)
+            dest_db.create_dataset(key,data=source_db[key])
 
         _t.stop()
 
@@ -233,15 +259,14 @@ class c_background_tools:
 
     # ----------------------------------------------------------------------------------------------
 
-    def calculate_background(self,raw_file,smoothed_file,num_bg_cuts=10,num_max_tries=100,
-            delta_Q_length=0.5,delta_polar_angle=10,delta_azimuthal_angle=10,num_Q_point_procs=1):
+    def calculate_background(self,num_bg_cuts=10,delta_Q_length=0.5,delta_polar_angle=10,
+                                     delta_azimuthal_angle=10,num_Q_point_procs=1):
 
         """
         do a 'rocking scan' around each Q-pt in the raw file and get random neighboring points 
         that lie in a piece of spherical shell the same Q-pt. 
         
-        num_bg_cuts determines the number of neighboring points to use. if a neighboring point
-        is all NaNs, the code tries again up to maximum num_max_tries attempts. 
+        num_bg_cuts determines the number of neighboring points to use.
 
         the neighboring points are bounded by |Q'| in |Q| +- delta_Q_length (in 1/A) and
         angle' in angle +- delta_angle (in degrees)
@@ -254,76 +279,197 @@ class c_background_tools:
         we will move away from the phonons and only look at the background. ofcourse it is 
         possible that we might find other phonons at another Q-pt... so we use multiple 
         background cuts that are randomly chosen as a fail safe.
-
-        NOTE: will parallelize the loop over Qpts to find background from neighbors. 
-
         """
 
-        check_file(raw_file)
-        check_file(smoothed_file)
+        _t = c_timer('calculate_background')
 
-        with h5py.File(raw_file,'r') as raw_db:
-            self.num_Q = raw_db['H_rlu'].size
-            self.energy = raw_db['DeltaE'][...]
+        check_file(self.raw_file)
+        check_file(self.smoothed_file)
+
+        with h5py.File(self.smoothed_file,'r') as _db:
+            self.num_Q = _db['H_rlu'].size
+            self.energy = _db['DeltaE'][...]
+
+        self.num_E = self.energy.size
+        self.background_signal = np.zeros((self.num_Q,self.num_E),dtype=float)
 
         # split Qpt indices onto multiple process to get and calculate background 
         self.Q_indices_on_procs = np.array_split(np.arange(self.num_Q),num_Q_point_procs)
+        print('\nnumber of Q-pts on each proc:')
+        msg = ''
+        for ii in range(num_Q_point_procs):
+            _ = f'proc[{ii}]'
+            msg += f'{_:10} {self.Q_indices_on_procs[ii].size}\n'
+        print(msg)
 
-        self.delta_polar_angle = delta_polar_angle*np.pi/180
-        self.delta_azimuthal_angle = delta_azimuthal_angle*np.pi/180
+        # +- bounds for the polar coordinates
+        self.delta_polar_angle = delta_polar_angle*np.pi/180 # degrees => radians
+        self.delta_azimuthal_angle = delta_azimuthal_angle*np.pi/180 # degrees => radians
         self.delta_Q_length = delta_Q_length
 
-        proc = 0
-        self._get_background_by_rocking_scans(proc,raw_file,smoothed_file,
-                num_bg_cuts,num_max_tries)
+        # Queue for passing data between procs
+        self.queue = mp.Queue()
+
+        proc_list = []
+        for pp in range(num_Q_point_procs):
+            proc_list.append(mp.Process(target=self._get_background_by_rocking_scans,
+                                args=[pp,num_bg_cuts]))
+
+        # start execution
+        for pp in proc_list:
+            pp.start()
+
+        # get the results from queue
+        for pp in range(num_Q_point_procs):
+
+            proc, background_signal_on_proc = self.queue.get()
+            Q_indices = self.Q_indices_on_procs[proc]
+            self.background_signal[Q_indices,:] = background_signal_on_proc[...]
+
+        # blocking; wait for all procs to finish before moving on
+        for pp in proc_list:
+            pp.join()
+            pp.close()
+
+        self._write_background_file()
+
+        _t.stop()
 
     # ----------------------------------------------------------------------------------------------
 
-    def _get_background_by_rocking_scans(self,proc,raw_file,smoothed_file,
-                num_bg_cuts,num_max_tries):
+    def _write_background_file(self):
+
+        """
+        create background file and copy datasets from raw file into it
+        """
+
+        _t = c_timer('write_background_file')
+
+        with h5py.File(self.smoothed_file,'r') as smooth_db, \
+                h5py.File(self.background_file,'w') as bg_db:
+
+            self._copy_header_datasets(smooth_db,bg_db)
+            bg_db['signal'][...] = self.background_signal[...]
+
+        _t.stop()
+
+    # ----------------------------------------------------------------------------------------------
+
+    def _get_background_by_rocking_scans(self,proc,num_bg_cuts):
 
         """
         do a 'rocking scan' around each Q-pt in the raw file and get random neighboring points
-        that lie in a piece of spherical shell the same Q-pt.
+        that lie in a piece of spherical shell centered Q-pt.
+
+        note, since Qpts are split over procs, only arg we need is which proc this is
+
+        outline:    loop over all Qpts on this proc. 
+                    for each one, randomly choose upto num_bg_cuts number of neighboring Qpts. 
+                    get the smooth data for all of them 
+                    calculate BG as point-by-point minimum in the smooth data
+                    fill a BG array for all of the Qpts on this proc.
+                    return to main proc using multiprocessing Queue 
+                    main proc writes BG arrays to file
         """
 
         if proc == 0:
             _t = c_timer(f'get_background_by_rocking_scans')
+            print(f'\nonly printing progress for proc 0\n')
 
         Q_indices = self.Q_indices_on_procs[proc]
         num_Q_on_proc = Q_indices.size
+        background_signal = np.zeros((num_Q_on_proc,self.num_E),dtype=float)
 
-        if proc == 0:
-            print(f'\n{num_Q_on_proc} Q-points on proc 0\n')
+        with h5py.File(self.raw_file,mode='r',libver='latest',swmr=True) as raw_db, \
+            h5py.File(self.smoothed_file,mode='r',libver='latest',swmr=True) as smooth_db:
 
-        with h5py.File(raw_file,mode='r',libver='latest',swmr=True) as raw_db, \
-        h5py.File(smoothed_file,mode='r',libver='latest',swmr=True) as smooth_db:
-
+            # need these to find Qpt and neighbors in spherical coords
             self.Q_len = raw_db['Q_len'][...]
             self.polar_angle = raw_db['polar_angle'][...]
             self.azimuthal_angle = raw_db['azimuthal_angle'][...]
 
             for ii, Q_index in enumerate(Q_indices):
 
+                num_cuts = num_bg_cuts
+
                 if proc == 0:
                     if ii%1000 == 0:
                         print(f'  Qpt {ii} out of {num_Q_on_proc}')
-
+                
+                # get this Qpt
                 Q_ii = self.Q_len[Q_index]
                 polar_ii = self.polar_angle[Q_index]
                 azimuthal_ii = self.azimuthal_angle[Q_index]
+                
+                # get neighbors
+                neighbor_inds = self._get_neighboring_Q_points_in_shell(Q_ii,polar_ii,azimuthal_ii)
+                num_neighbors = neighbor_inds.size
 
-                self._get_neighboring_Q_points_in_shell(Q_ii,polar_ii,azimuthal_ii)
+                # if no neighbors, background is 0
+                if num_neighbors == 0:
+                    msg = '\n*** WARNING ***\n'
+                    msg += f'no bg cuts for Qpt num. {Q_index}!\n'
+                    msg += 'setting bg to 0 for this Qpt\n'
+                    print(msg)
+
+                    background_signal[ii,:] = np.zeros(self.num_E,dtype=float)
+
+                    continue
+
+                # warn user if not enough neighbors
+                if num_neighbors < num_bg_cuts:
+
+                    # get all neighbors if num_neighbors < num_bg_cuts
+                    num_cuts = num_neighbors 
+
+                    msg = '\n*** WARNING ***\n'
+                    msg += f'found {num_neighbors} bg cuts for Qpt num. {Q_index}\n'
+                    print(msg)
+
+                # randomly pick neighbors
+                np.random.shuffle(neighbor_inds) # shuffles in place ...
+                neighbor_inds = neighbor_inds[:num_cuts]
+
+                background_signal[ii,:] = self._calculate_background_from_pt_by_pt_min(
+                        Q_index,neighbor_inds,smooth_db)
+
+        # put in queue to return to main proc
+        self.queue.put([proc,background_signal])
 
         if proc == 0:
             _t.stop()
 
     # ----------------------------------------------------------------------------------------------
 
+    def _calculate_background_from_pt_by_pt_min(self,Q_index,neighbor_inds,smooth_db):
+
+        """
+        cut Q_pt and neighbors from smoothed data and calculate background as the 
+        point-by-point minimum of the data
+        """
+
+        _mask = 1e8
+        
+        neighbor_inds = np.sort(neighbor_inds)
+        num_neighbors = neighbor_inds.size
+        smooth_signal = np.zeros((num_neighbors+1,self.num_E),dtype=float)
+        smooth_signal[0,:] = smooth_db['signal'][Q_index,:]
+        smooth_signal[1:,:] = smooth_db['signal'][neighbor_inds,:]
+
+        smooth_signal = np.nan_to_num(smooth_signal,nan=_mask,posinf=_mask,neginf=_mask)
+        background_signal = np.min(smooth_signal,axis=0)
+
+        background_signal[np.flatnonzero(~(background_signal < _mask))] = 0.0
+
+        return background_signal
+
+    # ----------------------------------------------------------------------------------------------
+
     def _get_neighboring_Q_points_in_shell(self,Q,polar,azimuthal):
 
         """
-        find neighboring Q-pts that are bounded by |Q|+-dQ, polar+-d_polar, azi+-d_azi
+        find neighboring Q-pts that are bounded by |Q|+-dQ, polar+-d_polar, azi+-d_azi,
+        i.e. all atoms in the shell centered on the Q-pt defined earlier
         """
 
         dQ = self.delta_Q_length
@@ -343,6 +489,12 @@ class c_background_tools:
         azimuthal_inds = np.intersect1d(
             np.flatnonzero(self.azimuthal_angle <= azimuthal+dazi),azimuthal_inds)
 
+        # intersection of all of these is the shell
+        neighbor_inds = np.intersect1d(len_inds,polar_inds)
+        neighbor_inds = np.intersect1d(neighbor_inds,azimuthal_inds)
+
+        return neighbor_inds
+
     # ----------------------------------------------------------------------------------------------
 
 
@@ -355,13 +507,11 @@ class c_background_tools:
 if __name__ == '__main__':
 
     raw_file = 'LSNO25_300K_parallel_test.hdf5'
-    smoothed_file = 'LSNO25_300K_parallel_teste_SMOOTH.hdf5'
 
     bg_tools = c_background_tools()
 
-#    bg_tools.make_smoothed_file(raw_file,smoothed_file,smoothing_fwhm=1.5,num_blocks=10)
-
-    bg_tools.calculate_background(raw_file,smoothed_file,num_Q_point_procs=16)
+    #bg_tools.make_smoothed_file(smoothing_fwhm=1.5,num_blocks=10)
+    bg_tools.calculate_background(num_Q_point_procs=16)
 
 
 
