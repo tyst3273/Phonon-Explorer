@@ -1,79 +1,6 @@
 
-
 import h5py 
 import numpy as np
-import os
-from timeit import default_timer
-
-
-# --------------------------------------------------------------------------------------------------
-
-def crash(err_msg=None,exception=None):
-    """
-    stop execution in a safe way
-    """
-    msg = '\n*** error ***\n'
-    if err_msg is not None:
-        msg += err_msg+'\n'
-    if exception is not None:
-        msg += '\nException:\n'+str(exception)+'\n'
-    print(msg)
-
-    # one of these should stop execution
-    raise KeyboardInterrupt
-    raise Exception
-    exit()
-
-# --------------------------------------------------------------------------------------------------
-
-def check_file(file_name):
-    """
-    check if the specified file exists
-    """
-    if not os.path.exists(file_name):
-        msg = f'the file:\n  \'{file_name}\' \nwas not found!'
-        crash(msg)
-
-# --------------------------------------------------------------------------------------------------
-
-
-
-
-
-# --------------------------------------------------------------------------------------------------
-
-class c_timer:
-
-    def __init__(self,label,units='s'):
-        """
-        small tool for timing and printing timing info
-        """
-
-        self.label = label
-        if units == 'm':
-            self.units = 'm'
-            self.scale = 1/60
-        else:
-            self.units = 's'
-            self.scale = 1
-        self.start_time = default_timer()
-
-    # ----------------------------------------------------------------------------------------------
-
-    def stop(self):
-        """
-        stop timer and print timing info
-        """
-
-        elapsed_time = default_timer()-self.start_time
-        elapsed_time *= self.scale
-        msg = f'timing:   {self.label} {elapsed_time:9.5f} [{self.units}]'
-        msg += '\n-------------------------------------------------------------------------\n'
-        print(msg)
-
-# --------------------------------------------------------------------------------------------------
-
-
 
 
 # --------------------------------------------------------------------------------------------------
@@ -86,94 +13,50 @@ class RawData:
         """
         
         self.params = params
-
         file_name = params.sqw_path
-        u = params.Projection_u
-        v = params.Projection_v
 
-        # load Qpts and other meta data from file
-        self._data_access = access_data_in_hdf5(file_name,u,v)
-        self._check_binning()
+        # this class wraps another one that actually interacts with the file
+        self._data_access_class = access_data_in_hdf5(file_name)
+        self._get_meta_data_from_hdf5_file()
 
     # ----------------------------------------------------------------------------------------------
 
-    def _check_binning(self):
+    def _get_meta_data_from_hdf5_file(self):
         """
         check binning vs what is in file
         """
-        _dh = self.params.Deltah
-        _dk = self.params.Deltak
-        _dl = self.params.Deltal
-        _e_lo = self.params.e_start
-        _e_hi = self.params.e_end
-        _de = self.params.e_step 
 
-        _H = self._data_access.H_bins[1]/2
-        _K = self._data_access.K_bins[1]/2
-        _L = self._data_access.L_bins[1]/2
-        _E = self._data_access.E_bins[1]
-
-        self._check_bin_args(_dh,_H,'H')
-        self._check_bin_args(_dk,_K,'K')
-        self._check_bin_args(_dl,_L,'L')
-        self._check_bin_args(_de,_E,'E')
-        
-        _E_bins = self._data_access.E_bins
-        if _e_hi < _E_bins[0] or _e_lo > _E_bins[2]: 
-            msg = 'the prebinned hdf5 file doesnt include the requested energy range.\n' \
-                  'either make a new prebinned hdf5 file or pick a different range.' \
-                  '\n\nsee the message below for what energy range to use. Bye!\n\n'
-            msg += f'user: {_e_lo:.3f}, {_de:.3f}, {_e_hi:.3f} meV\n'
-            msg += f'file: {_E_bins[0]:.3f}, {_E:.3f}, {_E_bins[2]:.3f} meV\n'
-            crash(msg)
-
-        if _e_lo < _E_bins[0] or _e_hi > _E_bins[2]:
-            msg = '\n*** WARNING ***\n'
-            msg += 'part of the requested energy range is outside what is in the file!\n' \
-                   'continuing, but be aware that not all of the data you want will be\n' \
-                   'returned. to avoid this warning, either make a new prebinned hdf5\n' \
-                   'file or pick a different range.' \
-                   '\n\nsee the message below for what energy range to use.\n\n'
-            msg += f'user: {_e_lo:.3f}, {_de:.3f}, {_e_hi:.3f} meV\n'
-            msg += f'file: {_E_bins[0]:.3f}, {_E:.3f}, {_E_bins[2]:.3f} meV\n\n'
-            print(msg)
+        self.dh = self._data_access_class.dh
+        self.dk = self._data_access_class.dk
+        self.dl = self._data_access_class.dl
+        self.dE = self._data_access_class.dE
+        self.u = self._data_access_class.u
+        self.v = self._data_access_class.v
+        self.w = self._data_access_class.w
 
     # ----------------------------------------------------------------------------------------------
 
-    def _check_bin_args(self,d_user,d_file,label):
-        """
-        check binning vs what is in file
-        """
-        if np.abs(d_user-d_file) > 1e-5:
-            msg = f'user specified binning along the \'{label}\' axis doesnt match whats in the\n' \
-                   'file. you cant change the binning without creating a new prebinned\n' \
-                   f'hdf5 file! make a the new file and use it or change the \'{label}\' binning\n' \
-                   'argument to what is in the hdf5 file!' \
-                   '\n\nsee the message below for what binning is in the file. Bye! \n\n'
-            msg += f'user: {d_user:.3}\n'
-            msg += f'file: {d_file:.3}\n'
-            crash(msg)
-
-
-    # ----------------------------------------------------------------------------------------------
-
-    def GetSlice(self,bin_h, bin_k, bin_l, bin_e, Projection_u, Projection_v):
+    def GetSlice(self, bin_h, bin_k, bin_l, bin_e, Projection_u, Projection_v):
         """
         get signal, error from file at requested Qpt
-        NOTE: projections, binning size (dH, etc), and bin_e are all ignored here. 
-            this is all fixed by what is in the file already and is checked earlier.
+        projections and binning size are ignored. bin_* args are used to determine the bin
+        center and then the nearest one is returned.
         """
         
         # requested bin center 
         Q = [np.array(bin_h).mean(),np.array(bin_k).mean(),np.array(bin_l).mean()]
 
+        print("\nQ_h: {:01.3f}".format(Q[0]))
+        print("Q_k: {:01.3f}".format(Q[1]))
+        print("Q_l: {:01.3f}".format(Q[2]))
+        print("bin_e: [{:01.3f}, {:01.3f}, {:01.3f}]".format(bin_e[0], bin_e[1], bin_e[2]),'\n')
+
         # get the data
-        cutoff = 0.5
-        self.Energy, self.Intensity, self.Error = self._data_access.get_signal_and_error(Q,cutoff)
+        self.Energy, self.Intensity, self.Error = self._data_access_class.get_signal_and_error(Q)
         self.Intensity *= 1000
         self.Error *= 1000
 
-        # down sample to the data onto the requested energy grid
+        # if requested grid is smaller than whats in file, downsample the data onto that grid
         _E_inds = np.intersect1d(np.flatnonzero(self.Energy >= bin_e[0]),
                     np.flatnonzero(self.Energy <= bin_e[2]))
         self.Energy = self.Energy[_E_inds]
@@ -190,24 +73,13 @@ class RawData:
 
 class access_data_in_hdf5:
 
-    def __init__(self,file_name,u=None,v=None,w=None):
+    def __init__(self,file_name):
         """
         class that gets data from hdf5 file
         """
 
-        check_file(file_name)
         self.file_name = file_name
-
-        msg = '-------------------------------------------------------------------------\n'
-        msg += 'cutting data from hdf5 file using custom interface\n'
-        print(msg)
-
-        self._check_proj(u,v,w)
         self._load_Q_and_E()
-
-        # vector from Q (user) to Q points in file. allocate now to avoid redoing for every cut
-        self.Q_to_Qp = np.zeros(self.Q_points.shape)
-        self.dist_to_Qp = np.zeros(self.Q_points.shape[0])
 
     # ----------------------------------------------------------------------------------------------
 
@@ -215,132 +87,55 @@ class access_data_in_hdf5:
         """
         get the Q_points and DeltaE array from hdf5 file. only want to have to do this once
         """
-        _t = c_timer('load_Q_and_E')
-        try:
-            with h5py.File(self.file_name,'r') as db:
-                self.num_Q_in_file = db['H'].size
-                self.Q_points = np.zeros((self.num_Q_in_file,3))
-                self.Q_points[:,0] = db['H'][...]
-                self.Q_points[:,1] = db['K'][...]
-                self.Q_points[:,2] = db['L'][...]
-                self.E = db['DeltaE'][...]
-                self.num_E_in_file = self.E.size
-                self.H_bins = db['H_bins'][...]
-                self.K_bins = db['K_bins'][...]
-                self.L_bins = db['L_bins'][...]
-                self.E_bins = db['E_bins'][...]
-        except Exception as ex:
-            msg = f'couldnt read Q and E from hdf5 file \'{self.file_name}\'.\n' \
-                  'check the file and the h5py installation and try again.\n\n' \
-                  'see the exception below for more hints.\n'
-            crash(msg,ex)
 
-        # use mean of binning as default cutoff
-        self.default_cutoff = (self.H_bins[1]+self.K_bins[1]+self.L_bins[1])/3
+        with h5py.File(self.file_name,'r') as db:
+            self.num_Q_in_file = db['H_rlu'].size
+            self.Q_points_rlu = np.zeros((self.num_Q_in_file,3))
+            self.Q_points_rlu[:,0] = db['H_rlu'][...]
+            self.Q_points_rlu[:,1] = db['K_rlu'][...]
+            self.Q_points_rlu[:,2] = db['L_rlu'][...]
+            self.E = db['DeltaE'][...]
+            self.dh = db['H_bin_args'][...][1]/2.0
+            self.dk = db['K_bin_args'][...][1]/2.0
+            self.dl = db['L_bin_args'][...][1]/2.0
+            self.dE = db['E_bin_args'][...][1]
+            self.u = db['u'][...]
+            self.v = db['v'][...]
+            self.w = db['w'][...]
 
-        _H_bins = self.H_bins; _K_bins = self.K_bins; _L_bins = self.L_bins; _E_bins = self.E_bins
-        _Q_max = self.Q_points.max(axis=0); _Q_min = self.Q_points.min(axis=0)
-        msg = f'\nfound {self.num_Q_in_file} Q-points and {self.num_E_in_file} E-points in file\n\n'
-        msg += 'range of reciprocal space included in file:\n'
-        msg += f'H range: {_Q_min[0]: .3f} {_Q_max[0]: .3f} rlu\n'
-        msg += f'K range: {_Q_min[1]: .3f} {_Q_max[1]: .3f} rlu\n'
-        msg += f'L range: {_Q_min[2]: .3f} {_Q_max[2]: .3f} rlu\n'
-        msg += f'E range: {self.E.min(): .3f} {self.E.max(): .3f}\n\n'
-        msg += 'binning used to make file: (lo, step, hi)\n'
-        msg += f'H bins: {_H_bins[0]: .3f}, {_H_bins[1]: .3f}, {_H_bins[2]: .3f}\n'
-        msg += f'K bins: {_K_bins[0]: .3f}, {_K_bins[1]: .3f}, {_K_bins[2]: .3f}\n'
-        msg += f'L bins: {_L_bins[0]: .3f}, {_L_bins[1]: .3f}, {_L_bins[2]: .3f}\n'
-        msg += f'E bins: {_E_bins[0]: .3f}, {_E_bins[1]: .3f}, {_E_bins[2]: .3f}\n'
-        print(msg)
+        # allocate these now and just reassign later; saves time since we have to do it repeatedly
 
-        _t.stop()
-        print('')
+        # vector from Qpts in file to Qpt requested by user (in rlu)
+        self.Q_file_to_Q_user_vector = np.zeros((self.num_Q_in_file,3))
+
+        # distance from Qpts in file to Qpt requested by user (in rlu)
+        self.Q_file_to_Q_user_distance = np.zeros(self.num_Q_in_file)
 
     # ----------------------------------------------------------------------------------------------
 
-    def _check_proj(self,u,v,w):
+    def get_signal_and_error(self,Q,cutoff=0.5):
         """
-        compare projection from user to whats in the file and print a warning if args are 
-        different. just to make sure user knows their cuts are gonna be wrong!
+        take Q in rlu, find nearest Qpt in file, and return signal and error arrays. NOTE:
+        if Qpt in file is sufficiently far from what is requested, should not return any data
         """
-        try:
-            with h5py.File(self.file_name,'r') as db:
-                u_db = db['u'][...]
-                v_db = db['v'][...]
-                w_db = db['w'][...]
-                dim_names = [db[f'Dim_{_}_name'][...].astype(str) for _ in range(4)]
-        except Exception as ex:
-            msg = f'couldnt read u,v,w vectors from hdf5 file \'{self.file_name}\'.\n' \
-                  'check the file and the h5py installation and try again.\n\n' \
-                  'see the exception below for more hints.\n'
-            crash(msg,ex)
-    
-        msg = '\ndim. names:\n'
-        msg += f'Dim 0: {dim_names[0]}\n'
-        msg += f'Dim 1: {dim_names[1]}\n'
-        msg += f'Dim 2: {dim_names[2]}\n'
-        msg += f'Dim 3: {dim_names[3]}\n'
-        print(msg)
-
-        self._check_proj_vector(u,u_db,'u')
-        self._check_proj_vector(v,v_db,'v')
-        self._check_proj_vector(w,w_db,'w')
-
-    # ----------------------------------------------------------------------------------------------
-
-    def _check_proj_vector(self,user,db,label):
-        """
-        compare projection vectors and print warning if they dont agree
-        """
-        msg = f'projection vector \'{label}\' in file: ['+', '.join([f'{_: .3f}' for _ in db])+']'
-        print(msg)
-
-        if user is None:
-            return
-
-        for ii in range(3):
-            if np.round(user[ii],3) != np.round(db[ii],3):
-                msg = f'user specified projection for the \'{label}\' vector doesnt match whats\n' \
-                       'in the file. you cant change the projection without creating a new\n' \
-                       'prebinned hdf5 file! make a the new file and use it or change the\n' \
-                       '\'Projection_u\', \'Projection_v\' arguments to what is in the hdf5 file!' \
-                       '\n\nsee the message below for what u and v are in the file. Bye! \n\n'
-                msg += 'user: ['+', '.join([f'{_: .3f}' for _ in user])+']\n'
-                msg += 'file: ['+', '.join([f'{_: .3f}' for _ in db])+']\n'
-                crash(msg)
-
-    # ----------------------------------------------------------------------------------------------
-
-    def get_signal_and_error(self,Q,cutoff=None):
-        """
-        take Q in rlu, find nearest Qpt in file, and return signal and error arrays
-        """
-
-        _t = c_timer('get_signal_and_error')
 
         _prec = 4; _eps = 0.005
-        if cutoff is None:
-            cutoff = self.default_cutoff
         
-        msg = f'\nattempting to get data at Q = ({Q[0]: .3f},{Q[1]: .3f},{Q[2]: .3f})\n'
-        print(msg)
-
         # get distance from user Q to all Qpts in file
-        _Qpts = self.Q_points
-        _Q2Qp = self.Q_to_Qp
-        _d = self.dist_to_Qp
-        _Q2Qp[:,0] = _Qpts[:,0]-Q[0]
-        _Q2Qp[:,1] = _Qpts[:,1]-Q[1]
-        _Q2Qp[:,2] = _Qpts[:,2]-Q[2]
-        _d[...] = np.round(np.sqrt(np.sum(_Q2Qp**2,axis=1)),_prec)
+        _Qpts = self.Q_points_rlu
+        _Qvec = self.Q_file_to_Q_user_vector
+        _Qdist = self.Q_file_to_Q_user_distance
+        _Qvec[:,0] = _Qpts[:,0]-Q[0]
+        _Qvec[:,1] = _Qpts[:,1]-Q[1]
+        _Qvec[:,2] = _Qvec[:,2]-Q[2]
+        _Qdist[...] = np.round(np.sqrt(np.sum(_Qvec**2,axis=1)),_prec)
 
         # find the closest Q-point
-        Q_ind = np.argsort(_d)[0]
+        Q_ind = np.argsort(_Qdist)[0]
 
         # raise Exception if empty slice (i.e. no data at Q-pt within distance cutoff of requested Q)
-        if _d[Q_ind] >= cutoff:
+        if _Qdist[Q_ind] >= cutoff:
             print('*** NOTE ***\nno slice at requested Q!\n')
-            _t.stop()
             raise Exception
 
         # print a warning if this Q-point isnt exaclty the same as requested by user
@@ -357,35 +152,7 @@ class access_data_in_hdf5:
         # now get and return the data
         sig, err = self._get_cut_from_hdf5(Q_ind)
 
-        _t.stop()
-
         return self.E, sig, err
-
-    # ----------------------------------------------------------------------------------------------
-
-    def _get_Q_ind(self,Q,cutoff):
-        """
-        find nearest Qpt in file
-        """
-        _prec = 4
-
-        # get distance from user Q to all Qpts in file
-        _Qpts = self.Q_points
-        _Q2Qp = self.Q_to_Qp
-        _d = self.dist_to_Qp
-        _Q2Qp[:,0] = _Qpts[:,0]-Q[0]
-        _Q2Qp[:,1] = _Qpts[:,1]-Q[1]
-        _Q2Qp[:,2] = _Qpts[:,2]-Q[2]
-        _d[...] = np.round(np.sqrt(np.sum(_Q2Qp**2,axis=1)),_prec)
-
-        # find the closest Q-point
-        Q_ind = np.argsort(_d)[0]
-
-        # check if within cutoff
-        if _d[Q_ind] >= cutoff:
-            Q_ind = None
-
-        return Q_ind
 
     # ----------------------------------------------------------------------------------------------
 

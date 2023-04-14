@@ -15,19 +15,8 @@ QMode=1
 
 
 
-# ------------------------ paralellism ----------------------------
-#num_processes=2 -- number of processes to use for parallel constant-Q cuts. NOTE: only GenerateConstQ.py is parallelized
-num_processes=1
-
-# horace_threads=2 -- Horace cuts/reduces the data using multithreaded parallelism. the default is 8 threads (i think)
-# if you use multiple processes to access data, it is easy to over-utilize the computer if horace uses multiple threads. 
-# generally you should keep [num_processes]x[horace_threads] <= the number of CORES on your computer
-horace_threads=8
-# -----------------------------------------------------------------
-
-
 #Name and directory for the sqw file, nxs file, or hdf5 file (Tys custom interface)
-sqw_path=/home/ty/research/projects/materials/LSNO/analysis/prebinned_data/data/LSNO25_300K_paral.hdf5
+sqw_path=/home/ty/research/projects/materials/LSNO/analysis/prebinned_data/data/LSNO25_300K_parallel.hdf5
 
 #HoracePath -- Needed on Linux only!! --  path to where the horace_on.m and herbert_on.m files are. not needed 
 #if rawDataClassFile != SQWAccess. It will be ignored on non-Linux OS.

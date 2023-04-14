@@ -66,8 +66,8 @@ class Parameters(TextFile):
         f.close()
         
         self.keyword=''
-        self.num_processes = self.evalIntWarning(self.ParseByKeyword('num_processes',parameters),1)
-        self.horace_threads = self.evalIntWarning(self.ParseByKeyword('horace_threads',parameters),4) # 4 is probably safe 
+        #self.num_processes = self.evalIntWarning(self.ParseByKeyword('num_processes',parameters),1)
+        #self.horace_threads = self.evalIntWarning(self.ParseByKeyword('horace_threads',parameters),4) # 4 is probably safe 
         self.BkgMode=self.evalIntWarning(self.ParseByKeyword("BkgMode",parameters),0)
         self.QMode=self.evalIntWarning(self.ParseByKeyword("QMode",parameters),0)
         self.sqw_path=self.evalError(self.ParseByKeyword("sqw_path",parameters))
@@ -85,8 +85,9 @@ class Parameters(TextFile):
         elif self.dataFileType == 'hdf5':
             self.rawDataClassFile='hdf5Access'
         else:
-            print ("Raw data file extension is not valid. Must be either SQW or NXS")
-            raise Exception("Raw data file extension is not valid. Must be either SQW or NXS")
+            msg = "Raw data file extension is not valid. Must be either .sqw, .nxs, or .hdf5"
+            print(msg)
+            raise Exception(msg)
             return
 
         self.ProcessedDataName=self.evalError(self.ParseByKeyword("ProcessedDataName",parameters))

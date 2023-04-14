@@ -7,6 +7,45 @@
 #    Office of Science, under Contract No. DE-SC0006939                  %                  
 #________________________________________________________________________%
 
+"""
+
+parallelism added by Tyler Sterling, Apr. 2022
+ 
+    summary of changes:
+ 
+    previously there was a seperate 'Generate' method for each child class. 
+ 
+    I moved 'Generate' to the the parent and now instead each child has a 
+    'get_Q_points_arr' method that generates an array filled with the Q-pts 
+    that the child class is designed to get data for. there is also a 
+    '_distribute_Q_over_procs' method in the parent class that  assigns the 
+    Q-points to each processes.
+ 
+    there are also new methods '_generate' and '_generate_in_parallel'. 
+    Generate is a now just a wrapper to both: if num_processes != 1, 
+    _generate_in_parallel is used (which itself calls _generate). 
+    otherwise, _generate is used.
+
+    to modify background Q class similarly to get it to work. 
+
+
+update by Tyler Sterling May 25 2022
+
+    having trouble with thread safety of matlab engine. some relevant links:
+
+    https://www.mathworks.com/matlabcentral/answers/505426-matlab-python-engine-won-t-run- ...
+    ... in-parallel-after-another-instance-of-the-engine-has-quit
+
+    https://stackoverflow.com/questions/248421/thread-safety-of-matlab-engine-api
+
+    it looks like OFFICIALLY the MATLAB engine is not supposed to work with multiprocessing 
+    at all ... I guess we are lucky this works. my testing shows that it is fine to create 
+    a matlab engines on each procs once they are spawned; we just cant create a matlab engine
+    and THEN distribute it over the procs
+
+    see here: https://www.mathworks.com/help/matlab/matlab_external/limitations-to-python-support.html
+        
+"""
 
 # --------------------------------------------------------------------------------------------------
 
@@ -25,7 +64,7 @@ import sys
 from decimal import *
 getcontext().prec=6
 #from nexusformat.nexus import *
-
+import multiprocessing as mp
 
 class Dataset: 
     
@@ -61,19 +100,6 @@ class Dataset:
         R=__import__(self.params.rawDataClassFile)
         RSE_Constants.rawData=R.RawData(self.params)
         RSE_Constants.FLAG=1
-
-        # binning in hdf5 file is not necessarily the same as requested by user. 
-        # get it from file or just copy whats in the input file otherwise
-        if self.params.dataFileType == 'hdf5':
-            self.Deltah_file = RSE_Constants.rawData.dh
-            self.Deltak_file = RSE_Constants.rawData.dk
-            self.Deltal_file = RSE_Constants.rawData.dl
-            self.e_step_file = RSE_Constants.rawData.dE
-        else:
-            self.Deltah_file = self.params.Deltah 
-            self.Deltak_file = self.params.Deltak
-            self.Deltal_file = self.params.Deltal
-            self.e_step_file =self.params.e_step
 
     # ----------------------------------------------------------------------------------------------
 
@@ -254,20 +280,63 @@ class Dataset:
 
     # ----------------------------------------------------------------------------------------------
 
+    def _distribute_Q_over_procs(self):
+
+        """
+        added by T.S. Apr 2022
+
+        distribute the Qpts to be done over the processes round-robin style.
+        note, if too many processes are requested, the idle ones are skipped to
+        avoid crashing, but this may be inefficient parallelization
+        """
+
+        _num_procs = self.params.num_processes
+        self.Q_on_procs = np.array_split(np.arange(self.num_Qpts),_num_procs)
+
+        # warn if using fewer processes will be used
+        num_non_empty = 0
+        for ii in range(_num_procs):
+            if self.Q_on_procs[ii].size > 0:
+                num_non_empty += 1
+            else:
+                break
+            
+        if _num_procs != num_non_empty:
+            print(f'\n WARNING! atleast one of the requested processes would have 0 Q-points.\n  ' \
+                f'to avoid crashing, i am reducing the number of processes to {num_non_empty}\n  ' \
+                 'for const. Q cuts. be aware that this might not be the most efficient choice!\n ')
+            self.num_procs_to_use = num_non_empty # the actual number to use for _generate
+        else:
+            self.num_procs_to_use = _num_procs # the actual number to use for _generate
+
+        # print the actual number being used
+        print(f' using {self.num_procs_to_use} processes:\n')
+        for proc in range(self.num_procs_to_use):
+            print(f'  there are {len(self.Q_on_procs[proc])} Q-points on proc. {proc}')
+        print('')
+
+    # ----------------------------------------------------------------------------------------------
+
     def Generate(self):
 
         """
-        this is a wrapper to _generate.  it comes up with an array of Qpts to get data for, 
-        then goes and gets the data
+        this is a wrapper to _generate and _generate_in_parallel (itself a wrapper to _generate).
+        it comes up with an array of Qpts to get data for, then does it either in serial or 
+        parallel
         """
 
         # get the Q-points
         self.get_Q_points_arr()
-        self._generate()
+
+        # check if parallelism is requested:
+        if self.params.num_processes != 1:
+            self._generate_in_parallel()
+        else:
+            self._generate()
 
     # ----------------------------------------------------------------------------------------------
 
-    def _generate(self):
+    def _generate(self,inds=None):
 
         """
         modified by T.S. Apr 2022
@@ -277,7 +346,11 @@ class Dataset:
 
         bin_e=[self.params.e_start,self.params.e_step,self.params.e_end]        
 
-        Qs = self.Qpts
+        # now get the Qpts for this proccess to do
+        if inds is None:
+            Qs = self.Qpts
+        else:
+            Qs = self.Qpts[inds,:]
 
         # get metadata for Q-pts
         try:
@@ -310,6 +383,41 @@ class Dataset:
                 print("no slice CollectionOfQs")
 
     # ----------------------------------------------------------------------------------------------
+
+    def _generate_in_parallel(self):
+        """
+        added by T.S. Apr 2022
+
+        generate const-Q cuts in parallel. all we have to do is call _generate from each process
+        and pass the *new* argument 'inds' which are the indices of the Qpts in the self.Qpts array
+        that the process is assigned to do. luckily _generate knows what to name the files and we
+        dont pass any thing back from each process, so we dont have to use a 'Queue' 
+        """
+
+        self._distribute_Q_over_procs()
+
+        msg = ' NOTICE! now entering the parallel part for const. Q cuts!\n  ' \
+              'multiple processes may be printing to the screen concurrently,\n  ' \
+              'so any diagnostics to the console may be nonsense!\n '
+        print(msg)
+
+        # container to hold the 'processes'
+        procs = []
+
+        # tell each process what it is supposed to do
+        for pp in range(self.num_procs_to_use):
+            inds = self.Q_on_procs[pp]
+            procs.append(mp.Process(target=self._generate,kwargs={'inds':inds}))
+
+        # give the 'start' command to all processes
+        for proc in procs:
+            proc.start()
+
+        # wait here for all to finish before moving on to the next block
+        # this is a 'blocking' command that is needed to prohibit any process that finishes quickly
+        # from moving to do more stuff
+        for proc in procs:
+            proc.join()
 
 
 # =======================================================================================================================
@@ -675,9 +783,69 @@ class DataBackgroundQs(Dataset):
         """
         added by Tyler Sterling Apr 2022
 
+        wrapper to _get_BG/_get_BG_parallel. determines wheter or not to use parallelism then
+        executes accordingly
+        """
+
+        # check if parallelism is requested:
+        if self.params.num_processes != 1:
+            self._get_BG_parallel()
+        else:
+            self._get_BG()
+
+    # ----------------------------------------------------------------------------------------------
+
+    def _get_BG_parallel(self):
+
+        """
+        added by Tyler Sterling Apr 2022
+
+        a wrapper to _get_BG. it distributes the Q-pts to do over the procs then calls _get_BG
+        from each proc.
+        """
+
+        self._distribute_Q_over_procs()
+
+        msg = '\n NOTICE! now entering the parallel part for background cuts!\n  ' \
+                'multiple processes may be printing to the screen concurrently,\n  ' \
+                'so any diagnostics to the console may be nonsense!\n '
+        print(msg)
+
+        # container to hold the 'processes'
+        procs = []
+
+        # the actual number of procs to use
+        for pp in range(self.num_procs_to_use): 
+            inds = self.Q_on_procs[pp]
+            procs.append(mp.Process(target=self._get_BG,kwargs={'inds':inds}))
+
+        # give the 'start' command to all processes
+        for proc in procs:
+            proc.start()
+
+        # wait here for all to finish before moving on to the next block
+        # this is a 'blocking' command that is needed to avoid any process that finishes quickly
+        # from moving to do more stuff
+        for proc in procs:
+            proc.join()
+
+    # --------------------------------------------------------------------------------------------------
+
+    def _get_BG(self,inds=None):
+
+        """
+        added by Tyler Sterling Apr 2022
+
         loop over the assigned Q-pts. at each iteration, exit if numFiles==maxFiles, i.e. if enough
         BG files have been produced. this enables multiple processes to work on the same directory at
         once without wasting effort.
+        """
+
+        """
+        matlab engine has to be restarted on every process! cant broadcast it in memory for some reason
+
+        but it cant be re-initialized it already initialized lol. that causes segfault for some reason.
+        need to add a method that kills the current one and re-inits on each proc
         """
 
         # startsup the matlab engine
@@ -686,7 +854,8 @@ class DataBackgroundQs(Dataset):
         folder = self.folder
         
         # the inds for this proc to do
-        inds = list(range(self.num_Qpts))
+        if inds is None:
+            inds = list(range(self.num_Qpts))
 
         # the raw data file MUST be cut into the dir, so do it no matter what
         if 0 in inds: # the raw data file is always the 0th in the list of inds
