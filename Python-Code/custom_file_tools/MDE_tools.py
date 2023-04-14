@@ -1173,15 +1173,12 @@ class c_background_tools:
 
                     continue
 
-                # warn user if not enough neighbors
+                # use all data available if num_neighbors < num_bg_cuts
                 if num_neighbors < num_bg_cuts:
 
                     # get all neighbors if num_neighbors < num_bg_cuts
                     num_cuts = num_neighbors 
 
-                    msg = '\n*** WARNING ***\n'
-                    msg += f'found {num_neighbors} bg cuts for Qpt num. {Q_index}\n'
-                    print(msg)
 
                 # randomly pick neighbors
                 np.random.shuffle(neighbor_inds) # shuffles in place ...
@@ -1293,35 +1290,41 @@ class c_background_tools:
 
 if __name__ == '__main__':
 
+
     _t = c_timer('MDE_tools',units='m')
 
-    # temp and projection
     T = 300
 
     MDE_file_name = f'../merged_mde/LSNO25_Ei_120meV_300K.nxs'
-    out_file_name = f'LSNO25_300K_parallel_test.hdf5'
+    out_file_name = f'LSNO25_300K_parallel_fine.hdf5'
     
     u = [ 1, 0, 0]
     v = [ 0, 1, 0]
     w = [ 0, 0, 1]
 
-    #H_bins = [  -5.025,  0.05,  15.025]
-    #K_bins = [ -12.025,  0.05,   7.525]
-    #L_bins = [ -11.000,   2.0,  11.000]
-    #E_bins = [  -20.25,   0.5,  100.25]
+    H_bins = [  -5.025,   0.050,    15.025]
+    K_bins = [ -12.025,   0.050,     7.525]
+    L_bins = [ -12.500,   5.000,    12.500]
+    E_bins = [ -20.250,   0.500,   100.250]
 
-    H_bins = [  -0.050,  0.10,   8.050]
-    K_bins = [  -0.050,  0.10,   8.050]
-    L_bins = [  -2.500,   5.0,   2.500]
-    E_bins = [  -20.25,   0.5,  100.25]
+    num_chunks = [4,4,4]
 
-    num_chunks = [4,4,1]
-
-    # class to do the stuff
     MDE_tools = c_MDE_tools(MDE_file_name)
     MDE_tools.bin_MDE_chunks(H_bins,K_bins,L_bins,E_bins,num_chunks,out_file_name,u,v,w)
 
     _t.stop()
+
+
+
+    _t = c_timer('background')
+
+    bg_tools = c_background_tools(out_file_name)
+    bg_tools.make_smoothed_file(smoothing_fwhm=1.5,num_blocks=10)
+    bg_tools.calculate_background(num_Q_point_procs=16)
+    bg_tools.subtract_background(num_blocks=10)
+
+    _t.stop()
+
 
 
 
