@@ -72,11 +72,7 @@ MinPointsInDataFile=5
 
 #Maximum of the Y-axis (scattering intensity) for plots
 #maxY=0.04
-maxY=1
-
-#Name of the file with RawData class that reads data from the raw data file. NOT USED IN THIS VERSION!!
-#rawDataClassFile=SQWAccess
-#rawDataClassFile=NXSAccessMantid
+maxY=0.4
 
 
 ## For reading qs from a file; Not needed for single reduced q mode

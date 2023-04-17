@@ -3,6 +3,22 @@ import h5py
 import numpy as np
 
 
+"""
+
+File added by Tyler Sterling, Apr. 2023
+
+Description: data access class to interface with custom *.hdf5 files produced with 'MDE_tools.py' 
+    (see Phonon-Explorer/Python-Code/custom_file_tools/MDE_tools.py). 
+
+Explanation: RawData() is the class that interfaces with phonon-explorer. These interfaces are
+    the same for all file types. RawData takes the TextFile.Parameters() class as an argument
+    and gets the file path from it. the RawData.GetSlice method cuts data from the file. the 
+    input options are the same as for the other data access classes. 
+
+"""
+
+
+
 # --------------------------------------------------------------------------------------------------
 
 class RawData:
@@ -17,22 +33,15 @@ class RawData:
 
         # this class wraps another one that actually interacts with the file
         self._data_access_class = access_data_in_hdf5(file_name)
-        self._get_meta_data_from_hdf5_file()
 
-    # ----------------------------------------------------------------------------------------------
-
-    def _get_meta_data_from_hdf5_file(self):
-        """
-        check binning vs what is in file
-        """
-
-        self.dh = self._data_access_class.dh
-        self.dk = self._data_access_class.dk
-        self.dl = self._data_access_class.dl
-        self.dE = self._data_access_class.dE
-        self.u = self._data_access_class.u
-        self.v = self._data_access_class.v
-        self.w = self._data_access_class.w
+        # binning arguments in the hdf5 file
+        self.Deltah = self._data_access_class.dh
+        self.Deltak = self._data_access_class.dk
+        self.Deltal = self._data_access_class.dl
+        self.e_step = self._data_access_class.dE
+        self.Projection_u = self._data_access_class.u
+        self.Projection_v = self._data_access_class.v
+        self.Projection_w = self._data_access_class.w
 
     # ----------------------------------------------------------------------------------------------
 
@@ -45,14 +54,22 @@ class RawData:
         
         # requested bin center 
         Q = [np.array(bin_h).mean(),np.array(bin_k).mean(),np.array(bin_l).mean()]
+        E_min = bin_e[0]; E_max = bin_e[2]
 
         print("\nQ_h: {:01.3f}".format(Q[0]))
         print("Q_k: {:01.3f}".format(Q[1]))
         print("Q_l: {:01.3f}".format(Q[2]))
-        print("bin_e: [{:01.3f}, {:01.3f}, {:01.3f}]".format(bin_e[0], bin_e[1], bin_e[2]),'\n')
+        print("bin_e: [{:01.3f}, {:01.3f}]".format(E_min, E_max),'\n')
 
         # get the data
-        self.Energy, self.Intensity, self.Error = self._data_access_class.get_signal_and_error(Q)
+        try:
+            self.Energy, self.Intensity, self.Error, self.Qpoint_from_file = \
+                self._data_access_class.get_signal_and_error(Q)
+        except Exception as e:
+            print("No slice!")
+            print(e)
+            return 1
+
         self.Intensity *= 1000
         self.Error *= 1000
 
@@ -63,7 +80,7 @@ class RawData:
         self.Intensity = self.Intensity[_E_inds]
         self.Error = self.Error[_E_inds]
 
-        return 1
+        return 0
 
     # ----------------------------------------------------------------------------------------------
 
@@ -119,7 +136,7 @@ class access_data_in_hdf5:
         if Qpt in file is sufficiently far from what is requested, should not return any data
         """
 
-        _prec = 4; _eps = 0.005
+        _prec = 4
         
         # get distance from user Q to all Qpts in file
         _Qpts = self.Q_points_rlu
@@ -127,7 +144,7 @@ class access_data_in_hdf5:
         _Qdist = self.Q_file_to_Q_user_distance
         _Qvec[:,0] = _Qpts[:,0]-Q[0]
         _Qvec[:,1] = _Qpts[:,1]-Q[1]
-        _Qvec[:,2] = _Qvec[:,2]-Q[2]
+        _Qvec[:,2] = _Qpts[:,2]-Q[2]
         _Qdist[...] = np.round(np.sqrt(np.sum(_Qvec**2,axis=1)),_prec)
 
         # find the closest Q-point
@@ -135,24 +152,14 @@ class access_data_in_hdf5:
 
         # raise Exception if empty slice (i.e. no data at Q-pt within distance cutoff of requested Q)
         if _Qdist[Q_ind] >= cutoff:
-            print('*** NOTE ***\nno slice at requested Q!\n')
             raise Exception
 
-        # print a warning if this Q-point isnt exaclty the same as requested by user
-        _Q = _Qpts[Q_ind]
-        for ii in range(3):
-            if np.abs(_Q[ii]-Q[ii]) >= _eps:
-                msg = '\n*** WARNING ***\n'
-                msg += 'nearest Q-point is not exactly what is requested!\n'
-                msg += f'nearest Q = ({_Q[0]: .3f},{_Q[1]: .3f},{_Q[2]: .3f})\n'
-                msg += 'if this is not what is expected, pick a Q-point commensurate with the\n' \
-                       'data in the file and run again.\n'
-                print(msg)
+        Qpoint_from_file = _Qpts[Q_ind]
 
         # now get and return the data
         sig, err = self._get_cut_from_hdf5(Q_ind)
 
-        return self.E, sig, err
+        return self.E, sig, err, Qpoint_from_file
 
     # ----------------------------------------------------------------------------------------------
 
@@ -180,43 +187,4 @@ class access_data_in_hdf5:
 
 
 
-
-
-# --------------------------------------------------------------------------------------------------
-
-if __name__ == '__main__':
-
-    import matplotlib.pyplot as plt
-
-    Q = [8,-2,0]
-
-    lw = 1
-    ms = 7
-
-    hdf5_file_name = 'LSNO25_300K_parallel.hdf5'
-    access_300K = access_data_in_hdf5(hdf5_file_name)
-    E, sig, err = access_300K.get_signal_and_error(Q)
-    sig[np.flatnonzero(sig == 0.0)] = np.nan
-    sig = sig/(1+1/(np.exp(E/(0.08617*300))-1))
-    #plt.errorbar(E,sig,yerr=err,barsabove=True,ls='-',lw=lw,marker='o',ms=ms,c='b',label='300K')
-    plt.plot(E,sig,ls='-',lw=lw,marker='o',ms=ms,c='b',label='300K')
-
-    hdf5_file_name = 'LSNO25_220K_parallel.hdf5'
-    access_220K = access_data_in_hdf5(hdf5_file_name)
-    E, sig, err = access_220K.get_signal_and_error(Q)
-    sig[np.flatnonzero(sig == 0.0)] = np.nan
-    sig = sig/(1+1/(np.exp(E/(0.08617*220))-1))
-    #plt.errorbar(E,sig,yerr=err,barsabove=True,ls='-',lw=lw,marker='o',ms=ms,c='r',label='220K')
-    plt.plot(E,sig,ls='-',lw=lw,marker='o',ms=ms,c='r',label='220K')
-
-    hdf5_file_name = 'LSNO25_5K_parallel.hdf5'
-    access_5K = access_data_in_hdf5(hdf5_file_name)
-    E, sig, err = access_5K.get_signal_and_error(Q)
-    sig[np.flatnonzero(sig == 0.0)] = np.nan
-    sig = sig/(1+1/(np.exp(E/(0.08617*5))-1))
-    #plt.errorbar(E,sig,yerr=err,barsabove=True,ls='-',lw=lw,marker='o',ms=ms,c='m',label='5K')
-    plt.plot(E,sig,ls='-',lw=lw,marker='o',ms=ms,c='m',label='5K')
-
-    plt.legend()
-    plt.show()
 

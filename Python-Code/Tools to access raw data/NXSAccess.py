@@ -34,7 +34,13 @@ class RawData:
     def __init__(self,params):
 
         self.params = params
-        RSE_Constants.fileHandle = LoadMD( params.sqw_path, OutputWorkspace='proj_md',FileBackEnd=True)
+        RSE_Constants.fileHandle = LoadMD(params.sqw_path,OutputWorkspace='proj_md',FileBackEnd=True)
+
+        # the binning is tracked by the RawData() classes
+        self.Deltah = self.params.Deltah
+        self.Deltak = self.params.Deltak
+        self.Deltal = self.params.Deltal
+        self.e_step = self.params.e_step
 
         return
 

@@ -62,19 +62,6 @@ class Dataset:
         RSE_Constants.rawData=R.RawData(self.params)
         RSE_Constants.FLAG=1
 
-        # binning in hdf5 file is not necessarily the same as requested by user. 
-        # get it from file or just copy whats in the input file otherwise
-        if self.params.dataFileType == 'hdf5':
-            self.Deltah_file = RSE_Constants.rawData.dh
-            self.Deltak_file = RSE_Constants.rawData.dk
-            self.Deltal_file = RSE_Constants.rawData.dl
-            self.e_step_file = RSE_Constants.rawData.dE
-        else:
-            self.Deltah_file = self.params.Deltah 
-            self.Deltak_file = self.params.Deltak
-            self.Deltal_file = self.params.Deltal
-            self.e_step_file =self.params.e_step
-
     # ----------------------------------------------------------------------------------------------
 
     def appendDataset(self):

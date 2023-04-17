@@ -36,19 +36,11 @@ class RawData:
         self.sqw_path = params.sqw_path 
 
         # the binning is tracked by the RawData() classes
-        self.Deltah = params.Deltah
-        self.Deltak = params.Deltak
-        self.Deltal = params.Deltal
-        self.e_step = params.e_step
+        self.Deltah = self.params.Deltah
+        self.Deltak = self.params.Deltak
+        self.Deltal = self.params.Deltal
+        self.e_step = self.params.e_step
 
-        # this will only run if params has HoracePath attr, which is only true for linux
-        if hasattr(params,'HoracePath'):
-            HoracePath = params.HoracePath
-            RSE_Constants.fileHandle.addpath(HoracePath)
-            RSE_Constants.fileHandle.herbert_on()
-            RSE_Constants.fileHandle.horace_on()
-
-        """
         # old method to do above code
         try: #This is needed only for Linux. Windows and Mac will throw an exception, which is safely caught.
             dataFile = params.sqw_path
@@ -58,7 +50,20 @@ class RawData:
             RSE_Constants.fileHandle.horace_on()
         except Exception as e:
             print("IGNORE THIS ERROR UNLESS RUNNING ON LINUX:", e)
-        """
+
+        # ------------ added by T.S. Apr 2022 -------------
+        # get number of threads horace is currently using
+        _thds = int(RSE_Constants.fileHandle.getfield(RSE_Constants.fileHandle.hor_config(),'threads'))
+        print(f' Horace is currently set to use {_thds:g} threads')
+        if _thds != params.horace_threads:
+            try:        
+                RSE_Constants.fileHandle.set(RSE_Constants.fileHandle.hor_config(),'threads',params.horace_threads)
+                print(f' Resetting Horace to use {params.horace_threads:g} threads')
+            except:
+                msg = '\n WARNING: Unable to reset the number of threads used by Horace.\n  ' \
+                    f'using the current setting: {_thds:g}\n'
+                print(msg)
+        # -------------------------------------------------
 
         return
 
