@@ -7,9 +7,15 @@
 #    Office of Science, under Contract No. DE-SC0006939                  %                  
 #________________________________________________________________________%
 
-# -------------------------------------------------------------------------
-# changing Horace threads added by Tyler Sterling Apr 2022
-# -------------------------------------------------------------------------
+"""
+
+Modified by Tyler Sterling, Apr. 2023
+
+Whats new: The binning args. and actual Q-point found in the file are attached as attributes
+    to this class. The binning args are self.Delta* and self.e_step and the Q-point is
+    self.Qpoint_rlu. These here since they are specific to the data that is cut.
+
+"""
 
 import math
 import sys
@@ -73,6 +79,10 @@ class RawData:
 
         #eng = matlab.engine.start_matlab();
         import matlab.engine # -- better to import this once when module is imported (T.S.
+
+        # attach this as attribute
+        self.Qpoint_rlu = [np.array(bin_h).mean(),np.array(bin_k).mean(),np.array(bin_l).mean()]
+        self.Qpoint_rlu = np.array(self.Qpoint_rlu)
 
         proj = dict(
             u=matlab.double(list(Projection_u)),

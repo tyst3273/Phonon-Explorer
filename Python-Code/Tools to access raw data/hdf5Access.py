@@ -144,10 +144,10 @@ class access_data_in_hdf5:
         print('Projection_u:',self.u)
         print('Projection_v:',self.v)
         print('Projection_w:',self.w)
+        print('\n-------------------------------------------\n')
 
-
-
-        # allocate these now and just overwrite later; saves time since we have to do it repeatedly
+        # allocate these now and just overwrite later; 
+        # saves time since we have to do it repeatedly
 
         # vector from Qpts in file to Qpt requested by user (in rlu)
         self.Q_file_to_Q_user_vector = np.zeros((self.num_Q_in_file,3))

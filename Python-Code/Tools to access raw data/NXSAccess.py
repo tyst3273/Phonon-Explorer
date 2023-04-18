@@ -7,9 +7,15 @@
 #    Office of Science, under Contract No. DE-SC0006939                  %                  
 #________________________________________________________________________%
 
-# ------------------------------------------------------------------------
-# parallelism added by Tyler Sterling, Apr. 2022
-# ------------------------------------------------------------------------
+"""
+
+Modified by Tyler Sterling, Apr. 2023
+
+Whats new: The binning args. and actual Q-point found in the file are attached as attributes
+    to this class. The binning args are self.Delta* and self.e_step and the Q-point is
+    self.Qpoint_rlu. These here since they are specific to the data that is cut.
+
+"""
 
 from TextFile import *
 import math
@@ -47,6 +53,11 @@ class RawData:
     # ----------------------------------------------------------------------------------------------
 
     def GetSlice(self, bin_h, bin_k, bin_l, bin_e, Projection_u, Projection_v):
+        
+        # attach this as attribute
+        self.Qpoint_rlu = [np.array(bin_h).mean(),np.array(bin_k).mean(),np.array(bin_l).mean()]
+        self.Qpoint_rlu = np.array(self.Qpoint_rlu)
+
         print("bin_h: [{:01.3f}, {:01.3f}]".format(bin_h[0], bin_h[1]))
         print("bin_k: [{:01.3f}, {:01.3f}]".format(bin_k[0], bin_k[1]))
         print("bin_l: [{:01.3f}, {:01.3f}]".format(bin_l[0], bin_l[1]))
