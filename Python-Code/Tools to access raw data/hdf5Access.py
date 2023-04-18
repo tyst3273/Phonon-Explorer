@@ -12,8 +12,23 @@ Description: data access class to interface with custom *.hdf5 files produced wi
 
 Explanation: RawData() is the class that interfaces with phonon-explorer. These interfaces are
     the same for all file types. RawData takes the TextFile.Parameters() class as an argument
-    and gets the file path from it. the RawData.GetSlice method cuts data from the file. the 
+    and gets the file path from it. the RawData.GetSlice method cuts data from the file. The 
     input options are the same as for the other data access classes. 
+
+    RawData opens the file and gets the Q-points and energy arrays from it. It does all of 
+    this inside of a 'plugin' called access_data_in_hdf5(). The Q-points from the file are 
+    compared to what the user requests. The nearest (or exact) Q-point is found by calculating the 
+    Euclidean distance (in RLU) between the requested Q-point and the ones in the file. 
+    The index of the nearest Q-point is used to slice the intensity and error from the file. 
+
+    The energy, intensity, error, and Q-point found are all attached to RawData class as 
+    attributes and are fetched upstream by phonon explorer. NOTE: if the user requests a 
+    smaller energy range than what is in the file, the data are down sampled onto that energy
+    grid. 
+
+Whats new: The binning args. and actual Q-point found in the file are attached as attributes
+    to this class. The binning args are self.Delta* and self.e_step and the Q-point is
+    self.Qpoint_rlu. These here since they are specific to the data that is cut.
 
 """
 
@@ -49,22 +64,23 @@ class RawData:
         """
         get signal, error from file at requested Qpt
         projections and binning size are ignored. bin_* args are used to determine the bin
-        center and then the nearest one is returned.
+        center and then the nearest one in the file is returned.
         """
         
         # requested bin center 
         Q = [np.array(bin_h).mean(),np.array(bin_k).mean(),np.array(bin_l).mean()]
         E_min = bin_e[0]; E_max = bin_e[2]
-
+        
+        # print the Q-point and E-range we are trying to get. 
         print("\nQ_h: {:01.3f}".format(Q[0]))
         print("Q_k: {:01.3f}".format(Q[1]))
         print("Q_l: {:01.3f}".format(Q[2]))
         print("bin_e: [{:01.3f}, {:01.3f}]".format(E_min, E_max),'\n')
 
-        # get the data
+        # try to get the data
         try:
-            self.Energy, self.Intensity, self.Error, self.Qpoint_from_file = \
-                self._data_access_class.get_signal_and_error(Q)
+            self.Energy, self.Intensity, self.Error, self.Qpoint_rlu = \
+                self._data_access_class.get_intensity_and_error(Q)
         except Exception as e:
             print("No slice!")
             print(e)
@@ -120,7 +136,18 @@ class access_data_in_hdf5:
             self.v = db['v'][...]
             self.w = db['w'][...]
 
-        # allocate these now and just reassign later; saves time since we have to do it repeatedly
+        print('Binning args in hdf5 file:')
+        print('Deltah:',self.dh)
+        print('Deltak:',self.dk)
+        print('Deltal:',self.dl)
+        print('e_step:',self.dE)
+        print('Projection_u:',self.u)
+        print('Projection_v:',self.v)
+        print('Projection_w:',self.w)
+
+
+
+        # allocate these now and just overwrite later; saves time since we have to do it repeatedly
 
         # vector from Qpts in file to Qpt requested by user (in rlu)
         self.Q_file_to_Q_user_vector = np.zeros((self.num_Q_in_file,3))
@@ -130,13 +157,13 @@ class access_data_in_hdf5:
 
     # ----------------------------------------------------------------------------------------------
 
-    def get_signal_and_error(self,Q,cutoff=0.5):
+    def get_intensity_and_error(self,Q,cutoff=0.5):
         """
-        take Q in rlu, find nearest Qpt in file, and return signal and error arrays. NOTE:
-        if Qpt in file is sufficiently far from what is requested, should not return any data
-        """
+        take Q in rlu, find nearest Qpt in file, and return signal and error arrays. 
 
-        _prec = 4
+        NOTE: if Qpt in file is sufficiently far from what is requested, should not return any data.
+            raises an Exception which is handles upstream by phonon explorer.
+        """
         
         # get distance from user Q to all Qpts in file
         _Qpts = self.Q_points_rlu
@@ -145,21 +172,22 @@ class access_data_in_hdf5:
         _Qvec[:,0] = _Qpts[:,0]-Q[0]
         _Qvec[:,1] = _Qpts[:,1]-Q[1]
         _Qvec[:,2] = _Qpts[:,2]-Q[2]
-        _Qdist[...] = np.round(np.sqrt(np.sum(_Qvec**2,axis=1)),_prec)
+        _Qdist[...] = np.round(np.sqrt(np.sum(_Qvec**2,axis=1)),4)
 
         # find the closest Q-point
         Q_ind = np.argsort(_Qdist)[0]
 
-        # raise Exception if empty slice (i.e. no data at Q-pt within distance cutoff of requested Q)
+        # raise Exception if empty slice 
+        # (i.e. no data at Q-pt within distance cutoff of requested Q)
         if _Qdist[Q_ind] >= cutoff:
             raise Exception
 
         Qpoint_from_file = _Qpts[Q_ind]
 
         # now get and return the data
-        sig, err = self._get_cut_from_hdf5(Q_ind)
+        intensity, error = self._get_cut_from_hdf5(Q_ind)
 
-        return self.E, sig, err, Qpoint_from_file
+        return self.E, intensity, error, Qpoint_from_file
 
     # ----------------------------------------------------------------------------------------------
 
@@ -169,18 +197,13 @@ class access_data_in_hdf5:
         """
         try:
             with h5py.File(self.file_name,'r') as db:
-                sig = db['signal'][Q_ind,...]
-                err = db['error'][Q_ind,...]
+                intensity = db['signal'][Q_ind,...]
+                error = db['error'][Q_ind,...]
         except Exception as ex:
-            msg = '\n*** WARNING ***\n'
-            msg += f'couldnt get signal/error from hdf5 file \'{self.file_name}\'.\n' \
-                  'see the exception below for what went wrong.\n\n' \
-                  'continuing, but this is bad! I hope you know what you are doing ...\n' 
-            msg += '\nException:\n'+str(ex)+'\n\n'
-            print(msg)
-            sig = np.full(self.num_E_in_file,np.nan); err = np.full(self.num_E_in_file,np.nan)
+            intensity = np.full(self.num_E_in_file,np.nan)
+            error = np.full(self.num_E_in_file,np.nan)
 
-        return sig, err
+        return intensity, error
 
     # ----------------------------------------------------------------------------------------------
 
