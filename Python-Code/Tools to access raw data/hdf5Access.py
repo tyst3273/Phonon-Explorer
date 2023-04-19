@@ -84,7 +84,6 @@ class RawData:
                 self._data_access_class.get_intensity_and_error(Q)
         except Exception as e:
             print("No slice!")
-            print(e)
             return 1
 
         self.Intensity *= 1000
