@@ -160,12 +160,15 @@ class access_data_in_hdf5:
 
     # ----------------------------------------------------------------------------------------------
 
-    def get_intensity_and_error(self,Q,cutoff=0.5):
+    def get_intensity_and_error(self,Q,cutoff=0.1):
         """
         take Q in rlu, find nearest Qpt in file, and return signal and error arrays. 
 
-        NOTE: if Qpt in file is sufficiently far from what is requested, should not return any data.
-            raises an Exception which is handles upstream by phonon explorer.
+        NOTE: if Qpt in file is sufficiently far from any Q-point in file, this not should not 
+            return any data. raises an Exception which is handles upstream by phonon explorer.
+
+            'cutoff' controls the minimum distance to a point in the file before
+            an exception is raised. 
         """
         
         # get distance from user Q to all Qpts in file
@@ -178,30 +181,30 @@ class access_data_in_hdf5:
         _Qdist[...] = np.round(np.sqrt(np.sum(_Qvec**2,axis=1)),4)
 
         # find the closest Q-point
-        Q_ind = np.argsort(_Qdist)[0]
+        Q_index = np.argsort(_Qdist)[0]
 
         # raise Exception if empty slice 
         # (i.e. no data at Q-pt within distance cutoff of requested Q)
-        if _Qdist[Q_ind] >= cutoff:
+        if _Qdist[Q_index] >= cutoff:
             raise Exception
 
-        Qpoint_from_file = _Qpts[Q_ind]
+        Qpoint_from_file = _Qpts[Q_index]
 
         # now get and return the data
-        intensity, error = self._get_cut_from_hdf5(Q_ind)
+        intensity, error = self._get_cut_from_hdf5(Q_index)
 
         return self.E, intensity, error, Qpoint_from_file
 
     # ----------------------------------------------------------------------------------------------
 
-    def _get_cut_from_hdf5(self,Q_ind):
+    def _get_cut_from_hdf5(self,Q_index):
         """
         attempt to get the data from hdf5 file. if fails, return nans
         """
         try:
             with h5py.File(self.file_name,'r') as db:
-                intensity = db['signal'][Q_ind,...]
-                error = db['error'][Q_ind,...]
+                intensity = db['signal'][Q_index,...]
+                error = db['error'][Q_index,...]
         except Exception as ex:
             intensity = np.full(self.num_E_in_file,np.nan)
             error = np.full(self.num_E_in_file,np.nan)
