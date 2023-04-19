@@ -10,13 +10,13 @@ File added by Tyler Sterling, Apr. 2023
 Description: data access class to interface with custom *.hdf5 files produced with 'MDE_tools.py' 
     (see Phonon-Explorer/Python-Code/custom_file_tools/MDE_tools.py). 
 
-Explanation: RawData() is the class that interfaces with phonon-explorer. These interfaces are
-    the same for all file types. RawData takes the TextFile.Parameters() class as an argument
+Explanation: RawData is the class that interfaces with phonon-explorer. These interfaces are
+    the same for all file types. RawData takes the TextFile.Parameters class as an argument
     and gets the file path from it. the RawData.GetSlice method cuts data from the file. The 
     input options are the same as for the other data access classes. 
 
     RawData opens the file and gets the Q-points and energy arrays from it. It does all of 
-    this inside of a 'plugin' called access_data_in_hdf5(). The Q-points from the file are 
+    this inside of a 'plugin' called access_data_in_hdf5. The Q-points from the file are 
     compared to what the user requests. The nearest (or exact) Q-point is found by calculating the 
     Euclidean distance (in RLU) between the requested Q-point and the ones in the file. 
     The index of the nearest Q-point is used to slice the intensity and error from the file. 
@@ -26,9 +26,10 @@ Explanation: RawData() is the class that interfaces with phonon-explorer. These 
     smaller energy range than what is in the file, the data are down sampled onto that energy
     grid. 
 
-Whats new: The binning args. and actual Q-point found in the file are attached as attributes
+Whats new: The binning args and actual Q-point found in the file are attached as attributes
     to this class. The binning args are self.Delta* and self.e_step and the Q-point is
-    self.Qpoint_rlu. These here since they are specific to the data that is cut.
+    self.Qpoint_rlu. These are here since they are specific to the data that is cut, so 
+    are attached to the object holding the data.
 
 """
 
@@ -118,7 +119,9 @@ class access_data_in_hdf5:
 
     def _load_Q_and_E(self):
         """
-        get the Q_points and DeltaE array from hdf5 file. only want to have to do this once
+        get the Q_points and DeltaE array from hdf5 file. only want to have to do this once.
+        also gets binning and projections args which are attached to RawData as attributes 
+        for upstream code to deal with.
         """
 
         with h5py.File(self.file_name,'r') as db:
