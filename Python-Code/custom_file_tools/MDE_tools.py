@@ -3,7 +3,7 @@
 Author: Tyler C. Sterling
 Email: ty.sterling@colorado.edu
 Affil: University of Colorado Boulder, Raman Spectroscopy and Neutron Scattering Lab
-Date: 01/24/2022
+Date: 04/26/2023
 Description:
     tools to:
         - programatically get data from mantid MDE files (in nexus format) using mantid
