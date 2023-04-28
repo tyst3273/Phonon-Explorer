@@ -16,7 +16,8 @@ QMode=1
 
 
 #Name and directory for the sqw file, nxs file, or hdf5 file (Tys custom interface)
-sqw_path=/home/ty/research/projects/materials/LSNO/analysis/prebinned_data/data/LSNO25_300K_parallel.hdf5
+#sqw_path=/home/ty/research/projects/materials/LSNO/analysis/prebinned_data/data/LSNO25_300K_parallel.hdf5
+sqw_path=/home/ty/research/projects/materials/jpark/jpark.hdf5
 
 #HoracePath -- Needed on Linux only!! --  path to where the horace_on.m and herbert_on.m files are. not needed 
 #if rawDataClassFile != SQWAccess. It will be ignored on non-Linux OS.
@@ -45,7 +46,7 @@ InputFilesDir=/home/ty/research/projects/materials/LSNO/analysis/prebinned_data/
 #Energy start, end and step for contant Q cuts in Horace. Note that randomly generated 
 #cuts for background calculation will automatically have a bigger range.
 
-e_start=50
+e_start=0
 e_end=100
 e_step=0.50
 
@@ -67,12 +68,12 @@ Projection_v=0,1,0
 
 #Minimum number of points in a data file. If the number of points with reasonable error 
 #bar is smaller, the cut is NOT saved.
-MinPointsInDataFile=5
+MinPointsInDataFile=0
 
 
 #Maximum of the Y-axis (scattering intensity) for plots
 #maxY=0.04
-maxY=0.4
+maxY=100
 
 
 ## For reading qs from a file; Not needed for single reduced q mode

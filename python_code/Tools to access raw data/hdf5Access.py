@@ -78,6 +78,10 @@ class RawData:
         print("bin_e: [{:01.3f}, {:01.3f}]".format(E_min, E_max),'\n')
 
         # try to get the data
+
+        #self.Energy, self.Intensity, self.Error, self.Qpoint_rlu = \
+        #        self._data_access_class.get_intensity_and_error(Q)
+
         try:
             self.Energy, self.Intensity, self.Error, self.Qpoint_rlu = \
                 self._data_access_class.get_intensity_and_error(Q)
@@ -128,7 +132,7 @@ class access_data_in_hdf5:
             self.Q_points_rlu[:,0] = db['H_rlu'][...]
             self.Q_points_rlu[:,1] = db['K_rlu'][...]
             self.Q_points_rlu[:,2] = db['L_rlu'][...]
-            self.E = db['DeltaE'][...]
+            self.energy = db['DeltaE'][...]
             self.dh = db['H_bin_args'][...][1]/2.0
             self.dk = db['K_bin_args'][...][1]/2.0
             self.dl = db['L_bin_args'][...][1]/2.0
@@ -182,14 +186,16 @@ class access_data_in_hdf5:
         # raise Exception if empty slice 
         # (i.e. no data at Q-pt within distance cutoff of requested Q)
         if _Qdist[Q_index] >= cutoff:
-            raise Exception
+            intensity = np.full(self.energy.size,np.NaN)
+            error = np.full(self.energy.size,np.NaN)
+            #raise Exception
 
         Qpoint_from_file = _Qpts[Q_index]
 
         # now get and return the data
         intensity, error = self._get_cut_from_hdf5(Q_index)
 
-        return self.E, intensity, error, Qpoint_from_file
+        return self.energy, intensity, error, Qpoint_from_file
 
     # ----------------------------------------------------------------------------------------------
 

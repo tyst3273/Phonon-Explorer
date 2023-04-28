@@ -174,6 +174,8 @@ class Dataset:
         self.Error=RSE_Constants.rawData.Error
         
         self.clean()
+
+        # doesnt write file if full of NaNs
         FileIsGood=self.dataIsValid(minPoints)
         if FileIsGood:
             fileForSlice=DataTextFile(folder,file)
