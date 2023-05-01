@@ -64,7 +64,7 @@ SaveMD(InputWorkspace="o",Filename="/SNS/ARCS/IPTS-26347/shared/jpark/MDHistoFil
 
 MD_workspace = mtd['o']
 hdf5_file_name = 'jpark.hdf5'
-m_save_MDE_to_hdf5.save_MDE_to_hdf5(MD_workspace,hdf5_file_name)
+save_MDE_to_hdf5(MD_workspace,hdf5_file_name)
 
 
 
