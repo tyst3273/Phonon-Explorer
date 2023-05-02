@@ -11,7 +11,7 @@ Description:
         - calculate and subtract background from raw data in custom hdf5 file
 """
 
-from file_utils import *
+from .m_file_utils import *
 
 import numpy as np
 import h5py 

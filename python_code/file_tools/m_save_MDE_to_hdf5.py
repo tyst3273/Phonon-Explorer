@@ -11,11 +11,13 @@ class _c_reduced_MDE_tools:
 
     def __init__(self,MD_workspace):
         """
-        reduced set of MDE tools to take WS as arg and write hdf5 file. 
+        reduced set of MDE tools to take WS as arg and write hdf5 file. this is a stand-alone
+        class that only requires non-std libs numpy and h5py 
 
         IMPORTANT: this assume the workspace called 'MDNorm' as the last algorithm.
         this is because workspace history is looked up to get metadata (binning, uv, etc).
-        not a huge problem if this is broken in the future, but will require fixing
+        not a huge problem if this is broken in the future, but will require fixing if it 
+        is
         """
         self.MD_workspace = MD_workspace
         self.get_binning()
