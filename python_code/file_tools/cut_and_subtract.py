@@ -4,11 +4,18 @@
 # c_ means class. if modules arent in this dir, can import with '.' 
 # connecting the path
 from file_tools.m_MDE_tools import c_MDE_tools
+from file_tools.m_background_tools import c_background_tools
 from file_tools.m_file_utils import c_timer, crash
 
 
-bin_MDE = False
-subtract_bg = True
+# raw event file
+MDE_file_name = f'../merged_mde/LSNO25_Ei_120meV_300K.nxs'
+
+# output hdf5 file
+out_file_name = f'LSNO25_300K_test.hdf5'
+
+bin_MDE = True
+subtract_bg = False
 
 # --------------------------------------------------------------------------------------------------
 # bin raw events file into histo datasets. merge histo datasets into single
@@ -18,14 +25,8 @@ if bin_MDE:
 
     MDE_timer = c_timer('MDE',units='m')
 
-    # raw event file
-    MDE_file_name = f'../merged_mde/LSNO25_Ei_120meV_300K.nxs'
-
     # load the raw event dataset
     MDE_tools = c_MDE_tools(MDE_file_name)
-
-    # output hdf5 file
-    out_file_name = f'LSNO25_300K_test.hdf5'
 
     # binning projections
     u = [ 1, 0, 0]
