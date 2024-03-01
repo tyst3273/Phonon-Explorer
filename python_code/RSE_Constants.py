@@ -64,6 +64,6 @@ class RSE_Constants():
     #SaveParamtoTxt.py
     FINAL_FIT_PARAMS = r'FinilFittingParam.txt'
 
-    
+    Temperature=1
 
     

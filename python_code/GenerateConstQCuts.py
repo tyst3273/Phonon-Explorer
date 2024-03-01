@@ -18,6 +18,7 @@ from plotDataWithFit import *
 from Display import *
 import os
 from Utils import timer
+from SubtractPolyBackgr import *
 
 
 # --------------------------------------------------------------------------------------------------
@@ -39,7 +40,6 @@ if params.QMode==1:
 
 _t = timer('const. Q cuts')
 
-print('\n now getting const. Q cuts from file.\n  this might take a while...\n\n')
 testData.Generate()
 
 # if not getting background cuts, plot data now
@@ -50,7 +50,6 @@ if params.BkgMode==0:
     Disp.MakePlotSummary(params.path_data,params.ProcessedDataName)
 
 _t.stop()
-
 
 # --------------------------------------------------------------------------------------------------
 # get the background cuts
@@ -70,5 +69,8 @@ if params.BkgMode==1:
     _t.stop()
 
 # --------------------------------------------------------------------------------------------------
+
+if params.BkgMode==2:
+    SubtractPolyBackground()
 
 

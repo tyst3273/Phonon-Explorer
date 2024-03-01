@@ -30,7 +30,7 @@ getcontext().prec=6
 class Dataset: 
     
     """
-    Dataset can be either a single cut at one Q or several cuts
+    Dataset can be either a single cut at one Q or several cuts put together for the purposes of multizone fitting,
     In the former case it is initialized with an array of filenames that has one filename, in the latter case with 
     an array containing many filenames. 
     """
@@ -61,21 +61,7 @@ class Dataset:
         R=__import__(self.params.rawDataClassFile)
         RSE_Constants.rawData=R.RawData(self.params)
         RSE_Constants.FLAG=1
-        
-# Read binning from hdf5 file and save to a file. This file will be read by the plotting code to insert correct bin values in the plots. It is necessary to do this in the beginning. If raw data are in a different format, then this code will be skipped.
 
-        try:
-#        if 1==1:
-            with open(self.params.path_data+'binning.txt', 'w') as f:
-                print(self.params.path_data+'binning.txt')
-                f.write('{:.2f}\n'.format(RSE_Constants.rawData.Deltah))
-                f.write('{:.2f}\n'.format(RSE_Constants.rawData.Deltak))
-                f.write('{:.2f}\n'.format(RSE_Constants.rawData.Deltal))
-            params.Deltah=RSE_Constants.rawData.Deltah
-            params.Deltak=RSE_Constants.rawData.Deltak
-            params.Deltal=RSE_Constants.rawData.Deltal
-        except:
-            pass
     # ----------------------------------------------------------------------------------------------
 
     def appendDataset(self):
@@ -108,19 +94,19 @@ class Dataset:
             if self.Intensity[i]>0:
                 if self.Error[i]/self.Intensity[i]>=self.params.ErrorToIntensityMaxRatio:
                     d=0
-                    self.Intensity[i]=0
-
-        indices_to_remove = np.where(self.Intensity == 0)[0]
-        mask = np.ones(len(self.Intensity), dtype=bool)
-        mask[indices_to_remove] = False
-        self.Intensity = self.Intensity[mask]
-        mask = np.ones(len(self.Energy), dtype=bool)
-        mask[indices_to_remove] = False
-        self.Energy = self.Energy[mask]
-        mask = np.ones(len(self.Error), dtype=bool)
-        mask[indices_to_remove] = False
-        self.Error = self.Error[mask]
-       
+#                    self.Intensity[i]=0
+        index.extend(np.nonzero(self.Intensity))
+        Nint=zeros(len(index[0]))
+        Neng=zeros(len(index[0]))
+        Nerr=zeros(len(index[0]))
+        for i in range (0,len(index[0])):
+            Nint[i]=self.Intensity[index[0][i]]
+            Neng[i]=self.Energy[index[0][i]]
+            Nerr[i]=self.Error[index[0][i]]
+        self.Intensity=Nint
+        self.Energy=Neng
+        self.Error=Nerr
+        
     # ----------------------------------------------------------------------------------------------
 
     def smooth(self):
@@ -172,9 +158,7 @@ class Dataset:
         bin_e[0]=bin_e[0]+self.params.Offset_E
         bin_e[2]=bin_e[2]+self.params.Offset_E
 
-        code=RSE_Constants.rawData.GetSlice(bin_h, bin_k, bin_l, bin_e, self.params.Projection_u, self.params.Projection_v)
-
-        print(RSE_Constants.rawData.Qpoint_rlu)
+        RSE_Constants.rawData.GetSlice(bin_h, bin_k, bin_l, bin_e, self.params.Projection_u, self.params.Projection_v)
 
         bin_h[0]=bin_h[0]-self.params.Offset_H
         bin_h[1]=bin_h[1]-self.params.Offset_H
@@ -194,10 +178,6 @@ class Dataset:
         # doesnt write file if full of NaNs
         FileIsGood=self.dataIsValid(minPoints)
         if FileIsGood:
-            file = RSE_Constants.FILENAME_FORMAT % (RSE_Constants.rawData.Qpoint_rlu[0],RSE_Constants.rawData.Qpoint_rlu[1],RSE_Constants.rawData.Qpoint_rlu[2])
-            if code==1:
-                print("Requested Q-point, ",bin_h[1]-bin_h[0],bin_k[1]-bin_k[0],bin_l[1]-bin_l[0]," NOT on the grid.")
-                print("Getting data from closest one: Q=", RSE_Constants.rawData.Qpoint_rl)
             fileForSlice=DataTextFile(folder,file)
 #            print ('mult  '+ str(mult))
             fileForSlice.Write(self.Energy,mult*self.Intensity,mult*self.Error)
@@ -281,83 +261,42 @@ class Dataset:
         """
         modified by T.S. Apr 2022
 
-        generate the data for the Qpts stored in self.Qpts
+        generate the SQW data for the Qpts stored in self.Qpts 
         """
-        
-        mult=1000 #Used by GetSlice
-        # matlab engine has to be restarted on every process! cant broadcast it in memory for some reason.
-        self.fileHandle = self.initialize()
 
         bin_e=[self.params.e_start,self.params.e_step,self.params.e_end]        
 
         Qs = self.Qpts
 
+        # get metadata for Q-pts
+        try:
+            QHlist=Qs[:,][:,0]
+            QKlist=Qs[:,][:,1]
+            QLlist=Qs[:,][:,2]
+        except:
+            QHlist=[Qs[0]]
+            QKlist=[Qs[1]]
+            QLlist=[Qs[2]]
 
-                # now go and cut data from files
-                
-        if self.params.dataFileType == 'hdf5':
-            
-#            if   (1==1):
+        # matlab engine has to be restarted on every process! cant broadcast it in memory for some reason.
+        self.fileHandle = self.initialize()
+
+        # now go and cut data from files
+        for i in range (0,len(QHlist)):
+
+            fileName=str(RSE_Constants.FILENAME_FORMAT % (QHlist[i],QKlist[i],QLlist[i]))
+            bin_h=[QHlist[i]-self.params.Deltah, QHlist[i]+self.params.Deltah]
+            bin_k=[QKlist[i]-self.params.Deltak, QKlist[i]+self.params.Deltak]
+            bin_l=[QLlist[i]-self.params.Deltal, QLlist[i]+self.params.Deltal]
 
             try:
-                energy, intensityArray, errorArray, Qpoints, code=RSE_Constants.rawData.GetCollectionOfQs(Qs)
+                print(fileName)
+                self.makeRawSlice(bin_h, bin_k, bin_l, bin_e, self.dataDirectory, \
+                                    fileName, self.params.MinPointsInDataFile)
+
             except Exception as e:
                 print(e)
                 print("no slice CollectionOfQs")
-#        for i in range(0,len(intensity)):
-#            print(len(intensity[i]))
-
-            E_min = bin_e[0]; E_max = bin_e[2]
-            mask = np.logical_and(energy >= E_min, energy <= E_max)
-            _E_inds = np.where(mask)[0]
-            self.Energy = energy[_E_inds]
-            
-
-            for i in range (0,len(Qpoints)):
-                
-                self.Intensity=intensityArray[i][_E_inds]
-                self.Error=errorArray[i][_E_inds]
-                self.clean()
-                
-                FileIsGood=self.dataIsValid(self.params.MinPointsInDataFile)
-                if FileIsGood:
-                    file = RSE_Constants.FILENAME_FORMAT % (Qpoints[i][0],Qpoints[i][1],Qpoints[i][2])
-                    if code==1:
-                        print("Requested Q-point, ",bin_h[1]-bin_h[0],bin_k[1]-bin_k[0],bin_l[1]-bin_l[0]," NOT on the grid.")
-                        print("Getting data from closest one: Q=", RSE_Constants.rawData.Qpoint_rl)
-                    fileForSlice=DataTextFile(self.dataDirectory,file)
-                    #            print ('mult  '+ str(mult))
-                    fileForSlice.Write(self.Energy,mult*self.Intensity,mult*self.Error)
-                    print(file)
-                self.Energy = energy[_E_inds]  #reset energy before cleaning again
-        else: #            For sqw and nxs raw file formats
-
-            # get metadata for Q-pts
-            try:
-                QHlist=Qs[:,][:,0]
-                QKlist=Qs[:,][:,1]
-                QLlist=Qs[:,][:,2]
-            except:
-                QHlist=[Qs[0]]
-                QKlist=[Qs[1]]
-                QLlist=[Qs[2]]
-
-            for i in range (0,len(QHlist)):
-
-                fileName=str(RSE_Constants.FILENAME_FORMAT % (QHlist[i],QKlist[i],QLlist[i]))
-                bin_h=[QHlist[i]-self.params.Deltah, QHlist[i]+self.params.Deltah]
-                bin_k=[QKlist[i]-self.params.Deltak, QKlist[i]+self.params.Deltak]
-                bin_l=[QLlist[i]-self.params.Deltal, QLlist[i]+self.params.Deltal]
-            
-#               if (1==1):
-                try:
-                    print(fileName)
-                    self.makeRawSlice(bin_h, bin_k, bin_l, bin_e, self.dataDirectory, \
-                                    fileName, self.params.MinPointsInDataFile)
-
-                except Exception as e:
-                    print(e)
-                    print("no slice CollectionOfQs")
 
     # ----------------------------------------------------------------------------------------------
 
@@ -487,6 +426,8 @@ class DataSmall_q(Dataset):
 # =======================================================================================================================
 
 
+
+
 class CollectionOfQs(Dataset):
 
     # ----------------------------------------------------------------------------------------------
@@ -515,8 +456,18 @@ class CollectionOfQs(Dataset):
         self.num_Qpts = self.Qpts.shape[0]
         print(f'\n there are {self.num_Qpts} Qpts\n')
 
-    #
-    
+    # ----------------------------------------------------------------------------------------------
+
+
+
+
+
+
+# =======================================================================================================================
+# -----------------------------------------------------------------------------------------------------------------------
+# =======================================================================================================================
+
+
 class DataBackgroundQs(Dataset):
 
     # ----------------------------------------------------------------------------------------------

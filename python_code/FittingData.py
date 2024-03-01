@@ -55,19 +55,21 @@ class FittingData():
 
         LB=numpy.zeros(self.NumberofParam)
         UB=numpy.zeros(self.NumberofParam)
-        PositionDelta=0.3*self.positionGuesses[self.NumberofPeaks-1]
+#        PositionDelta=0.3*self.positionGuesses[self.NumberofPeaks-1]
         
         for i in range (0,self.NumberofParam):
             LB[i]=0
-            UB[i]=numpy.inf   
+#            UB[i]=200
+            UB[i]=numpy.inf
         
         for ii in range (0,self.NumberofPeaks):
             LB[3*ii+2]=self.WidthLowerBound #Low bound of the widths must change with each experiment
             UB[3*ii+2]=self.WidthLowerBound*3
-            LB[3*ii+1]=self.InitialGuesses[3*ii+1]-PositionDelta
-            UB[3*ii+1]=self.InitialGuesses[3*ii+1]+PositionDelta
-#            print(self.InitialGuesses[3*ii+1])
-        
+#        LB[3*ii+1]=self.InitialGuesses[3*ii+1]-PositionDelta
+#        UB[3*ii+1]=self.InitialGuesses[3*ii+1]+PositionDelta
+            LB[3*ii+1]=0.8*self.InitialGuesses[3*ii+1]
+            UB[3*ii+1]=1.2*self.InitialGuesses[3*ii+1]
+
 #        UB[0]=0.023
             
 #        UB[1]=self.InitialGuesses[1]+0.1

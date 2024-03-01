@@ -237,10 +237,24 @@ class c_MDE_tools:
 
     def bin_MDE_chunks(self,H_bin_args,K_bin_args,L_bin_args,E_bin_args,num_chunks=[1,1,1],
         merged_file_name='merged_sparse_histo.hdf5',u=[1,0,0],v=[0,1,0],w=None):
-
         """
         split requested binning into chunks and bin over small chunks separately. merge the 
         results of them all into a single file
+
+        H_bin = [start, step, stop]. note, these are now interpreted like the args to mantid 
+            MDNorm and to Horace cut_sqw: the binning will actually start at 'start' with spacing
+            equal to the step size. i.e. the bin centers will be [start+1*step/2, start+2*step/2, 
+            start+3*step/2, ...]
+
+        etc. for K_bin, L_bin, E_bin
+
+        num_chunks is number of chunks to split binning in Q-space. E.g. if num_chunks = [2,1,1]
+        and there are 10 bins along H, the data will be cut in 2 go's with the first 5 H-bins in
+        the first go and the last 5 in the seconds. 
+
+        merged_file_name is the *.hdf5 where all bins will be written.
+
+        u, v, w are the projections. w is optional and the cross product of u and v if not given.
         """
         
         _t = c_timer('bin_MDE_chunks',units='m')
@@ -682,6 +696,15 @@ class c_MDE_tools:
         bin the events in the MDE workspace into a histogram workspace; note that this doesnt 
         really return anything or create new attributes. the produced data are stored in the 
         histogram workspace
+
+        H_bin = [start, step, stop]. note, these are now interpreted like the args to mantid
+            MDNorm and to Horace cut_sqw: the binning will actually start at 'start' with spacing
+            equal to the step size. i.e. the bin centers will be [start+1*step/2, start+2*step/2,
+            start+3*step/2, ...]
+
+        etc. for K_bin, L_bin, E_bin
+
+        u, v, w are the projections. w is optional and the cross product of u and v if not given.
         """
 
         MDE_ws = self.get_ws(self.MDE_ws_name)

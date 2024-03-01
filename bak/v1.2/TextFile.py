@@ -12,6 +12,7 @@
 import numpy as np
 import math
 import os
+import sys
 from RSE_Constants import RSE_Constants
 from Utils import arg_parser
 
@@ -152,7 +153,9 @@ class Parameters(TextFile):
         self.NumberOfTries=self.evalIntWarning(self.ParseByKeyword("NumberOfTries",parameters),10)
         self.maxFiles=self.evalIntWarning(self.ParseByKeyword("maxFiles",parameters),10)
 #        self.Resolution=eval(self.evalError(self.ParseByKeyword("Resolution",parameters)))
-        self.MinPointsInDataBackgroundFile=self.evalIntWarning(self.ParseByKeyword("MinPointsInDataBackgroundFile",parameters),10)
+        self.MinPointsInDataBackgroundFile=self.evalIntWarning(self.ParseByKeyword("MinPointsInDataBackgroundFile",parameters),10)   
+#        self.MinPeakWidthForSmoothing=eval(self.evalError(self.ParseByKeyword("MinPeakWidthForSmoothing",parameters)))
+#        self.InitWidthsFinal=self.MinPeakWidthForSmoothing
         self.Resolution=eval(self.evalError(self.ParseByKeyword("Resolution",parameters)))
         self.BackgroundAlgorithm=self.evalWarning(self.ParseByKeyword("BackgroundAlgorithm",parameters),"Standard")
 #        if self.BackgroundAlgorithm!="Standard":
@@ -161,28 +164,7 @@ class Parameters(TextFile):
         self.ReadSharedParams(parameters)
 
     # ----------------------------------------------------------------------------------------------
-    def ReadPolyBackgroundParams(self):
-        with open(os.path.join(self.foldername,self.filename)) as f:
-             parameters = f.read().splitlines()
 
-        self.PolyFitNumberIgnoredPointsAtEnd=self.evalIntWarning(self.ParseByKeyword("PolyFitNumberIgnoredPointsAtEnd",parameters),0)
-        
-        if self.PolyFitNumberIgnoredPointsAtEnd==1:
-             print("Last "+str(self.PolyFitNumberIgnoredPointsAtEnd)+" points will be ignored in background determination to remove effect of detector edge")
-
-             
-
-        # ----------------------------------------------------------------------------------------------
-        
-        self.Trim=self.evalIntWarning(self.ParseByKeyword("Trim",parameters),0)
-        
-        if self.Trim==1:
-             print("Last "+str(self.PolyFitNumberIgnoredPointsAtEnd)+" points will be ignored in background determination to remove effect of detector edge")
-        else:
-             self.Trim=0
-        
-        self.Temperature=self.evalReaNoWarning(self.ParseByKeyword("Temperature",parameters),3.0)
-        
     def ReadMultizoneFitParams(self):
         with open(os.path.join(self.foldername,self.filename)) as f:
              parameters = f.read().splitlines()

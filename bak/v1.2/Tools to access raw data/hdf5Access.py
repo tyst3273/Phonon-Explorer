@@ -1,7 +1,7 @@
 
 import h5py 
 import numpy as np
-import time
+
 
 """
 
@@ -50,7 +50,6 @@ class RawData:
         # this class wraps another one that actually interacts with the file
         self._data_access_class = access_data_in_hdf5(file_name)
 
-
         # binning arguments in the hdf5 file
         self.Deltah = self._data_access_class.dh
         self.Deltak = self._data_access_class.dk
@@ -60,60 +59,6 @@ class RawData:
         self.Projection_v = self._data_access_class.v
 
     # ----------------------------------------------------------------------------------------------
-
-    def GetMultiDimData(self, H_min, H_max, K_min, K_max, L_min, L_max, E_min, E_max, Projection_u=0, Projection_v=0, hbin=0, kbin=0, lbin=0, ebin=0): #last 6 params are for compatibility of the API with other file formats. Not used here.
-    
-        if H_max-H_min<2*self.Deltah:
-            mid=(H_max+H_min)/2
-            H_min=mid-self.Deltah
-            H_max=mid+self.Deltah
-        if K_max-K_min<2*self.Deltak:
-            mid=(K_max+H_min)/2
-            K_min=mid-self.Deltak
-            K_max=mid+self.Deltak
-        if L_max-L_min<2*self.Deltak:
-            mid=(L_max+L_min)/2
-            L_min=mid-self.Deltal
-            L_max=mid+self.Deltal
-        if E_max-E_min<self.e_step:
-            mid=(E_max+E_min)/2
-            E_min=mid-self.e_step/2
-            E_max=mid+self.e_step/2
-
-        min=[H_min,K_min,L_min]
-        max=[H_max,K_max,L_max]
-
-        try:
-            self.Energy, self.Intensity, self.Error, self.Qpoint_rlu, code = \
-                self._data_access_class.get_intensity_and_error_in_Q_range(min_vals, max_vals)
-        except Exception as e:
-            print("No slice!")
-            return -1
-
-        mask = np.logical_and(self.Energy >= E_min, self.Energy <= E_max)
-        _E_inds = np.where(mask)[0]
-        
-        self.Energy = self.Energy[_E_inds]
-        self.Intensity = self.Intensity[_E_inds]
-        self.Error = self.Error[_E_inds]
-
-        return 0
-        
-    def GetRockingScan(self, Phi_min, Phi_max, Theta_min, Theta_max):
-        return
-
-    def GetCollectionOfQs(self,Q):
-#        if (1==1):
-        try:
-            self.Energy, intensityArray, errorArray, Qpoints, code = \
-            self._data_access_class.get_intensity_and_error_in_Array_of_Qs(Q)
-            return self.Energy, intensityArray, errorArray, Qpoints, code
-        except Exception as e:
-            print("No slice!")
-            return -1
-
-        return 0
-
 
     def GetSlice(self, bin_h, bin_k, bin_l, bin_e, Projection_u, Projection_v):
         """
@@ -125,27 +70,36 @@ class RawData:
         # requested bin center 
         Q = [np.array(bin_h).mean(),np.array(bin_k).mean(),np.array(bin_l).mean()]
         E_min = bin_e[0]; E_max = bin_e[2]
+        
+        # print the Q-point and E-range we are trying to get. 
+        print("\nQ_h: {:01.3f}".format(Q[0]))
+        print("Q_k: {:01.3f}".format(Q[1]))
+        print("Q_l: {:01.3f}".format(Q[2]))
+        print("bin_e: [{:01.3f}, {:01.3f}]".format(E_min, E_max),'\n')
 
-#        if (1==1):
+        # try to get the data
+
+        #self.Energy, self.Intensity, self.Error, self.Qpoint_rlu = \
+        #        self._data_access_class.get_intensity_and_error(Q)
+
         try:
-            self.Energy, self.Intensity, self.Error, self.Qpoint_rlu, code = \
-                self._data_access_class.get_intensity_and_error_Single_Q(Q)
+            self.Energy, self.Intensity, self.Error, self.Qpoint_rlu = \
+                self._data_access_class.get_intensity_and_error(Q)
         except Exception as e:
             print("No slice!")
-            return -1
+            return 1
+
         self.Intensity *= 1000
         self.Error *= 1000
 
         # if requested grid is smaller than whats in file, downsample the data onto that grid
-#        _E_inds = np.intersect1d(np.flatnonzero(self.Energy >= bin_e[0]), np.flatnonzero(self.Energy <= bin_e[2]))
-        mask = np.logical_and(self.Energy >= bin_e[0], self.Energy <= bin_e[2])
-        _E_inds = np.where(mask)[0]
-        
+        _E_inds = np.intersect1d(np.flatnonzero(self.Energy >= bin_e[0]),
+                    np.flatnonzero(self.Energy <= bin_e[2]))
         self.Energy = self.Energy[_E_inds]
         self.Intensity = self.Intensity[_E_inds]
         self.Error = self.Error[_E_inds]
 
-        return code
+        return 0
 
     # ----------------------------------------------------------------------------------------------
 
@@ -178,12 +132,6 @@ class access_data_in_hdf5:
             self.Q_points_rlu[:,0] = db['H_rlu'][...]
             self.Q_points_rlu[:,1] = db['K_rlu'][...]
             self.Q_points_rlu[:,2] = db['L_rlu'][...]
-#            self.Q_len = db['Q_len'][...]
-#            self.phi=db['polar_angle'][...]
-#            self.psi=db['azimuthal_angle'][...]
-#            for i in range(0,10):
-#                print("{:.2f}, {:.2f}, {:.2f}".format(self.Q_points_rlu[i,0],self.Q_points_rlu[i,1],self.Q_points_rlu[i,2]))
-#            time.sleep(20)
             self.energy = db['DeltaE'][...]
             self.dh = db['H_bin_args'][...][1]/2.0
             self.dk = db['K_bin_args'][...][1]/2.0
@@ -211,8 +159,47 @@ class access_data_in_hdf5:
         self.Q_file_to_Q_user_distance = np.zeros(self.num_Q_in_file)
 
     # ----------------------------------------------------------------------------------------------
-    def _get_cut_from_hdf5(self,Q_index):
 
+    def get_intensity_and_error(self,Q,cutoff=0.1):
+        """
+        take Q in rlu, find nearest Qpt in file, and return signal and error arrays. 
+
+        NOTE: if Qpt in file is sufficiently far from any Q-point in file, this not should not 
+            return any data. raises an Exception which is handles upstream by phonon explorer.
+
+            'cutoff' controls the minimum distance to a point in the file before
+            an exception is raised. 
+        """
+        
+        # get distance from user Q to all Qpts in file
+        _Qpts = self.Q_points_rlu
+        _Qvec = self.Q_file_to_Q_user_vector
+        _Qdist = self.Q_file_to_Q_user_distance
+        _Qvec[:,0] = _Qpts[:,0]-Q[0]
+        _Qvec[:,1] = _Qpts[:,1]-Q[1]
+        _Qvec[:,2] = _Qpts[:,2]-Q[2]
+        _Qdist[...] = np.round(np.sqrt(np.sum(_Qvec**2,axis=1)),4)
+
+        # find the closest Q-point
+        Q_index = np.argsort(_Qdist)[0]
+
+        # raise Exception if empty slice 
+        # (i.e. no data at Q-pt within distance cutoff of requested Q)
+        if _Qdist[Q_index] >= cutoff:
+            intensity = np.full(self.energy.size,np.NaN)
+            error = np.full(self.energy.size,np.NaN)
+            #raise Exception
+
+        Qpoint_from_file = _Qpts[Q_index]
+
+        # now get and return the data
+        intensity, error = self._get_cut_from_hdf5(Q_index)
+
+        return self.energy, intensity, error, Qpoint_from_file
+
+    # ----------------------------------------------------------------------------------------------
+
+    def _get_cut_from_hdf5(self,Q_index):
         """
         attempt to get the data from hdf5 file. if fails, return nans
         """
@@ -226,66 +213,9 @@ class access_data_in_hdf5:
 
         return intensity, error
 
-            # ----------------------------------------------------------------------------------------------
+    # ----------------------------------------------------------------------------------------------
 
 
-    def filter_array(self, arr, min_vals, max_vals):
-    
-        mask = np.all((arr >= min_vals) & (arr <= max_vals), axis=1)
-        filtered_indices = np.where(mask)[0]
-        filtered_arr = arr[mask]
-        
-        return filtered_arr, filtered_indices
-        
-    def get_intensity_and_error_in_Q_range(self, min_vals, max_vals):
-
-        Q_Points=[]
-        Q_Point_Indices=[]
-        
-        for i in range(0,len(min_vals)):
-            Q_Point, Q_Point_Index=self.filter_array(self.Q_points_rlu, min_vals[i], max_vals[i])
-            try:
-                for i in range(0,len(Q_Point)):
-                    Q_Points.append(Q_Point[i])
-                    Q_Point_Indices.append(Q_Point_Index[i])
-            except:
-                pass
-        code=0
-
-        Num_Q_Points = len(Q_Point_Indices)
-        sorted_indices = np.argsort(Q_Point_Indices)
-        Q_Points_sorted = []
-        sorted_Q_Point_Indices = []
-        for i in range (0,len(sorted_indices)):
-            positions = np.where(sorted_Q_Point_Indices == Q_Point_Indices[sorted_indices[i]])[0]
-            if len(positions)==0:
-                sorted_Q_Point_Indices.append(Q_Point_Indices[sorted_indices[i]])
-                Q_Points_sorted.append(Q_Points[sorted_indices[i]])
-        
-        intensity = np.full(Num_Q_Points,np.NaN)
-        error = np.full(Num_Q_Points,np.NaN)
-
-        intensityArray, errorArray = self._get_cut_from_hdf5(sorted_Q_Point_Indices)
-        
-        return Q_Points_sorted, intensityArray, errorArray, code
 
 
-    def get_intensity_and_error_Single_Q(self,Q,cutoff=0.5):
-            
-        min=[[Q[0]-self.dh,Q[1]-self.dk,Q[2]-self.dl]]
-        max=[[Q[0]+self.dh,Q[1]+self.dk,Q[2]+self.dl]]
-        
-        Qpoints, intensity, error, code = self.get_intensity_and_error_in_Q_range(min, max)
-        Qpoint_from_file=Qpoints[0]
 
-        return self.energy, intensity[0], error[0], Qpoint_from_file, code
-
-    def get_intensity_and_error_in_Array_of_Qs(self,Q):
-        
-        min=Q-[self.dh,self.dk,self.dl]
-        max=Q+[self.dh,self.dk,self.dl]
-
-
-        Qpoints, intensity, error, code = self.get_intensity_and_error_in_Q_range(min, max)
-
-        return self.energy, intensity, error, Qpoints, code
