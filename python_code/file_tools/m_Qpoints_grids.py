@@ -6,7 +6,7 @@ Affil: University of Colorado Boulder, Raman Spectroscopy and Neutron Scattering
 Date: 03/01/2024
 Description:
     turns out that having a seperate file for every binning is a nuisance. we want to have 
-    multiple binning 
+    multiple binnings/grid offsets in a single file to make our lives easier
 """
 
 from timeit import default_timer
