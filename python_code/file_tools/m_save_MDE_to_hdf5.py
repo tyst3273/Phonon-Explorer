@@ -5,7 +5,7 @@ import os
 
 # --------------------------------------------------------------------------------------------------
 
-class _c_reduced_MDE_tools:
+class c_reduced_MDE_tools:
 
     # ----------------------------------------------------------------------------------------------
 
@@ -381,7 +381,7 @@ def save_MDE_to_hdf5(MD_workspace,hdf5_file_name):
     that contain only NaNs along energy axis. 
     """
 
-    MDE_tools = _c_reduced_MDE_tools(MD_workspace)
+    MDE_tools = c_reduced_MDE_tools(MD_workspace)
     MDE_tools.write_sparse_hdf5(hdf5_file_name)
 
 # --------------------------------------------------------------------------------------------------
