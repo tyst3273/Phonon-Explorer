@@ -1,8 +1,4 @@
 
-import h5py 
-import numpy as np
-import time
-
 """
 
 File added by Tyler Sterling, Apr. 2023
@@ -33,7 +29,9 @@ Whats new: The binning args and actual Q-point found in the file are attached as
 
 """
 
-
+import h5py
+import numpy as np
+import time
 
 # --------------------------------------------------------------------------------------------------
 
@@ -61,7 +59,9 @@ class RawData:
 
     # ----------------------------------------------------------------------------------------------
 
-    def GetMultiDimData(self, H_min, H_max, K_min, K_max, L_min, L_max, E_min, E_max, Projection_u=0, Projection_v=0, hbin=0, kbin=0, lbin=0, ebin=0): #last 6 params are for compatibility of the API with other file formats. Not used here.
+    def GetMultiDimData(self, H_min, H_max, K_min, K_max, L_min, L_max, E_min, E_max, 
+            Projection_u=0, Projection_v=0, hbin=0, kbin=0, lbin=0, ebin=0): 
+        #last 6 params are for compatibility of the API with other file formats. Not used here.
     
         if H_max-H_min<2*self.Deltah:
             mid=(H_max+H_min)/2

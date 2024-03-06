@@ -1,86 +1,77 @@
-################################
-#
-# Copy Facilities.xml to your 
-# .mantid/instrument folder
-#
-################################
 
+"""
+Author: Andrei T. Savici
+Email: saviciat@ornl.gov
 
-from file_tools.m_save_MDE_to_hdf5 import save_MDE_to_hdf5
+Updated by: Tyler C. Sterling
+Email: ty.sterling@colorado.edu
+Affil: University of Colorado Boulder, Raman Spectroscopy and Neutron Scattering Lab
 
-from mantid.simpleapi import *
+Date: 03/05/2024
+Description:
+    - parse files NXSPE files from JPARC, merge into MDE dataset, use MDNorm to bin, 
+        then write the histogrammed data to .hdf5 file that can be used by phonon 
+        explorer. 
+    - all the code to talk to the JPARC files was written by Andrei. Tyler wrote the 
+        wrapper that loops over Q-pt grids and he wrote the code that writes histo 
+        data to file.
+
+    - note: to get mantid to correctly accept files from JPARC, you have to use a 
+        modified "Facilities.xml" file. there is one provied in 'file_tools' dir. 
+        allegedly we can just copy this to our $HOME/.mantid/instrument dir, but that 
+        didnt work recently (it used to). I had to edit $HOME/.mantid/Mantid.user.properties 
+        file and add instrumentDefinition.directory=/SNS/users/YOUR-USER-NAME/.mantid/instrument
+        where you should replace YOUR-USER-NAME by your user name on the SNS server. 
+        for other computers, the path should ultimately it should point to 
+        $HOME/.mantid/instrument
+"""
+
 import glob
-import numpy as np
+from file_tools.m_PreprocessNXSPE import bin_NXSPE_with_offsets
+from file_tools.m_file_utils import c_timer
 
-#EDIT HERE
-stepH=0.2
-stepK=0.2
-stepL=0.2
-HBin=[1-stepH/2,stepH,2+stepH/2]
-KBin=[-6.1-stepK/2,stepK,6.1+stepK/2]
-LBin=[-4-stepL/2,stepL,4+stepL/2]
-files = sorted(glob.glob('/SNS/ARCS/IPTS-26347/shared/jpark/nxspe120Ei_010K_Ebin1_RCmasked/S0*.nxspe'))
+# --------------------------------------------------------------------------------------------------
 
-#This is the file that lists the goniometer angler for each NXPCE file
-fn = '/SNS/ARCS/IPTS-26347/shared/jpark/120meV300Hz010K_run_list.txt'
-hdf5_file_name = 'nxspe120Ei_010K_Ebin1ZBk.hdf5'
+# [start, step, stop]. these are interpreted like the args to mantid MDNorm and to 
+# Horace cut_sqw: the binning will actually start at 'start' with spacing equal to 
+# the step size. i.e. the bin centers will be [start+1*step/2, start+2*step/2,
+# start+3*step/2, ...]
 
-#This should be aligned UV matrix
-UBpars={'a':3.93,'b':3.93,'c':3.93,'alpha':90,'beta':90,'gamma':90,'u':'1,0,-0.1','v':'0,1,-0.1'}
+H_bins = [  0.90,  0.20,  2.10]
+K_bins = [ -6.10,  0.20,  6.10]
+L_bins = [ -4.10,  0.20,  4.10]
 
-########################################
+# [offset_1, offset_2, ..., offset_N]. loop over the offets in *_offsets and bin using 
+# the args in *_bin shifted by the offets. e.g. for H_offset = [0.0, 0.01] and H_bins = 
+# [-0.05, 0.1, 0.55], we will generate data on a grid intergrated around H=0.0+-0.05, 
+# H=0.1+-0.05, ..., H=0.5+-0.05 and similarly H=0.01+-0.05, H=0.11+-0.05, ..., H=0.51+-0.05 
+# etc. similarly for K_offets, L_offsets. 
+
+H_offsets = [  0.1]
+K_offsets = None #[  0.1] 
+L_offsets = None #[  0.1]
+
+# event files (i.e. neutron => detector) binned in energy
+event_files = sorted(
+    glob.glob('/SNS/ARCS/IPTS-26347/shared/jpark/nxspe120Ei_010K_Ebin1_RCmasked/S0*.nxspe'))
+
+# file that lists the goniometer angles for each NXPSE file
+goniometer_file = '/SNS/ARCS/IPTS-26347/shared/jpark/120meV300Hz010K_run_list.txt'
+hdf5_output_file = 'nxspe120Ei_010K_Ebin1ZBk.hdf5'
+
+# this should be aligned UV matrix
+UB_params={'a':3.93,'b':3.93,'c':3.93,'alpha':90,'beta':90,'gamma':90,
+    'u':'1,0,-0.1','v':'0,1,-0.1'}
+
+_timer = c_timer('bin_with_offsets',units='m')
+
+# this goes and does the stuff
+bin_NXSPE_with_offsets(event_files,goniometer_file,hdf5_output_file,UB_params,
+    H_bins,K_bins,L_bins,H_offsets,K_offsets,L_offsets)
+
+_timer.stop()
 
 
-d=np.loadtxt(fn,skiprows=1,dtype=str)
-runs=d[:,0]
-gon=d[:,11].astype(float)-82.388
-gon_dict=dict()
-for r,g in zip(runs, gon):
-    gon_dict[r]=g
-
-wg=Load(','.join(files))
-for wsn in wg.getNames():
-    ang=gon_dict[wsn.split('S0')[1]]
-    SetGoniometer(Workspace=wsn, Axis0 = f'{ang},0,1,0,1')
-axis_deltaE=wg[0].readX(0)
-emin=axis_deltaE[0]
-emax=axis_deltaE[-1]
-de_step=axis_deltaE[1]-emin
-ConvertFromDistribution(wg)
-wge=ConvertToEventWorkspace(wg)
-wge=CropWorkspaceForMDNorm(wge,XMin=emin,XMax=emax)
-SetUB(wge,**UBpars)
-AddSampleLog(Workspace='wge', LogName='gd_prtn_chrg', LogText='1.0', LogType='Number', NumberType='Double')
-mdparts=ConvertToMD(InputWorkspace=wge, QDimensions='Q3D', dEAnalysisMode='Direct', Q3DFrames='Q_sample')
-mde=MergeMD(mdparts)
-#SaveMD(InputWorkspace="mde",Filename="/SNS/ARCS/IPTS-26347/shared/jpark/MDEventFile.nxs")
-
-#UBpars={'a':3.93,'b':3.93,'c':3.93,'alpha':90,'beta':90,'gamma':90,'u':'1,0,-0.1','v':'0,1,-0.1'}
-#SetUB(mde,**UBpars)
-
-#print(axis_deltaE)
-# test MDNorm - elastic slice
-MDNorm(InputWorkspace=mde,
-       QDimension0='1,0,0',
-       QDimension1='0,1,0',
-       QDimension2='0,0,1',
-       Dimension0Name='QDimension0',
-       Dimension0Binning="{},{},{}".format(HBin[0],HBin[1],HBin[2]),
-       Dimension1Name='QDimension1',
-       Dimension1Binning="{},{},{}".format(KBin[0],KBin[1],KBin[2]),
-       Dimension2Name='QDimension2',
-       Dimension2Binning="{},{},{}".format(LBin[0],LBin[1],LBin[2]),
-       Dimension3Name='DeltaE',
-       Dimension3Binning="{}".format(de_step),
-#       SymmetryOperations='x,y,z;-x,-y,z;x,y,-z;-x,-y,-z;y,x,z;y,x,-z',
-       OutputWorkspace='o',
-       OutputDataWorkspace='d',
-       OutputNormalizationWorkspace='n')
-
-#SaveMD(InputWorkspace="o",Filename="/SNS/ARCS/IPTS-26347/shared/jpark/MDHistoFile.nxs")
-
-MD_workspace = mtd['o']
-save_MDE_to_hdf5(MD_workspace,hdf5_file_name)
 
 
 

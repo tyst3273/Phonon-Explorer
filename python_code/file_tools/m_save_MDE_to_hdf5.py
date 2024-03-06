@@ -215,7 +215,7 @@ class c_reduced_MDE_tools:
 
     # ----------------------------------------------------------------------------------------------
     
-    def write_sparse_hdf5(self,hdf5_file_name):
+    def append_sparse_to_hdf5(self,hdf5_file_name):
         """
         write sparse data to hdf5 file
         """
@@ -233,24 +233,29 @@ class c_reduced_MDE_tools:
         print(msg)
 
         _exists = os.path.exists(hdf5_file_name)
-        if _exists:
-            msg = '\nhdf5 file already exists... removing it!\n'
-            print(msg)
-            os.remove(hdf5_file_name)
-
-        with h5py.File(hdf5_file_name,mode='w',libver='latest') as db:
-            self._write_datasets(db)
-
-
+        with h5py.File(hdf5_file_name,mode='a',libver='latest') as db:
+            
+            # create datasets if file doesnt exist
+            if not _exists:
+                self._create_datasets(db)
+    
+            # otherwise, resize and add data to datasets        
+            else:
+                self._append_datasets(db)
+    
     # ----------------------------------------------------------------------------------------------
-
-    def _write_datasets(self,db):
+    
+    def _create_datasets(self,db):
         """
-        create datasets in file and write them
+        create datasets in file if it doesnt already exits
         """
 
         _nE = self.dim_arrays[3].size
 
+        # see below... i used 'chunks=True' to let h5py estimate these sizes
+        _chunks = (125,12) # chunk size nQxnE arrays (resizable along 1st dim)
+        _flat_chunks = (1000,) # chunk size for nQ arrays (resizable)
+        
         db.create_dataset('lattice_vectors',data=self.lattice_vectors)
         db.create_dataset('recip_lattice_vectors',data=self.recip_lattice_vectors)
         db.create_dataset('a',data=self.a)
@@ -274,25 +279,84 @@ class c_reduced_MDE_tools:
 
         db.create_dataset('DeltaE',data=self.dim_arrays[3],dtype=np.float32)
 
+        # resizable arrays
+
         # Q rlu
-        db.create_dataset('H_rlu',data=self.Q_mesh[:,0],dtype=np.float32)
-        db.create_dataset('K_rlu',data=self.Q_mesh[:,1],dtype=np.float32)
-        db.create_dataset('L_rlu',data=self.Q_mesh[:,2],dtype=np.float32)
+        db.create_dataset('H_rlu',data=self.Q_mesh[:,0],
+                                maxshape=(None,),dtype=np.float32,chunks=_flat_chunks)
+        db.create_dataset('K_rlu',data=self.Q_mesh[:,1],
+                                maxshape=(None,),dtype=np.float32,chunks=_flat_chunks)
+        db.create_dataset('L_rlu',data=self.Q_mesh[:,2],
+                                maxshape=(None,),dtype=np.float32,chunks=_flat_chunks)
 
         # Q cartesian
-        db.create_dataset('H_cartesian',data=self.cartesian_Q_mesh[:,0],dtype=np.float32)
-        db.create_dataset('K_cartesian',data=self.cartesian_Q_mesh[:,1],dtype=np.float32)
-        db.create_dataset('L_cartesian',data=self.cartesian_Q_mesh[:,2],dtype=np.float32)
+        db.create_dataset('H_cartesian',data=self.cartesian_Q_mesh[:,0],
+                                maxshape=(None,),dtype=np.float32,chunks=_flat_chunks)
+        db.create_dataset('K_cartesian',data=self.cartesian_Q_mesh[:,1],
+                                maxshape=(None,),dtype=np.float32,chunks=_flat_chunks)
+        db.create_dataset('L_cartesian',data=self.cartesian_Q_mesh[:,2],
+                                maxshape=(None,),dtype=np.float32,chunks=_flat_chunks)
 
         # Q polar
-        db.create_dataset('Q_len',data=self.polar_Q_mesh[:,0],dtype=np.float32)
-        db.create_dataset('polar_angle',data=self.polar_Q_mesh[:,1],dtype=np.float32)
-        db.create_dataset('azimuthal_angle',data=self.polar_Q_mesh[:,2],dtype=np.float32)
+        db.create_dataset('Q_len',data=self.polar_Q_mesh[:,0],
+                                maxshape=(None,),dtype=np.float32,chunks=_flat_chunks)
+        db.create_dataset('polar_angle',data=self.polar_Q_mesh[:,1],
+                                maxshape=(None,),dtype=np.float32,chunks=_flat_chunks)
+        db.create_dataset('azimuthal_angle',data=self.polar_Q_mesh[:,2],
+                                maxshape=(None,),dtype=np.float32,chunks=_flat_chunks)
 
         # the data
-        db.create_dataset('signal',data=self.signal,dtype=np.float64)
-        db.create_dataset('error',data=self.error,dtype=np.float64)
-        #db.create_dataset('num_events',data=self.num_events,dtype=int)
+        db.create_dataset('signal',data=self.signal,
+                                maxshape=(None,_nE),dtype=np.float64,chunks=_chunks)
+        db.create_dataset('error',data=self.error,
+                                maxshape=(None,_nE),dtype=np.float64,chunks=_chunks)
+        #db.create_dataset('num_events',data=self.num_events,
+        #                        maxshape=(None,_nE),dtype=int,chunks=_chunks)
+
+    # ----------------------------------------------------------------------------------------------
+
+    def _append_datasets(self,db):
+        """
+        create datasets in file and write them
+        """
+
+        _nE = self.dim_arrays[3].size
+        _nQ = self.Q_mesh[:,0].size
+        _nfile = db['signal'].shape[0]
+        msg = f'resizing arrays from ({_nfile},{_nE}) to ({_nQ+_nfile},{_nE})\n'
+        print(msg)
+
+        # rlu
+        db['H_rlu'].resize(_nQ+_nfile,axis=0)
+        db['H_rlu'][_nfile:] = self.Q_mesh[:,0]
+        db['K_rlu'].resize(_nQ+_nfile,axis=0)
+        db['K_rlu'][_nfile:] = self.Q_mesh[:,1]
+        db['L_rlu'].resize(_nQ+_nfile,axis=0)
+        db['L_rlu'][_nfile:] = self.Q_mesh[:,2]
+
+        # cartesian
+        db['H_cartesian'].resize(_nQ+_nfile,axis=0)
+        db['H_cartesian'][_nfile:] = self.cartesian_Q_mesh[:,0]
+        db['K_cartesian'].resize(_nQ+_nfile,axis=0)
+        db['K_cartesian'][_nfile:] = self.cartesian_Q_mesh[:,1]
+        db['L_cartesian'].resize(_nQ+_nfile,axis=0)
+        db['L_cartesian'][_nfile:] = self.cartesian_Q_mesh[:,2]
+
+        # polar
+        db['Q_len'].resize(_nQ+_nfile,axis=0)
+        db['Q_len'][_nfile:] = self.polar_Q_mesh[:,0]
+        db['polar_angle'].resize(_nQ+_nfile,axis=0)
+        db['polar_angle'][_nfile:] = self.polar_Q_mesh[:,1]
+        db['azimuthal_angle'].resize(_nQ+_nfile,axis=0)
+        db['azimuthal_angle'][_nfile:] = self.polar_Q_mesh[:,2]
+
+        # data
+        db['signal'].resize(_nQ+_nfile,axis=0)
+        db['signal'][_nfile:,:] = self.signal[...]
+        db['error'].resize(_nQ+_nfile,axis=0)
+        db['error'][_nfile:,:] = self.error[...]
+        #db['num_events'].resize(_nQ+_nfile,axis=0)
+        #db['num_events'][_nfile:,:] = self.num_events[...]
 
     # ----------------------------------------------------------------------------------------------
     
@@ -369,11 +433,9 @@ class c_reduced_MDE_tools:
 
     # ----------------------------------------------------------------------------------------------
 
-
-
 # --------------------------------------------------------------------------------------------------
 
-def save_MDE_to_hdf5(MD_workspace,hdf5_file_name):
+def save_MDE_to_hdf5(MD_workspace,hdf5_file_name,overwrite=True):
 
     """
     takes MD Histogram workspace and hdf5 file name as args. gets signal, error, lattice info,
@@ -382,14 +444,13 @@ def save_MDE_to_hdf5(MD_workspace,hdf5_file_name):
     """
 
     MDE_tools = c_reduced_MDE_tools(MD_workspace)
-    MDE_tools.write_sparse_hdf5(hdf5_file_name)
+
+    if overwrite:
+        if os.path.exists(hdf5_file_name):
+            msg = 'hdf5 file already exists. removing it ...\n'
+            print(msg)
+            os.remove(hdf5_file_name)
+
+    MDE_tools.append_sparse_to_hdf5(hdf5_file_name)    
 
 # --------------------------------------------------------------------------------------------------
-
-
-     
-
-
-
-
-

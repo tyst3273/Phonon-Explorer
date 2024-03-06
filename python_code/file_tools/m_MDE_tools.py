@@ -11,7 +11,7 @@ Description:
         - calculate and subtract background from raw data in custom hdf5 file
 """
 
-from .m_file_utils import *
+from file_tools.m_file_utils import *
 
 import numpy as np
 import h5py 
@@ -235,8 +235,108 @@ class c_MDE_tools:
 
     # ----------------------------------------------------------------------------------------------
 
+    def bin_MDE_with_offsets(self,H_bins,K_bins,L_bins,E_bins,H_offsets=None,K_offsets=None,
+        L_offsets=None,num_chunks=[1,1,1],merged_file_name='MD_histo.hdf5',
+        u=[1,0,0],v=[0,1,0],w=None):
+        """
+        bin the events in the MDE workspace into a histogram workspace; note that this doesnt
+        really return anything or create new attributes. the produced data are stored in the
+        histogram workspace.
+
+        turns out that having a seperate file for every grid offset is a nuisance. we want to 
+        have multiple binnings/grid offsets in a single file to make our lives easier.
+
+        H_bin = [start, step, stop]. note, these are now interpreted like the args to mantid
+            MDNorm and to Horace cut_sqw: the binning will actually start at 'start' with spacing
+            equal to the step size. i.e. the bin centers will be [start+1*step/2, start+2*step/2,
+            start+3*step/2, ...]. similarly for K_bins, L_bins.
+
+        H_offets = [offset_1, offset_2, ..., offset_N]. loop over the offets in H_offsets and bin
+            using the args in H_bin shifted by the offets. e.g. for H_offset = [0.0, 0.01] and
+            H_bins = [-0.05, 0.1, 0.55], we will generate data on a grid intergrated around
+            H=0.0+-0.05, H=0.1+-0.05, ..., H=0.5+-0.05 and similarly H=0.01+-0.05, H=0.11+-0.05, ...,   
+            H=0.51+-0.05 etc. similarly for K_offets, L_offsets.
+
+        num_chunks is number of chunks to split binning in Q-space. E.g. if num_chunks = [2,1,1]
+        and there are 10 bins along H, the data will be cut in 2 go's with the first 5 H-bins in
+        the first go and the last 5 in the seconds. 
+
+        merged_file_name is the name of the output data. each offset grid is appended to the file
+
+        u, v, w are the projections. w is optional and the cross product of u and v if not given.
+        """
+
+        H_bins = np.array(H_bins,dtype=float)
+        K_bins = np.array(K_bins,dtype=float)
+        L_bins = np.array(L_bins,dtype=float)
+
+        # check if any offsets are defined and initialize null offsets otherwise
+        loop_over_offsets = False
+        if H_offsets is None:
+            H_offsets = np.array([0.0],dtype=float)
+        else:
+            H_offsets = np.array(H_offsets,dtype=float) 
+            loop_over_offsets = True
+        if K_offsets is None:
+            K_offsets = np.array([0.0],dtype=float)
+        else:
+            K_offsets = np.array(K_offsets,dtype=float)
+            loop_over_offsets = True
+        if L_offsets is None:
+            L_offsets = np.array([0.0],dtype=float)
+        else:
+            L_offsets = np.array(L_offsets,dtype=float)
+            loop_over_offsets = True
+
+        print('H_bins:',H_bins)
+        print('K_bins:',K_bins)
+        print('L_bins:',L_bins,'\n')
+
+        # bin the data on the unshifted grid first. this initiates file etc.
+        self.bin_MDE_chunks(H_bins,K_bins,L_bins,E_bins,num_chunks,merged_file_name,u,v,w)
+
+        # only loop over offsets if one is defined
+        if loop_over_offsets:
+
+            num_offsets = H_offsets.size*K_offsets.size*L_offsets.size
+
+            print('\n----------------------------------------------------------------\n')
+            print('H_offsets:',H_offsets)
+            print('K_offsets:',K_offsets)
+            print('L_offsets:',L_offsets)
+            print('num_offsets:',num_offsets)
+
+            msg = '\nlooping over offsets'
+            print(msg)
+
+            _H_offset = np.array([0,0,0],dtype=float)
+            _K_offset = np.array([0,0,0],dtype=float)
+            _L_offset = np.array([0,0,0],dtype=float)
+
+            _n = 0
+
+            # loop over the offsets and bin the data at each offset
+            for ii, _H in enumerate(H_offsets):
+                for jj, _K in enumerate(K_offsets):
+                    for kk, _L in enumerate(L_offsets):
+
+                        _H_offset[0] = _H; _H_offset[2] = _H
+                        _K_offset[0] = _K; _K_offset[2] = _K
+                        _L_offset[0] = _L; _L_offset[2] = _L
+
+                        print(f'\noffset[{_n+1}]:',_H,_K,_L,'\n')
+
+                        # go and bin the data 
+                        self.bin_MDE_chunks(H_bins+_H_offset,K_bins+_K_offset,
+                            L_bins+_L_offset,E_bins,num_chunks,merged_file_name,
+                            u,v,w,overwrite=False)
+
+                        _n += 1
+
+    # ----------------------------------------------------------------------------------------------
+
     def bin_MDE_chunks(self,H_bin_args,K_bin_args,L_bin_args,E_bin_args,num_chunks=[1,1,1],
-        merged_file_name='merged_sparse_histo.hdf5',u=[1,0,0],v=[0,1,0],w=None):
+        merged_file_name='merged_sparse_histo.hdf5',u=[1,0,0],v=[0,1,0],w=None,overwrite=True):
         """
         split requested binning into chunks and bin over small chunks separately. merge the 
         results of them all into a single file
@@ -260,7 +360,9 @@ class c_MDE_tools:
         _t = c_timer('bin_MDE_chunks',units='m')
 
         self.merged_file_name = merged_file_name
-        if os.path.exists(merged_file_name):
+
+        # overwrite by default, but dont overwrite in some cases, e.g. assembling multiple offsets
+        if os.path.exists(merged_file_name) and overwrite:
             msg = 'merged file already exists. removing it ...\n'
             print(msg)
             os.remove(merged_file_name)
@@ -707,6 +809,15 @@ class c_MDE_tools:
         u, v, w are the projections. w is optional and the cross product of u and v if not given.
         """
 
+        if not hasattr(self,'H_range'):
+            self.H_bin_edges, self.H_range, self.dH = self._get_bin_edges(H_bins)
+            #self.K_bin_args = K_bin_args
+            self.K_bin_edges, self.K_range, self.dK = self._get_bin_edges(K_bins)
+            #self.L_bin_args = L_bin_args
+            self.L_bin_edges, self.L_range, self.dL = self._get_bin_edges(L_bins)
+            #self.E_bin_args = E_bin_args
+            self.E_bin_edges, self.E_range, self.dE = self._get_bin_edges(E_bins)
+
         MDE_ws = self.get_ws(self.MDE_ws_name)
 
         # get u, v vectors to determin axes along which to bin
@@ -774,36 +885,6 @@ class c_MDE_tools:
 
     # ----------------------------------------------------------------------------------------------
 
-    def bin_MDE_with_offsets(self,H_bins=None,K_bins=None,L_bins=None,E_bins=None,
-            H_offsets=[0.0],K_offsets=[0.0],L_offsets=[0.0],histo_file_name='MD_histo.hdf5',
-            u=[1,0,0],v=[0,1,0],w=None):
-        """
-        bin the events in the MDE workspace into a histogram workspace; note that this doesnt
-        really return anything or create new attributes. the produced data are stored in the
-        histogram workspace.
-
-        turns out that having a seperate file for every grid offset is a nuisance. we want to 
-        have multiple binnings/grid offsets in a single file to make our lives easier.
-
-        H_bin = [start, step, stop]. note, these are now interpreted like the args to mantid
-            MDNorm and to Horace cut_sqw: the binning will actually start at 'start' with spacing
-            equal to the step size. i.e. the bin centers will be [start+1*step/2, start+2*step/2,
-            start+3*step/2, ...]. similarly for K_bins, L_bins.
-
-        H_offets = [offset_1, offset_2, ..., offset_N]. loop over the offets in H_offsets and bin
-        using the args in H_bin shifted by the offets. e.g. for H_offset = [0.0, 0.01] and
-        H_bins = [-0.05, 0.1, 0.55], we will generate data on a grid intergrated around
-        H=0.0+-0.05, H=0.1+-0.05, ..., H=0.5+-0.05 and similarly H=0.01+-0.05, H=0.11+-0.05, ...,
-        H=0.51+-0.05 etc. similarly for K_offets, L_offsets.
-
-        hist_file_name is the name of the output data. each offset grid is appended to the file
-
-        u, v, w are the projections. w is optional and the cross product of u and v if not given.
-        """
-
-    # ----------------------------------------------------------------------------------------------
-    
-# --------------------------------------------------------------------------------------------------
 
 
 

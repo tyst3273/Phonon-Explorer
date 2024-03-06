@@ -96,8 +96,8 @@ class Parameters(TextFile):
         if not os.path.isdir(self.path_data):
             os.makedirs(self.path_data)
 
-        self.Projection_u=np.asarray(self.evalError(self.ParseByKeyword("Projection_u",parameters)).split(",")).astype(np.float)
-        self.Projection_v=np.asarray(self.evalError(self.ParseByKeyword("Projection_v",parameters)).split(",")).astype(np.float)
+        self.Projection_u=np.asarray(self.evalError(self.ParseByKeyword("Projection_u",parameters)).split(",")).astype(float)
+        self.Projection_v=np.asarray(self.evalError(self.ParseByKeyword("Projection_v",parameters)).split(",")).astype(float)
         self.path_InputFiles=self.evalError(self.ParseByKeyword("InputFilesDir",parameters))
         self.ErrorToIntensityMaxRatio=self.evalRealWarning(self.ParseByKeyword("ErrorToIntensityMaxRatio",parameters),1)
         if self.QMode==1:    
