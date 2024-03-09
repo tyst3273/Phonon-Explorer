@@ -24,7 +24,7 @@ class Plot:
         self.params=params
         
     def Plot(self):
-        dataFileNames=[file for file in sorted(os.listdir(self.dataDirectory)) if file.startswith("H") and not file.endswith("pdf")]
+        dataFileNames=[file for file in sorted(os.listdir(self.dataDirectory)) if file.startswith("H") and not (file.endswith("pdf") or file.endswith("jpg"))]
         for i in range (0,len(dataFileNames)):
             data=Dataset(self.dataDirectory,[dataFileNames[i]])
             self.plotDataset(data,0)
@@ -60,6 +60,7 @@ class Plot:
             title=filenames[0]
         plt.title(title+self.titleApend)
         plt.savefig(plotsFolder+title+'.pdf')
+#        plt.savefig(plotsFolder+title+'.jpg')
         plt.close()
 
     def getFitResultsArray(self,fitResults, Energy,indx):

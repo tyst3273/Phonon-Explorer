@@ -25,8 +25,12 @@ class Display:
 
             for filename in pdf_files:
                 merger.append(PdfFileReader(os.path.join(files_dir, filename), "rb"))
-
+            
             merger.write(os.path.join(files_dir, name))
+
+#            for filename in pdf_files:
+#                os.remove(os.path.join(files_dir, filename))
+            
         except Exception as e:
             print ("MakePlotsSumary failed in "+folder)
             print(e)

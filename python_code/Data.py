@@ -22,10 +22,10 @@ from RSE_Constants import *
 import time
 import timeit
 import sys
+#import Interpolator
 from decimal import *
 getcontext().prec=6
 #from nexusformat.nexus import *
-
 
 class Dataset: 
     
@@ -71,9 +71,11 @@ class Dataset:
                 f.write('{:.2f}\n'.format(RSE_Constants.rawData.Deltah))
                 f.write('{:.2f}\n'.format(RSE_Constants.rawData.Deltak))
                 f.write('{:.2f}\n'.format(RSE_Constants.rawData.Deltal))
+                f.write('{:.2f}\n'.format(RSE_Constants.rawData.e_step))
             params.Deltah=RSE_Constants.rawData.Deltah
             params.Deltak=RSE_Constants.rawData.Deltak
             params.Deltal=RSE_Constants.rawData.Deltal
+            params.e_step=RSE_Constants.rawData.e_step
         except:
             pass
     # ----------------------------------------------------------------------------------------------
@@ -482,9 +484,9 @@ class DataSmall_q(Dataset):
 
 
 
-# =======================================================================================================================
-# -----------------------------------------------------------------------------------------------------------------------
-# =======================================================================================================================
+# =================================================================================================
+# -------------------------------------------------------------------------------------------------
+# ==================================================================================================
 
 
 class CollectionOfQs(Dataset):
@@ -503,20 +505,19 @@ class CollectionOfQs(Dataset):
         """
         added by T.S. Apr 2022
 
-        need to know what Qpoints to do in advance of looping over them. this is sensible in general but is
-        required to do them in parallel
+        need to know what Qpoints to do in advance of looping over them. this is sensible in 
+        general but is required to do them in parallel
 
         in this case, just read the specified file
         """
 
-        self.Qpts=np.genfromtxt(self.params.path_InputFiles+self.params.textfile_for_selectedQs)
+        self.Qpts=np.atleast_2d(
+                np.genfromtxt(self.params.path_InputFiles+self.params.textfile_for_selectedQs))
         if self.Qpts.shape[1] != 3:
             exit('\n ERROR!\n  Qpts in file should have shape [N_Q]x[3]\n')
         self.num_Qpts = self.Qpts.shape[0]
         print(f'\n there are {self.num_Qpts} Qpts\n')
 
-    #
-    
 class DataBackgroundQs(Dataset):
 
     # ----------------------------------------------------------------------------------------------

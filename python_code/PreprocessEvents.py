@@ -8,10 +8,10 @@ from file_tools.m_MDE_tools import c_MDE_tools
 from file_tools.m_background_tools import c_background_tools
 from file_tools.m_file_utils import c_timer, crash
 
-#import file_tools.m_MDE_tools as m_MDE_tools
-#from importlib import reload
-#reload(m_MDE_tools)
-#c_MDE_tools = m_MDE_tools.c_MDE_tools
+from importlib import reload
+import file_tools.m_MDE_tools as m_MDE_tools
+reload(m_MDE_tools)
+c_MDE_tools = m_MDE_tools.c_MDE_tools
 
 # --------------------------------------------------------------------------------------------------
 
@@ -44,23 +44,24 @@ if bin_MDE:
     # the args to mantid MDNorm and to Horace cut_sqw: the binning will
     # actually start at 'start' with spacing equal to the step size. i.e. the
     # bin centers will be [start+1*step/2, start+2*step/2, start+3*step/2, ...]
-    #H_bins = [  -5.025,   0.050,    15.025]
-    #K_bins = [ -12.025,   0.050,     7.525]
-    #L_bins = [ -12.500,   5.000,    12.500]
-    #E_bins = [ -20.250,   0.500,   100.250]
-    H_bins = [   4.950,   0.100,     7.050]
-    K_bins = [   2.950,   0.100,     6.050]
-    L_bins = [  -7.500,   5.000,     7.500]
-    E_bins = [ -20.250,   0.500,   100.250]
+    #H_bins = [  -5.050,   0.100,    15.050]
+    #K_bins = [ -12.050,   0.100,     7.550]
+    #L_bins = [ -10.500,   1.000,    10.500]
+    #E_bins = [ -20.500,   1.000,   100.500]
+    H_bins = [    3.950,    0.100,     8.050]
+    K_bins = [   -2.050,    0.100,     2.050]
+    L_bins = [   -5.000,    2.000,     5.000]
+    E_bins = [  -20.500,    1.000,   100.500]
 
     # for the binning args above, bin data with this offset. e.g. for 0.0, it is 
     # just the binning args above. for 0.1, the bins above are offset by 0.1 etc.
-    H_offsets = [0.03]
-    K_offsets = [0.0]
-    L_offsets = [0.0]
+    H_offsets = [0.050]
+    K_offsets = [0.050]
+    L_offsets = [1.000]
+    #H_offsets = None; K_offsets = None; L_offsets = None
 
     # split binning over these chunks
-    num_chunks = [2,2,2]
+    num_chunks = [2,2,1]
 
     # bin the file and write hdf5
     MDE_tools.bin_MDE_with_offsets(H_bins,K_bins,L_bins,E_bins,H_offsets,K_offsets,L_offsets,

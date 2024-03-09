@@ -110,43 +110,47 @@ def SubtractPolyBackground():
 
     files=[file for file in os.listdir(folder) if file.startswith(RSE_Constants.STARTS_WITH) and not file.endswith(RSE_Constants.ENDS_WITH)]
 
-    print(folderForBkgSubtractedFiles)
+    print(RSE_Constants.BACKGROUND_SUBTRACTED_FOLDER, os.path.isdir(params.folderForBkgSubtractedFiles))
+    if not os.path.isdir(params.folderForBkgSubtractedFiles):
+        os.makedirs(params.folderForBkgSubtractedFiles)
 
 
     for i in range (0,len(files)):
 
-      
-        font = {'family': 'serif',
+        try:
+            font = {'family': 'serif',
             'color':  'darkred',
             'weight': 'normal',
             'size': 16,
             }
 
         #print(filenames1[i],filenames2[j])
-        n=params.PolyFitNumberIgnoredPointsAtEnd #allows deleting n points at the end of the file
-        filename=folder+files[i]
-        AllData=np.genfromtxt(filename)
-        AllData1=np.array(AllData[:-n])
+            n=params.PolyFitNumberIgnoredPointsAtEnd #allows deleting n points at the end of the file
+            filename=folder+files[i]
+            AllData=np.genfromtxt(filename)
+            AllData1=np.array(AllData[:-n])
     #       print(AllData)
-        intensity=AllData1[:,1]
-        energy=AllData1[:,0]
-        error=AllData1[:,2]
-        energy,DataWithoutBackground,error,background = SutractPolyBackground1File(energy,intensity,error,params.Trim)
-        print(files[i])
+            intensity=AllData1[:,1]
+            energy=AllData1[:,0]
+            error=AllData1[:,2]
+            energy,DataWithoutBackground,error,background = SutractPolyBackground1File(energy,intensity,error,params.Trim)
+            print(files[i])
 #    print(params.folderForBkgSubtractedFiles)
 #    if len(AllData1[:,0])-len(energy)>0.6*len(AllData1[:,0]):
-        TxtFile=open(params.folderForBkgSubtractedFiles+files[i],'w+')
-        for j in range (0,len(energy)):
-            TxtFile.write(str(energy[j])+'  '+str(DataWithoutBackground[j])+'  '+str(error[j])+'\n')
-        TxtFile.close()
+            TxtFile=open(params.folderForBkgSubtractedFiles+files[i],'w+')
+            for j in range (0,len(energy)):
+                TxtFile.write(str(energy[j])+'  '+str(DataWithoutBackground[j])+'  '+str(error[j])+'\n')
+            TxtFile.close()
     
-        BackgroundCurve=[]
+            BackgroundCurve=[]
 #        BackgroundCurve.append(AllData1[:,0])
-        BackgroundCurve.append(energy)
-        BackgroundCurve.append(background)
-        plt=Plot(params)
-        plt.plotSingle(params.path_data,params.path_data,[files[i]],BackgroundCurve)
-        plt.plotSingle(params.folderForBkgSubtractedFiles,params.folderForBkgSubtractedFiles,[files[i]])
+            BackgroundCurve.append(energy)
+            BackgroundCurve.append(background)
+            plt=Plot(params)
+            plt.plotSingle(params.path_data,params.path_data,[files[i]],BackgroundCurve)
+            plt.plotSingle(params.folderForBkgSubtractedFiles,params.folderForBkgSubtractedFiles,[files[i]])
+        except:
+            a=1
     Disp=Display()
     Disp.MakePlotSummary(params.folderForBkgSubtractedFiles,params.ProcessedDataName)
     Disp.MakePlotSummary(params.path_data,params.ProcessedDataName)

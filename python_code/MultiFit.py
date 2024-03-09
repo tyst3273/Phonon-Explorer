@@ -76,7 +76,8 @@ for i in range (0,len(params.positionGuessesList[:])):
     PlotDataWithFitting=PlotDataWithFitParamCustomFolder(params,folder,folder,folder)
     Disp=Display()
     from FitParameters import *
-Disp.MakePlotSummary(params.folderForBkgSubtractedFiles,params.ProcessedDataName)
+    Disp.MakePlotSummary(params.folderForBkgSubtractedFiles,params.ProcessedDataName)
+#Disp.MakePlotSummary(params.folderForBkgSubtractedFiles,params.ProcessedDataName)
 
 print(datetime.datetime.now())
 

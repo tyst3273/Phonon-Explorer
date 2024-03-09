@@ -27,7 +27,7 @@ class Plot:
                 params.Deltah = float(f.readline().strip())
                 params.Deltak = float(f.readline().strip())
                 params.Deltal = float(f.readline().strip())
-
+                params.e_step = float(f.readline().strip())
         
     def Plot(self):
         dataFileNames=[file for file in sorted(os.listdir(self.dataDirectory)) if file.startswith("H") and not file.endswith("pdf")]

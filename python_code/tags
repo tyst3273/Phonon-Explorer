@@ -1,0 +1,765 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_OUTPUT_EXCMD	mixed	/number, pattern, mixed, or combineV2/
+!_TAG_OUTPUT_FILESEP	slash	/slash or backslash/
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
+!_TAG_PATTERN_LENGTH_LIMIT	96	/0 for no limit/
+!_TAG_PROC_CWD	/home/ty/research/repos/Phonon-Explorer/python_code/	//
+!_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
+!_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+!_TAG_PROGRAM_VERSION	5.9.0	//
+ALL_FILES_APPEND	RSE_Constants.py	/^    ALL_FILES_APPEND = r'_AllFilesWithBackground.pdf'$/;"	v	class:RSE_Constants
+ALL_PLOTS	RSE_Constants.py	/^    ALL_PLOTS = r'_ALLPlots.pdf'$/;"	v	class:RSE_Constants
+Adjust	BackgroundAdjustment.py	/^def Adjust(H,K,L,Adjustment, maxY):$/;"	f
+Adjust	BackgroundAdjustmentLine.py	/^def Adjust(H,K,L,Intercept,slope, maxY, inFolder,T=0.1):$/;"	f
+Adjust	BackgroundAdjustmentLine2.py	/^def Adjust(H,K,L,Intercept,slope, maxY, inFolder,T=0.1):$/;"	f
+AdjustList	BackgroundAdjustment.py	/^AdjustList=Qs[:,][:,3]$/;"	v
+AllData	DispPlot.py	/^    AllData=np.genfromtxt(datasetdir+FileNames[i])$/;"	v
+AllData	StokesAS.py	/^    AllData=np.genfromtxt(datasetdir1+filenames1[i])$/;"	v
+AllData	TDepPlot.py	/^    AllData=np.genfromtxt(datasetdir[i]+FileName)$/;"	v
+AllData1	Symmetrize_H.py	/^           AllData1=np.genfromtxt(datasetdir1+filenames1[i])$/;"	v
+AllData1	Symmetrize_H_K.py	/^           AllData1=np.genfromtxt(datasetdir1+filenames1[i])$/;"	v
+AllData1	compare_data.py	/^            AllData1=np.genfromtxt(datasetdir1+filenames1[i])$/;"	v
+AllData2	Symmetrize_H.py	/^           AllData2=np.genfromtxt(datasetdir2+filenames2[j])$/;"	v
+AllData2	Symmetrize_H_K.py	/^           AllData2=np.genfromtxt(datasetdir2+filenames2[j])$/;"	v
+AllData2	compare_data.py	/^            AllData2=np.genfromtxt(datasetdir2+filenames2[j])$/;"	v
+AutomaticAdjustForConst	Background.py	/^    def AutomaticAdjustForConst(self,params,folder,rawData):$/;"	m	class:Background
+BACKGROUND_SUBTRACTED_FOLDER	RSE_Constants.py	/^    BACKGROUND_SUBTRACTED_FOLDER = r'subtr_Background'$/;"	v	class:RSE_Constants
+BACKGR_PREFIX	RSE_Constants.py	/^    BACKGR_PREFIX = r'B_'$/;"	v	class:RSE_Constants
+BG_timer	PreprocessEvents.py	/^    BG_timer = c_timer('background')$/;"	v
+Backgr	SubtractBackground_old.py	/^    Backgr=Background(params,folder,rawData)$/;"	v
+Background	Background.py	/^class Background():$/;"	c
+BackgroundFiles	GenerateConstQCuts.py	/^    BackgroundFiles=DataBackgroundQs(params)$/;"	v
+BackgroundQ	Background Tools/BackgroundLSNO80meV.py	/^class BackgroundQ:$/;"	c
+BackgroundQ	Background Tools/Standard.py	/^class BackgroundQ:$/;"	c
+CalcQslash	Background Tools/BackgroundLSNO80meV.py	/^    def CalcQslash(self):$/;"	m	class:BackgroundQ
+CalcQslash	Background Tools/Standard.py	/^    def CalcQslash(self,Qu,Qv,Qp,randomPhi,randomTheta):$/;"	m	class:BackgroundQ
+CollectionOfQs	Data.py	/^class CollectionOfQs(Dataset):$/;"	c
+CollectionOfQs	Data_parallelized.py	/^class CollectionOfQs(Dataset):$/;"	c
+CompareDataWithBackground	Background.py	/^    def CompareDataWithBackground(self):$/;"	m	class:Background
+CompareDataWithFit	Background.py	/^    def CompareDataWithFit(self, data, funcEnergy, fit): #bug here. Not using$/;"	m	class:Background
+ConvertToSmallH	reduced q Algorithms/Cubic.py	/^    def ConvertToSmallH(self,H):$/;"	m	class:Smallq
+ConvertToSmallH	reduced q Algorithms/Orthorhombic.py	/^    def ConvertToSmallH(self,H):$/;"	m	class:Smallq
+ConvertToSmallH	reduced q Algorithms/Tetragonal.py	/^    def ConvertToSmallH(self,H):$/;"	m	class:Smallq
+CorrectHEnd	file_tools/tmp/PreprocessNXSPE.py	/^CorrectHEnd=HStart+NHSteps*stepH$/;"	v
+CorrectHEnd	file_tools/tmp/bak.PreprocessNXSPE.py	/^CorrectHEnd=HStart+NHSteps*stepH$/;"	v
+DIR_FORMAT	RSE_Constants.py	/^    DIR_FORMAT = r'H%5.2f K%5.2f L%5.2f\/'$/;"	v	class:RSE_Constants
+Data	MakeAdjustmentList.py	/^Data=Dataset(folder,[dataFileNames[0]])$/;"	v
+DataBackgroundQs	Data.py	/^class DataBackgroundQs(Dataset):$/;"	c
+DataBackgroundQs	Data_parallelized.py	/^class DataBackgroundQs(Dataset):$/;"	c
+DataMinus	Symmetrize_H.py	/^        DataMinus=np.genfromtxt(datasetdir1+File2)$/;"	v
+DataMinus	Symmetrize_H_K.py	/^        DataMinus=np.genfromtxt(datasetdir1+File2)$/;"	v
+DataPlus	Symmetrize_H.py	/^        DataPlus=np.genfromtxt(datasetdir1+filenames1[i])$/;"	v
+DataPlus	Symmetrize_H_K.py	/^        DataPlus=np.genfromtxt(datasetdir1+filenames1[i])$/;"	v
+DataSmall_q	Data.py	/^class DataSmall_q(Dataset):$/;"	c
+DataSmall_q	Data_parallelized.py	/^class DataSmall_q(Dataset):$/;"	c
+DataTextFile	TextFile.py	/^class DataTextFile(TextFile):$/;"	c
+DataWithoutBackgroundA	StokesAS.py	/^            energyA,DataWithoutBackgroundA,error1A,backgroundA = SutractPolyBackground1File(ener/;"	v
+DataWithoutBackgroundS	StokesAS.py	/^            energyS,DataWithoutBackgroundS,error1S,backgroundS = SutractPolyBackground1File(ener/;"	v
+Dataset	Data.py	/^class Dataset: $/;"	c
+Dataset	Data_parallelized.py	/^class Dataset: $/;"	c
+DeletePointsAboveLine	SubtractPolyBackgr.py	/^def DeletePointsAboveLine(a,b,c,x,y,err):$/;"	f
+Disp	BackgroundAdjustment.py	/^Disp=Display()$/;"	v
+Disp	BackgroundAdjustmentLine.py	/^Disp=Display()$/;"	v
+Disp	BackgroundAdjustmentLine2.py	/^Disp=Display()$/;"	v
+Disp	GenerateConstQCuts.py	/^    Disp=Display()$/;"	v
+Disp	MultiFit.py	/^    Disp=Display()$/;"	v
+Disp	Replot.py	/^Disp=Display()$/;"	v
+Disp	StokesAS.py	/^Disp=Display()$/;"	v
+Disp	SubtractBackground.py	/^Disp=Display() # initialize class to make the plots$/;"	v
+Disp	SubtractBackground_old.py	/^Disp=Display()$/;"	v
+Disp	Symmetrize_H.py	/^Disp=Display()$/;"	v
+Disp	Symmetrize_H_K.py	/^Disp=Display()$/;"	v
+Disp	compare_data.py	/^Disp=Display()$/;"	v
+Display	Display.py	/^class Display:$/;"	c
+DisplayAllFiles	Background.py	/^    def DisplayAllFiles(self,folder,plotsFolder,fileName):$/;"	m	class:Background
+DisplayOrigFile	Background.py	/^    def DisplayOrigFile(self,folder,plotsFolder,fileName):$/;"	m	class:Background
+DivideByBoseFactorNorm	Data.py	/^    def DivideByBoseFactorNorm(self,T,M=1.0):  #M normalization$/;"	m	class:Dataset
+DivideByBoseFactorNorm	Data_parallelized.py	/^    def DivideByBoseFactorNorm(self,T,M=1.0):  #M normalization$/;"	m	class:Dataset
+ENDS_WITH	RSE_Constants.py	/^    ENDS_WITH = r'.pdf'$/;"	v	class:RSE_Constants
+E_MAX	RSE_Constants.py	/^    E_MAX = 250$/;"	v	class:RSE_Constants
+E_MIN	RSE_Constants.py	/^    E_MIN = -50$/;"	v	class:RSE_Constants
+E_STEP	RSE_Constants.py	/^    E_STEP = 0.1$/;"	v	class:RSE_Constants
+E_bins	PreprocessEvents.py	/^    E_bins = [  -20.500,    1.000,   100.500]$/;"	v
+ExtractQfromFileName	Data.py	/^    def ExtractQfromFileName(self,FileName):$/;"	m	class:Dataset
+ExtractQfromFileName	Data_parallelized.py	/^    def ExtractQfromFileName(self,FileName):$/;"	m	class:Dataset
+ExtractQfromFileName	Symmetrize_H.py	/^def ExtractQfromFileName(FileName):$/;"	f
+ExtractQfromFileName	Symmetrize_H_K.py	/^def ExtractQfromFileName(FileName):$/;"	f
+FILENAME_FORMAT	RSE_Constants.py	/^    FILENAME_FORMAT = r'H%5.2f K%5.2f L%5.2f'$/;"	v	class:RSE_Constants
+FINAL_FIT_PARAMS	RSE_Constants.py	/^    FINAL_FIT_PARAMS = r'FinilFittingParam.txt'$/;"	v	class:RSE_Constants
+FITTING_PARAM_FILE	RSE_Constants.py	/^    FITTING_PARAM_FILE = r'FittingParam'$/;"	v	class:RSE_Constants
+FLAG	RSE_Constants.py	/^    FLAG=0 #Never change this$/;"	v	class:RSE_Constants
+File2	Symmetrize_H.py	/^        File2=filenames1[i].replace('K-','K ')$/;"	v
+File2	Symmetrize_H_K.py	/^        File2=filenames1[i].replace('H-','H ')$/;"	v
+File3	Symmetrize_H_K.py	/^        File3=filenames1[i].replace('K-','K ')$/;"	v
+File4	Symmetrize_H_K.py	/^        File4=filenames1[i].replace('H ','H-')$/;"	v
+FileName	TDepPlot.py	/^FileName="H-5.00 K 0.00 L 0.00"$/;"	v
+FileNames	DispPlot.py	/^FileNames=[]$/;"	v
+Filterlist	Data.py	/^    def Filterlist(self,filenames):$/;"	m	class:DataSmall_q
+Filterlist	Data_parallelized.py	/^    def Filterlist(self,filenames):$/;"	m	class:DataSmall_q
+FirstLine	DispPlot.py	/^FirstLine='0'$/;"	v
+FitParameters	FitParameters.py	/^class FitParameters:$/;"	c
+FitTextFile	TextFile.py	/^class FitTextFile(TextFile):$/;"	c
+Fitting	MultiFit.py	/^    Fitting=FittingData(params,InitialGuesses,data)$/;"	v
+FittingBackgroundData	FittingData.py	/^class FittingBackgroundData(FittingData):$/;"	c
+FittingData	FittingData.py	/^class FittingData():$/;"	c
+FittingDataFromFile	FittingData.py	/^class FittingDataFromFile(FittingData):$/;"	c
+FittingFunction	FittingFunction.py	/^class FittingFunction:$/;"	c
+GEN_FOLDER	RSE_Constants.py	/^    GEN_FOLDER = 'GoodFilesForBackground_'$/;"	v	class:RSE_Constants
+Generate	Data.py	/^    def Generate(self):$/;"	m	class:Dataset
+Generate	Data_parallelized.py	/^    def Generate(self):$/;"	m	class:Dataset
+GenerateAllFiles	Data.py	/^    def GenerateAllFiles(self):$/;"	m	class:DataBackgroundQs
+GenerateAllFiles	Data_parallelized.py	/^    def GenerateAllFiles(self):$/;"	m	class:DataBackgroundQs
+GenerateFolder	Data.py	/^    def GenerateFolder(self,Q):$/;"	m	class:DataBackgroundQs
+GenerateFolder	Data_parallelized.py	/^    def GenerateFolder(self,Q):$/;"	m	class:DataBackgroundQs
+GeneratePhiTheta	Background Tools/Standard.py	/^    def GeneratePhiTheta(self):$/;"	m	class:BackgroundQ
+GenerateSmallQList	reduced q Algorithms/Cubic.py	/^    def GenerateSmallQList(self):$/;"	m	class:Smallq
+GenerateSmallQList	reduced q Algorithms/Orthorhombic.py	/^    def GenerateSmallQList(self):$/;"	m	class:Smallq
+GenerateSmallQList	reduced q Algorithms/Tetragonal.py	/^    def GenerateSmallQList(self):$/;"	m	class:Smallq
+GetCollectionOfQs	Tools to access raw data/hdf5Access.py	/^    def GetCollectionOfQs(self,Q):$/;"	m	class:RawData
+GetMultiDimData	Tools to access raw data/hdf5Access.py	/^    def GetMultiDimData(self, H_min, H_max, K_min, K_max, L_min, L_max, E_min, E_max, Projection/;"	m	class:RawData
+GetRockingScan	Tools to access raw data/hdf5Access.py	/^    def GetRockingScan(self, Phi_min, Phi_max, Theta_min, Theta_max):$/;"	m	class:RawData
+GetSlice	Tools to access raw data/NXSAccess.py	/^    def GetSlice(self, bin_h, bin_k, bin_l, bin_e, Projection_u, Projection_v):$/;"	m	class:RawData
+GetSlice	Tools to access raw data/SQWAccess.py	/^    def GetSlice(self, bin_h, bin_k, bin_l, bin_e, Projection_u, Projection_v):$/;"	m	class:RawData
+GetSlice	Tools to access raw data/SQWAccess_parallel.py	/^    def GetSlice(self, bin_h, bin_k, bin_l, bin_e, Projection_u, Projection_v):$/;"	m	class:RawData
+GetSlice	Tools to access raw data/hdf5Access.py	/^    def GetSlice(self, bin_h, bin_k, bin_l, bin_e, Projection_u, Projection_v):$/;"	m	class:RawData
+Getslice	Tools to access raw data/Getslice.m	/^function s=Getslice(varargin)$/;"	f
+GraphWindow	webiste.py	/^class GraphWindow(QWidget):$/;"	c
+H	DispPlot.py	/^H=np.zeros(len(FileNames))$/;"	v
+HBin	file_tools/tmp/PreprocessNXSPE.py	/^HBin = np.zeros((HMult,3))$/;"	v
+HBin	file_tools/tmp/PreprocessNXSPE.py	/^HBin=[1-stepH\/2,stepH,2+stepH\/2]$/;"	v
+HBin	file_tools/tmp/bak.PreprocessNXSPE.py	/^HBin=zeros[Hmult][3]$/;"	v
+HEnd	file_tools/tmp/PreprocessNXSPE.py	/^HEnd=2$/;"	v
+HEnd	file_tools/tmp/bak.PreprocessNXSPE.py	/^HEnd=2$/;"	v
+HMult	file_tools/tmp/PreprocessNXSPE.py	/^HMult=2 #number of steps in each bin (This way bins can overlap)$/;"	v
+HMult	file_tools/tmp/bak.PreprocessNXSPE.py	/^HMult=2 #number of steps in each bin (This way bins can overlap)$/;"	v
+HStart	file_tools/tmp/PreprocessNXSPE.py	/^HStart=1$/;"	v
+HStart	file_tools/tmp/bak.PreprocessNXSPE.py	/^HStart=1$/;"	v
+H_bins	PreprocessEvents.py	/^    H_bins = [    3.950,    0.100,     8.050]$/;"	v
+H_bins	PreprocessNXSPE.py	/^H_bins = [  0.90,  0.20,  3.10]$/;"	v
+H_offsets	PreprocessEvents.py	/^    H_offsets = [0.050]$/;"	v
+H_offsets	PreprocessNXSPE.py	/^H_offsets = [  0.10]$/;"	v
+INPUTS_FILENAME	RSE_Constants.py	/^    INPUTS_FILENAME = r'InputParameters.txt'$/;"	v	class:RSE_Constants
+INPUTS_FILENAME_MAIN	RSE_Constants.py	/^    INPUTS_FILENAME_MAIN = r'InputInputParameters.txt'$/;"	v	class:RSE_Constants
+INPUTS_PATH	RSE_Constants.py	/^    INPUTS_PATH = INPUTS_PATH_MAIN$/;"	v	class:RSE_Constants
+INPUTS_PATH_MAIN	RSE_Constants.py	/^    INPUTS_PATH_MAIN = os.path.normpath('..\/Input_Files')$/;"	v	class:RSE_Constants
+INTERPOLATION_MASK	RSE_Constants.py	/^    INTERPOLATION_MASK = 1e10$/;"	v	class:RSE_Constants
+InitCommon	plotDataWithFit.py	/^    def InitCommon(self,params):$/;"	m	class:PlotDataWithFitParam
+InitCommon	plotDataWithFit_.py	/^    def InitCommon(self,params):$/;"	m	class:PlotDataWithFitParam
+InitialGuesses	FitParameters.py	/^class InitialGuesses(FitParameters):$/;"	c
+InitialGuesses	MultiFit.py	/^    InitialGuesses=InitialGuesses(params,data)$/;"	v
+InputValidationError	RSEErrors.py	/^class InputValidationError(Exception):$/;"	c
+InterceptList	BackgroundAdjustmentLine.py	/^InterceptList=Qs[:,][:,3]$/;"	v
+InterceptList	BackgroundAdjustmentLine2.py	/^InterceptList=Qs[:,][:,3]$/;"	v
+KBin	file_tools/tmp/PreprocessNXSPE.py	/^KBin=[-6.1-stepK\/2,stepK,6.1+stepK\/2]$/;"	v
+KEnd	file_tools/tmp/PreprocessNXSPE.py	/^KEnd=2$/;"	v
+KEnd	file_tools/tmp/PreprocessNXSPE.py	/^KEnd=6$/;"	v
+KEnd	file_tools/tmp/bak.PreprocessNXSPE.py	/^KEnd=2$/;"	v
+KEnd	file_tools/tmp/bak.PreprocessNXSPE.py	/^KEnd=6$/;"	v
+KMult	file_tools/tmp/PreprocessNXSPE.py	/^KMult=2$/;"	v
+KMult	file_tools/tmp/bak.PreprocessNXSPE.py	/^KMult=2$/;"	v
+KStart	file_tools/tmp/PreprocessNXSPE.py	/^KStart=-6$/;"	v
+KStart	file_tools/tmp/PreprocessNXSPE.py	/^KStart=1$/;"	v
+KStart	file_tools/tmp/bak.PreprocessNXSPE.py	/^KStart=-6$/;"	v
+KStart	file_tools/tmp/bak.PreprocessNXSPE.py	/^KStart=1$/;"	v
+K_bins	PreprocessEvents.py	/^    K_bins = [   -2.050,    0.100,     2.050]$/;"	v
+K_bins	PreprocessNXSPE.py	/^K_bins = [ -6.10,  0.20,  6.10]$/;"	v
+K_offsets	PreprocessEvents.py	/^    K_offsets = [0.050]$/;"	v
+K_offsets	PreprocessNXSPE.py	/^K_offsets = [  0.00] $/;"	v
+LBin	file_tools/tmp/PreprocessNXSPE.py	/^LBin=[-4-stepL\/2,stepL,4+stepL\/2]$/;"	v
+LEnd	file_tools/tmp/PreprocessNXSPE.py	/^LEnd=2$/;"	v
+LEnd	file_tools/tmp/PreprocessNXSPE.py	/^LEnd=4$/;"	v
+LEnd	file_tools/tmp/bak.PreprocessNXSPE.py	/^LEnd=2$/;"	v
+LEnd	file_tools/tmp/bak.PreprocessNXSPE.py	/^LEnd=4$/;"	v
+LMult	file_tools/tmp/PreprocessNXSPE.py	/^LMult=2$/;"	v
+LMult	file_tools/tmp/bak.PreprocessNXSPE.py	/^LMult=2$/;"	v
+LStart	file_tools/tmp/PreprocessNXSPE.py	/^LStart=-4$/;"	v
+LStart	file_tools/tmp/PreprocessNXSPE.py	/^LStart=1$/;"	v
+LStart	file_tools/tmp/bak.PreprocessNXSPE.py	/^LStart=-4$/;"	v
+LStart	file_tools/tmp/bak.PreprocessNXSPE.py	/^LStart=1$/;"	v
+L_bins	PreprocessEvents.py	/^    L_bins = [   -5.000,    2.000,     5.000]$/;"	v
+L_bins	PreprocessNXSPE.py	/^L_bins = [ -4.10,  0.20,  4.10]$/;"	v
+L_offsets	PreprocessEvents.py	/^    L_offsets = [1.000]$/;"	v
+L_offsets	PreprocessNXSPE.py	/^L_offsets = [  0.00]$/;"	v
+M1	StokesAS.py	/^M1=1$/;"	v
+M1	compare_data.py	/^M1=1$/;"	v
+M2	compare_data.py	/^M2=1$/;"	v
+MDE_file_name	PreprocessEvents.py	/^MDE_file_name = f'..\/..\/..\/merged_mde\/LSNO25_Ei_120meV_300K.nxs'$/;"	v
+MDE_timer	PreprocessEvents.py	/^    MDE_timer = c_timer('MDE',units='m')$/;"	v
+MDE_tools	PreprocessEvents.py	/^    MDE_tools = c_MDE_tools(MDE_file_name)$/;"	v
+MD_WORKSPACE	RSE_Constants.py	/^    MD_WORKSPACE='_mantid_workspace_'$/;"	v	class:RSE_Constants
+MD_workspace	file_tools/tmp/PreprocessNXSPE.py	/^MD_workspace = mtd['o']$/;"	v
+MainWindow	webiste.py	/^class MainWindow(QMainWindow):$/;"	c
+MakePlotSummary	Display.py	/^    def MakePlotSummary(self,folder,subdir):$/;"	m	class:Display
+NHSteps	file_tools/tmp/PreprocessNXSPE.py	/^NHSteps=math.ceil((HEnd-HStart)\/stepH)$/;"	v
+NHSteps	file_tools/tmp/bak.PreprocessNXSPE.py	/^NHSteps=math.ceil((HEnd-HStart)\/stepH)$/;"	v
+NOT_STARTS_WITH	RSE_Constants.py	/^    NOT_STARTS_WITH = r'x'$/;"	v	class:RSE_Constants
+Norm	TDepPlot.py	/^Norm=[1,1,1,0.75,0.75,0.75]$/;"	v
+NumDir	TDepPlot.py	/^NumDir=6$/;"	v
+OUTPUT_DATA_PRECISION	RSE_Constants.py	/^    OUTPUT_DATA_PRECISION = '%.6f'$/;"	v	class:RSE_Constants
+Parameters	TextFile.py	/^class Parameters(TextFile):$/;"	c
+Parse	TextFile.py	/^    def Parse(self,line):$/;"	m	class:Parameters
+ParseByKeyword	TextFile.py	/^    def ParseByKeyword(self,keyword,parameters):$/;"	m	class:Parameters
+Plot	plotDataWithFit.py	/^    def Plot(self):$/;"	m	class:Plot
+Plot	plotDataWithFit.py	/^class Plot:$/;"	c
+Plot	plotDataWithFit_.py	/^    def Plot(self):$/;"	m	class:Plot
+Plot	plotDataWithFit_.py	/^class Plot:$/;"	c
+PlotDataWithFitParam	plotDataWithFit.py	/^class PlotDataWithFitParam(Plot):$/;"	c
+PlotDataWithFitParam	plotDataWithFit_.py	/^class PlotDataWithFitParam(Plot):$/;"	c
+PlotDataWithFitParamCustomFolder	plotDataWithFit.py	/^class PlotDataWithFitParamCustomFolder(PlotDataWithFitParam):  $/;"	c
+PlotDataWithFitParamCustomFolder	plotDataWithFit_.py	/^class PlotDataWithFitParamCustomFolder(PlotDataWithFitParam):  $/;"	c
+PlotDataWithFitting	MultiFit.py	/^    PlotDataWithFitting=PlotDataWithFitParamCustomFolder(params,folder,folder,folder)$/;"	v
+PlotDataWithFitting	SubtractBackground_old.py	/^    PlotDataWithFitting=PlotDataWithFitParamCustomFolder(params,folder,folder,folder)$/;"	v
+PlotDataWithGaussianSmoothedBG	plotDataWithFit.py	/^class PlotDataWithGaussianSmoothedBG(Plot):$/;"	c
+PlotDataWithGaussianSmoothedBG	plotDataWithFit_.py	/^class PlotDataWithGaussianSmoothedBG(Plot):$/;"	c
+PreprocessNXSPE	file_tools/m_PreprocessNXSPE.py	/^def PreprocessNXSPE(H_bins,K_bins,L_bins,event_files,goniometer_file,UB_params):$/;"	f
+ProjectDir	compare_data.py	/^ProjectDir='0.5,0,0\/'$/;"	v
+Q	MakeAdjustmentList.py	/^    Q=Data.ExtractQfromFileName(dataFileNames[i])$/;"	v
+Q	Symmetrize_H.py	/^    Q=ExtractQfromFileName(filenames1[i])$/;"	v
+Q	Symmetrize_H_K.py	/^    Q=ExtractQfromFileName(filenames1[i])$/;"	v
+QHlist	BackgroundAdjustment.py	/^QHlist=Qs[:,][:,0]$/;"	v
+QHlist	BackgroundAdjustmentLine.py	/^QHlist=Qs[:,][:,0]$/;"	v
+QHlist	BackgroundAdjustmentLine2.py	/^QHlist=Qs[:,][:,0]$/;"	v
+QKlist	BackgroundAdjustment.py	/^QKlist=Qs[:,][:,1]$/;"	v
+QKlist	BackgroundAdjustmentLine.py	/^QKlist=Qs[:,][:,1]$/;"	v
+QKlist	BackgroundAdjustmentLine2.py	/^QKlist=Qs[:,][:,1]$/;"	v
+QLlist	BackgroundAdjustment.py	/^QLlist=Qs[:,][:,2]$/;"	v
+QLlist	BackgroundAdjustmentLine.py	/^QLlist=Qs[:,][:,2]$/;"	v
+QLlist	BackgroundAdjustmentLine2.py	/^QLlist=Qs[:,][:,2]$/;"	v
+Qabs	Background Tools/BackgroundLSNO80meV.py	/^    def Qabs(self):$/;"	m	class:BackgroundQ
+Qabs	Background Tools/Standard.py	/^    def Qabs(self):$/;"	m	class:BackgroundQ
+Qs	BackgroundAdjustment.py	/^Qs=np.genfromtxt(params.folderForBkgSubtractedFiles+"BackgroundAdjustment.txt")$/;"	v
+Qs	BackgroundAdjustmentLine.py	/^Qs=np.genfromtxt(folder+"BackgroundAdjustment.txt")$/;"	v
+Qs	BackgroundAdjustmentLine2.py	/^Qs=np.genfromtxt(inFolder+"BackgroundAdjustment.txt")$/;"	v
+RSE_Constants	RSE_Constants.py	/^class RSE_Constants():$/;"	c
+RawData	Tools to access raw data/NXSAccess.py	/^class RawData: $/;"	c
+RawData	Tools to access raw data/SQWAccess.py	/^class RawData: $/;"	c
+RawData	Tools to access raw data/SQWAccess_parallel.py	/^class RawData: $/;"	c
+RawData	Tools to access raw data/hdf5Access.py	/^class RawData:$/;"	c
+Read	Data.py	/^    def Read(self):$/;"	m	class:DataSmall_q
+Read	Data_parallelized.py	/^    def Read(self):$/;"	m	class:DataSmall_q
+Read	TextFile.py	/^    def Read(self):$/;"	m	class:DataTextFile
+Read	TextFile.py	/^    def Read(self):$/;"	m	class:FitTextFile
+ReadAndPlot	plotDataWithFit.py	/^    def ReadAndPlot(self):$/;"	m	class:PlotDataWithFitParam
+ReadAndPlot	plotDataWithFit_.py	/^    def ReadAndPlot(self):$/;"	m	class:PlotDataWithFitParam
+ReadBackgroundParams	TextFile.py	/^    def ReadBackgroundParams(self):$/;"	m	class:Parameters
+ReadExtendedLine	FitParameters.py	/^    def ReadExtendedLine(self,paramFileLineIndex,parameters):$/;"	m	class:FitParameters
+ReadMultizoneFitParams	TextFile.py	/^    def ReadMultizoneFitParams(self):$/;"	m	class:Parameters
+ReadPolyBackgroundParams	TextFile.py	/^    def ReadPolyBackgroundParams(self):$/;"	m	class:Parameters
+ReadSharedParams	TextFile.py	/^    def ReadSharedParams(self,parameters): #multizone and background$/;"	m	class:Parameters
+SAVE_BACK	RSE_Constants.py	/^    SAVE_BACK = r'_Background.pdf'$/;"	v	class:RSE_Constants
+SLICE_TEMP_DIRECTORY	RSE_Constants.py	/^    SLICE_TEMP_DIRECTORY = os.path.normpath('E:\/TestData\/450K_Data\/Temp') #Not used in this v/;"	v	class:RSE_Constants
+SMOOTHED_STARTS_WITH	RSE_Constants.py	/^    SMOOTHED_STARTS_WITH = 'smooth_'$/;"	v	class:RSE_Constants
+STARTS_WITH	RSE_Constants.py	/^    STARTS_WITH = r'H'$/;"	v	class:RSE_Constants
+SYMBOL	RSE_Constants.py	/^    SYMBOL = ['bo','ro','go','b*','r*','g*','b+','r+','g+','b^','r^','g^','bo','ro','go','b*','r/;"	v	class:RSE_Constants
+Save	Background.py	/^    def Save(self,folder,filename):$/;"	m	class:Background
+SlopeList	BackgroundAdjustmentLine.py	/^SlopeList=Qs[:,][:,4]$/;"	v
+SlopeList	BackgroundAdjustmentLine2.py	/^SlopeList=Qs[:,][:,4]$/;"	v
+Smallq	reduced q Algorithms/Cubic.py	/^class Smallq: #Dataset can be either a single cut at one Q or several cuts put together for the /;"	c
+Smallq	reduced q Algorithms/Orthorhombic.py	/^class Smallq: #Dataset can be either a single cut at one Q or several cuts put together for the /;"	c
+Smallq	reduced q Algorithms/Tetragonal.py	/^class Smallq: #Dataset can be either a single cut at one Q or several cuts put together for the /;"	c
+SmoothedBackground	GaussianSmooth.py	/^class SmoothedBackground:$/;"	c
+StringArray	DispPlot.py	/^StringArray=[]$/;"	v
+StringArray	TDepPlot.py	/^StringArray=[]$/;"	v
+SubtractConstant	Data.py	/^    def SubtractConstant(self,Const):$/;"	m	class:Dataset
+SubtractConstant	Data_parallelized.py	/^    def SubtractConstant(self,Const):$/;"	m	class:Dataset
+SubtractLine	Data.py	/^    def SubtractLine(self,Intercept,Slope):$/;"	m	class:Dataset
+SubtractLine	Data_parallelized.py	/^    def SubtractLine(self,Intercept,Slope):$/;"	m	class:Dataset
+SubtractPolyBackground	SubtractPolyBackgr.py	/^def SubtractPolyBackground():$/;"	f
+SutractPolyBackground1File	SubtractPolyBackgr.py	/^def SutractPolyBackground1File(energy,intensity,error,Trim):$/;"	f
+T	DispPlot.py	/^T=1$/;"	v
+T	DispPlot.py	/^T=10$/;"	v
+T	Symmetrize_H.py	/^T=10$/;"	v
+T	TDepPlot.py	/^T=[0.1,0.1,0.1,0.1,0.1,0.1]$/;"	v
+T1	StokesAS.py	/^T1=300$/;"	v
+T1	Symmetrize_H.py	/^T1=10$/;"	v
+T1	Symmetrize_H_K.py	/^T1=10$/;"	v
+T1	compare_data.py	/^T1=10$/;"	v
+T2	Symmetrize_H.py	/^T2=450$/;"	v
+T2	Symmetrize_H_K.py	/^T2=450$/;"	v
+T2	compare_data.py	/^T2=335$/;"	v
+TEMP_FILE	RSE_Constants.py	/^    TEMP_FILE = r'guru99.py'$/;"	v	class:RSE_Constants
+Temp	DispPlot.py	/^Temp=240$/;"	v
+Temperature	RSE_Constants.py	/^    Temperature=1$/;"	v	class:RSE_Constants
+TextFile	TextFile.py	/^class TextFile():$/;"	c
+TxtFile	DispPlot.py	/^TxtFile=open(location_ForPlots+'\/Disp.csv','w+')$/;"	v
+TxtFile	MakeAdjustmentList.py	/^TxtFile=open(folder+"BackgroundAdjustment.txt",'w+')$/;"	v
+TxtFile	Symmetrize_H.py	/^        TxtFile=open(datasetdir1+File2,'w+')    $/;"	v
+TxtFile	Symmetrize_H_K.py	/^        TxtFile=open(datasetdir1+'a'+File2,'w+')    $/;"	v
+TxtFile	TDepPlot.py	/^TxtFile=open(location_ForPlots+FileName,'w+')    $/;"	v
+UB_params	PreprocessNXSPE.py	/^UB_params={'a':3.93,'b':3.93,'c':3.93,'alpha':90,'beta':90,'gamma':90,$/;"	v
+UBpars	file_tools/tmp/PreprocessNXSPE.py	/^UBpars={'a':3.93,'b':3.93,'c':3.93,'alpha':90,'beta':90,'gamma':90,'u':'1,0,-0.1','v':'0,1,-0.1'/;"	v
+Write	TextFile.py	/^    def Write(self, Energy, Intensity, Error):$/;"	m	class:DataTextFile
+Write	TextFile.py	/^    def Write(self, FitResultsArray):$/;"	m	class:FitTextFile
+WriteFinalParamToFile	WriteFinalParamToFile.py	/^class WriteFinalParamToFile:$/;"	c
+WriteToText	MultiFit.py	/^    WriteToText=FitParameters(numpy.sqrt(numpy.diag(pcov)),data.filenames)$/;"	v
+WriteToText	MultiFit.py	/^    WriteToText=FitParameters(popt,data.filenames)$/;"	v
+WriteToText	SubtractBackground_old.py	/^            WriteToText=FitParameters(popt,data.filenames)$/;"	v
+X_LABEL	RSE_Constants.py	/^    X_LABEL = r'Energy'$/;"	v	class:RSE_Constants
+Y_LABEL	RSE_Constants.py	/^    Y_LABEL = r'Intensity'$/;"	v	class:RSE_Constants
+__init__	Background Tools/BackgroundLSNO80meV.py	/^    def __init__(self,h,k,l,params,index): #h,k,l for the dataset for which background is being /;"	m	class:BackgroundQ
+__init__	Background Tools/Standard.py	/^    def __init__(self,h,k,l,params,index): #h,k,l for the dataset for which background is being /;"	m	class:BackgroundQ
+__init__	Background.py	/^    def __init__(self,params,folder,rawData):$/;"	m	class:Background
+__init__	Data.py	/^    def __init__(self,folder,filenames):$/;"	m	class:Dataset
+__init__	Data.py	/^    def __init__(self,params):$/;"	m	class:CollectionOfQs
+__init__	Data.py	/^    def __init__(self,params):$/;"	m	class:DataBackgroundQs
+__init__	Data.py	/^    def __init__(self,params,dataDirectory,q=[1000,1000,1000]):$/;"	m	class:DataSmall_q
+__init__	Data_parallelized.py	/^    def __init__(self,folder,filenames):$/;"	m	class:Dataset
+__init__	Data_parallelized.py	/^    def __init__(self,params):$/;"	m	class:CollectionOfQs
+__init__	Data_parallelized.py	/^    def __init__(self,params):$/;"	m	class:DataBackgroundQs
+__init__	Data_parallelized.py	/^    def __init__(self,params,dataDirectory,q=[1000,1000,1000]):$/;"	m	class:DataSmall_q
+__init__	FitParameters.py	/^    def __init__(self,fitResults,filenames):$/;"	m	class:FitParameters
+__init__	FitParameters.py	/^    def __init__(self,params,data):$/;"	m	class:InitialGuesses
+__init__	FittingData.py	/^    def __init__(self,params,InitialGuesses,data):$/;"	m	class:FittingData
+__init__	FittingData.py	/^    def __init__(self,params,InitialGuesses,folder,datafile):$/;"	m	class:FittingDataFromFile
+__init__	FittingData.py	/^    def __init__(self,params,folder,datafile):$/;"	m	class:FittingBackgroundData
+__init__	FittingFunction.py	/^    def __init__(self,InitialGuesses):$/;"	m	class:FittingFunction
+__init__	GaussianSmooth.py	/^    def __init__(self,folder):$/;"	m	class:SmoothedBackground
+__init__	RSEErrors.py	/^    def __init__(self, *args, **kwargs):$/;"	m	class:InputValidationError
+__init__	TextFile.py	/^    def __init__(self):$/;"	m	class:Parameters
+__init__	TextFile.py	/^    def __init__(self,FolderName,FileName):$/;"	m	class:DataTextFile
+__init__	TextFile.py	/^    def __init__(self,FolderName,FileName):$/;"	m	class:FitTextFile
+__init__	TextFile.py	/^    def __init__(self,FolderName,FileName):$/;"	m	class:TextFile
+__init__	Tools to access raw data/NXSAccess.py	/^    def __init__(self,params):$/;"	m	class:RawData
+__init__	Tools to access raw data/SQWAccess.py	/^    def __init__(self, params):$/;"	m	class:RawData
+__init__	Tools to access raw data/SQWAccess_parallel.py	/^    def __init__(self, params):$/;"	m	class:RawData
+__init__	Tools to access raw data/hdf5Access.py	/^    def __init__(self,file_name):$/;"	m	class:access_data_in_hdf5
+__init__	Tools to access raw data/hdf5Access.py	/^    def __init__(self,params):$/;"	m	class:RawData
+__init__	Utils.py	/^    def __init__(self):$/;"	m	class:arg_parser
+__init__	Utils.py	/^    def __init__(self,label,units='s'):$/;"	m	class:timer
+__init__	WriteFinalParamToFile.py	/^    def __init__(self,params,data):$/;"	m	class:WriteFinalParamToFile
+__init__	file_tools/m_MDE_tools.py	/^    def __init__(self,MDE_file_name=None):$/;"	m	class:c_MDE_tools
+__init__	file_tools/m_background_tools.py	/^    def __init__(self,raw_file):$/;"	m	class:c_background_tools
+__init__	file_tools/m_file_utils.py	/^    def __init__(self,label,units='s'):$/;"	m	class:c_timer
+__init__	file_tools/m_save_MDE_to_hdf5.py	/^    def __init__(self,MD_workspace):$/;"	m	class:c_reduced_MDE_tools
+__init__	m_save_MDE_to_hdf5.py	/^    def __init__(self,MD_workspace):$/;"	m	class:_c_reduced_MDE_tools
+__init__	plotDataWithFit.py	/^    def __init__(self,params):$/;"	m	class:Plot
+__init__	plotDataWithFit.py	/^    def __init__(self,params):$/;"	m	class:PlotDataWithFitParam
+__init__	plotDataWithFit.py	/^    def __init__(self,params,bg_folder,bg_files):$/;"	m	class:PlotDataWithGaussianSmoothedBG
+__init__	plotDataWithFit.py	/^    def __init__(self,params,location_ForPlots,locationForOutputParam,dataDirectory):$/;"	m	class:PlotDataWithFitParamCustomFolder
+__init__	plotDataWithFit_.py	/^    def __init__(self,params):$/;"	m	class:Plot
+__init__	plotDataWithFit_.py	/^    def __init__(self,params):$/;"	m	class:PlotDataWithFitParam
+__init__	plotDataWithFit_.py	/^    def __init__(self,params,bg_folder,bg_files):$/;"	m	class:PlotDataWithGaussianSmoothedBG
+__init__	plotDataWithFit_.py	/^    def __init__(self,params,location_ForPlots,locationForOutputParam,dataDirectory):$/;"	m	class:PlotDataWithFitParamCustomFolder
+__init__	reduced q Algorithms/Cubic.py	/^    def __init__(self,Q):$/;"	m	class:Smallq
+__init__	reduced q Algorithms/Orthorhombic.py	/^    def __init__(self,Q):$/;"	m	class:Smallq
+__init__	reduced q Algorithms/Tetragonal.py	/^    def __init__(self,Q):$/;"	m	class:Smallq
+__init__	webiste.py	/^    def __init__(self):$/;"	m	class:GraphWindow
+__init__	webiste.py	/^    def __init__(self):$/;"	m	class:MainWindow
+_append_datasets	file_tools/m_MDE_tools.py	/^    def _append_datasets(self,db):$/;"	m	class:c_MDE_tools
+_append_datasets	file_tools/m_save_MDE_to_hdf5.py	/^    def _append_datasets(self,db):$/;"	m	class:c_reduced_MDE_tools
+_append_suffix_to_file_name	file_tools/m_background_tools.py	/^    def _append_suffix_to_file_name(self,file_name,suffix):$/;"	m	class:c_background_tools
+_c_reduced_MDE_tools	m_save_MDE_to_hdf5.py	/^class _c_reduced_MDE_tools:$/;"	c
+_calculate_background_from_pt_by_pt_min	file_tools/m_background_tools.py	/^    def _calculate_background_from_pt_by_pt_min(self,Q_index,neighbor_inds,smooth_db):$/;"	m	class:c_background_tools
+_copy_header_datasets	file_tools/m_background_tools.py	/^    def _copy_header_datasets(self,source_db,dest_db):$/;"	m	class:c_background_tools
+_create_datasets	file_tools/m_MDE_tools.py	/^    def _create_datasets(self,db):$/;"	m	class:c_MDE_tools
+_create_datasets	file_tools/m_save_MDE_to_hdf5.py	/^    def _create_datasets(self,db):$/;"	m	class:c_reduced_MDE_tools
+_distribute_Q_over_procs	Data_parallelized.py	/^    def _distribute_Q_over_procs(self):$/;"	m	class:Dataset
+_gaussian_smooth	file_tools/m_background_tools.py	/^    def _gaussian_smooth(self,x,y,fwhm):$/;"	m	class:c_background_tools
+_gaussian_smooth_1d	file_tools/m_background_tools.py	/^    def _gaussian_smooth_1d(self,x,y,gaussian):$/;"	m	class:c_background_tools
+_generate	Data.py	/^    def _generate(self):$/;"	m	class:Dataset
+_generate	Data_parallelized.py	/^    def _generate(self,inds=None):$/;"	m	class:Dataset
+_generate_in_parallel	Data_parallelized.py	/^    def _generate_in_parallel(self):$/;"	m	class:Dataset
+_get_BG	Data_parallelized.py	/^    def _get_BG(self,inds=None):$/;"	m	class:DataBackgroundQs
+_get_BG_parallel	Data_parallelized.py	/^    def _get_BG_parallel(self):$/;"	m	class:DataBackgroundQs
+_get_background_by_rocking_scans	file_tools/m_background_tools.py	/^    def _get_background_by_rocking_scans(self,proc,num_bg_cuts):$/;"	m	class:c_background_tools
+_get_bin_edges	file_tools/m_MDE_tools.py	/^    def _get_bin_edges(self,bins):$/;"	m	class:c_MDE_tools
+_get_chunk_bin_args	file_tools/m_MDE_tools.py	/^    def _get_chunk_bin_args(self,edges,d,n):$/;"	m	class:c_MDE_tools
+_get_cut_from_hdf5	Tools to access raw data/hdf5Access.py	/^    def _get_cut_from_hdf5(self,Q_index):$/;"	m	class:access_data_in_hdf5
+_get_neighboring_Q_points_in_shell	file_tools/m_background_tools.py	/^    def _get_neighboring_Q_points_in_shell(self,Q,polar,azimuthal):$/;"	m	class:c_background_tools
+_init_parameters	TextFile.py	/^    def _init_parameters(self,FolderName,FileName):$/;"	m	class:Parameters
+_load_Q_and_E	Tools to access raw data/hdf5Access.py	/^    def _load_Q_and_E(self):$/;"	m	class:access_data_in_hdf5
+_loop_over_chunks	file_tools/m_MDE_tools.py	/^    def _loop_over_chunks(self):$/;"	m	class:c_MDE_tools
+_setup_offsets	file_tools/m_MDE_tools.py	/^    def _setup_offsets(self,H_offsets,K_offsets,L_offsets):$/;"	m	class:c_MDE_tools
+_smooth_by_looping_over_Q_blocks	file_tools/m_background_tools.py	/^    def _smooth_by_looping_over_Q_blocks(self,num_blocks,raw_db,smooth_db):$/;"	m	class:c_background_tools
+_smooth_cut	GaussianSmooth.py	/^    def _smooth_cut(self,bg_data):$/;"	m	class:SmoothedBackground
+_split_bins_on_chunks	file_tools/m_MDE_tools.py	/^    def _split_bins_on_chunks(self):$/;"	m	class:c_MDE_tools
+_t	GenerateConstQCuts.py	/^    _t = timer('background cuts')$/;"	v
+_t	GenerateConstQCuts.py	/^_t = timer('const. Q cuts')$/;"	v
+_timer	PreprocessNXSPE.py	/^_timer = c_timer('bin_with_offsets',units='m')$/;"	v
+_write_background	GaussianSmooth.py	/^    def _write_background(self,fine_e,pbp_min,raw_file_path,raw_file_name):$/;"	m	class:SmoothedBackground
+_write_background_file	file_tools/m_background_tools.py	/^    def _write_background_file(self):$/;"	m	class:c_background_tools
+_write_datasets	m_save_MDE_to_hdf5.py	/^    def _write_datasets(self,db):$/;"	m	class:_c_reduced_MDE_tools
+_write_smooth_file	GaussianSmooth.py	/^    def _write_smooth_file(self,fine_e,sf_int,bg_file):$/;"	m	class:SmoothedBackground
+access_data_in_hdf5	Tools to access raw data/hdf5Access.py	/^class access_data_in_hdf5:$/;"	c
+ang	file_tools/tmp/PreprocessNXSPE.py	/^    ang=gon_dict[wsn.split('S0')[1]]$/;"	v
+appendDataset	Data.py	/^    def appendDataset(self):$/;"	m	class:Dataset
+appendDataset	Data_parallelized.py	/^    def appendDataset(self):$/;"	m	class:Dataset
+append_sparse_to_hdf5	file_tools/m_MDE_tools.py	/^    def append_sparse_to_hdf5(self,output_file_name):$/;"	m	class:c_MDE_tools
+append_sparse_to_hdf5	file_tools/m_save_MDE_to_hdf5.py	/^    def append_sparse_to_hdf5(self,hdf5_file_name):$/;"	m	class:c_reduced_MDE_tools
+arg_parser	Utils.py	/^class arg_parser:$/;"	c
+axis_deltaE	file_tools/tmp/PreprocessNXSPE.py	/^axis_deltaE=wg[0].readX(0)$/;"	v
+backgroundA	StokesAS.py	/^            energyA,DataWithoutBackgroundA,error1A,backgroundA = SutractPolyBackground1File(ener/;"	v
+backgroundS	StokesAS.py	/^            energyS,DataWithoutBackgroundS,error1S,backgroundS = SutractPolyBackground1File(ener/;"	v
+bg_tools	PreprocessEvents.py	/^    bg_tools = c_background_tools(out_file_name)$/;"	v
+bin_MDE	PreprocessEvents.py	/^bin_MDE = True$/;"	v
+bin_MDE	file_tools/m_MDE_tools.py	/^    def bin_MDE(self,H_bins=None,K_bins=None,L_bins=None,E_bins=None,u=[1,0,0],v=[0,1,0],w=None)/;"	m	class:c_MDE_tools
+bin_MDE_chunks	file_tools/m_MDE_tools.py	/^    def bin_MDE_chunks(self,H_bin_args,K_bin_args,L_bin_args,E_bin_args,num_chunks=[1,1,1],$/;"	m	class:c_MDE_tools
+bin_MDE_with_offsets	file_tools/m_MDE_tools.py	/^    def bin_MDE_with_offsets(self,H_bins,K_bins,L_bins,E_bins,H_offsets=None,K_offsets=None,$/;"	m	class:c_MDE_tools
+bin_NXSPE_with_offsets	PreprocessNXSPE.py	/^bin_NXSPE_with_offsets = m_PreprocessNXSPE.bin_NXSPE_with_offsets$/;"	v
+bin_NXSPE_with_offsets	file_tools/m_PreprocessNXSPE.py	/^def bin_NXSPE_with_offsets(event_files,goniometer_file,output_file,UB_params,$/;"	f
+buildInitArray	FitParameters.py	/^    def buildInitArray(self,NumberofPeaks,NumberofDatasets,positions):$/;"	m	class:InitialGuesses
+buildfittingFunction	FittingFunction.py	/^    def buildfittingFunction(self):$/;"	m	class:FittingFunction
+buildfittingFunctionDeclaration	FittingFunction.py	/^    def buildfittingFunctionDeclaration(self):$/;"	m	class:FittingFunction
+c_MDE_tools	PreprocessEvents.py	/^c_MDE_tools = m_MDE_tools.c_MDE_tools$/;"	v
+c_MDE_tools	file_tools/m_MDE_tools.py	/^class c_MDE_tools:$/;"	c
+c_background_tools	file_tools/m_background_tools.py	/^class c_background_tools:$/;"	c
+c_reduced_MDE_tools	file_tools/m_save_MDE_to_hdf5.py	/^class c_reduced_MDE_tools:$/;"	c
+c_timer	file_tools/m_file_utils.py	/^class c_timer:$/;"	c
+calculate_background	file_tools/m_background_tools.py	/^    def calculate_background(self,num_bg_cuts=10,delta_Q_length=0.5,delta_polar_angle=10,$/;"	m	class:c_background_tools
+check_file	file_tools/m_file_utils.py	/^def check_file(file_name):$/;"	f
+check_ws	file_tools/m_MDE_tools.py	/^    def check_ws(self,ws_name,crash=True,bonus_msg=None):$/;"	m	class:c_MDE_tools
+clean	Data.py	/^    def clean(self):$/;"	m	class:Dataset
+clean	Data_parallelized.py	/^    def clean(self):$/;"	m	class:Dataset
+crash	file_tools/m_file_utils.py	/^def crash(err_msg=None,exception=None):$/;"	f
+create_pdf_buttons	webiste.py	/^    def create_pdf_buttons(self):$/;"	m	class:MainWindow
+d	file_tools/tmp/PreprocessNXSPE.py	/^d=np.loadtxt(fn,skiprows=1,dtype=str)$/;"	v
+data	MultiFit.py	/^        data=DataSmall_q(params,params.folderForBkgSubtractedFiles)$/;"	v
+data	SubtractBackground_old.py	/^            data=Dataset(folder,[files[j]])$/;"	v
+dataFileNames	MakeAdjustmentList.py	/^dataFileNames=[file for file in os.listdir(folder) if file.startswith("H") and not file.endswith/;"	v
+dataIsValid	Data.py	/^    def dataIsValid(self,minPointsInDataFile):$/;"	m	class:Dataset
+dataIsValid	Data_parallelized.py	/^    def dataIsValid(self,minPointsInDataFile):$/;"	m	class:Dataset
+datasetdir	DispPlot.py	/^datasetdir='E:\/Bagage22\/Bagage_22_TA\/subtr_background\/'$/;"	v
+datasetdir	DispPlot.py	/^datasetdir=location_ForPlots$/;"	v
+datasetdir	TDepPlot.py	/^datasetdir=[]$/;"	v
+datasetdir1	StokesAS.py	/^datasetdir1='\/users\/dmitryreznik\/To be backed up\/working files\/LSNO_bin_test\/LSNO25_300K\//;"	v
+datasetdir1	Symmetrize_H.py	/^datasetdir1='E:\/Data_LSNO_120meV_240K\/Longitudinal_LSNO110K01DH01K005\/good_slices\/'$/;"	v
+datasetdir1	Symmetrize_H_K.py	/^datasetdir1='E:\/Data_IPTS-12942_UD55_55meV_10K\/BendingDispSingleH0x025\/good_slices\/'$/;"	v
+datasetdir1	compare_data.py	/^datasetdir1='\/users\/dmitryreznik\/To be backed up\/working files\/LSr0x2MnO3JPark\/nxspe054Ei_/;"	v
+datasetdir2	compare_data.py	/^datasetdir2='\/users\/dmitryreznik\/To be backed up\/working files\/LSr0x2MnO3JPark\/nxspe054Ei_/;"	v
+de_step	file_tools/tmp/PreprocessNXSPE.py	/^de_step=axis_deltaE[1]-emin$/;"	v
+delete_points_at_indices	SubtractPolyBackgr.py	/^def delete_points_at_indices(lst, indices):$/;"	f
+dim2array	Data.py	/^    def dim2array(self,d):$/;"	m	class:Dataset
+dim2array	Data_parallelized.py	/^    def dim2array(self,d):$/;"	m	class:Dataset
+doFitting	FittingData.py	/^    def doFitting(self):$/;"	m	class:FittingData
+elasticLineWidth	StokesAS.py	/^    elasticLineWidth=4 #FWHM in meV$/;"	v
+emax	file_tools/tmp/PreprocessNXSPE.py	/^emax=axis_deltaE[-1]$/;"	v
+emin	file_tools/tmp/PreprocessNXSPE.py	/^emin=axis_deltaE[0]$/;"	v
+energy	DispPlot.py	/^    energy=AllData[:,][:,0]$/;"	v
+energy	DispPlot.py	/^energy=[]$/;"	v
+energy	StokesAS.py	/^    energy=AllData[:,][:,0]$/;"	v
+energy	TDepPlot.py	/^    energy=AllData[:,][:,0]$/;"	v
+energy	TDepPlot.py	/^energy=[]$/;"	v
+energy0	DispPlot.py	/^energy0=np.zeros(int((energyMax-energyMin)\/estep)+1)$/;"	v
+energy0	TDepPlot.py	/^energy0=np.zeros(int((energyMax-energyMin)\/estep)+1)$/;"	v
+energy1	StokesAS.py	/^            energy1=energy[max(indices0):]$/;"	v
+energy1	Symmetrize_H.py	/^           energy1=AllData1[:,][:,0]$/;"	v
+energy1	Symmetrize_H.py	/^        energy1=DataPlus[:,][:,0]$/;"	v
+energy1	Symmetrize_H_K.py	/^           energy1=AllData1[:,][:,0]$/;"	v
+energy1	Symmetrize_H_K.py	/^        energy1=DataPlus[:,][:,0]$/;"	v
+energy1	compare_data.py	/^            energy1=AllData1[:,][:,0]$/;"	v
+energy2	StokesAS.py	/^            energy2=-energy[:min(indices0)]$/;"	v
+energy2	Symmetrize_H.py	/^           energy2=AllData2[:,][:,0]$/;"	v
+energy2	Symmetrize_H.py	/^        energy2=DataMinus[:,][:,0]$/;"	v
+energy2	Symmetrize_H_K.py	/^           energy2=AllData2[:,][:,0]$/;"	v
+energy2	Symmetrize_H_K.py	/^        energy2=DataMinus[:,][:,0]$/;"	v
+energy2	compare_data.py	/^            energy2=AllData2[:,][:,0]$/;"	v
+energy3	Symmetrize_H_K.py	/^        energy3=DataMinus[:,][:,0]$/;"	v
+energy4	Symmetrize_H_K.py	/^        energy4=DataMinus[:,][:,0]$/;"	v
+energyA	StokesAS.py	/^            energyA,DataWithoutBackgroundA,error1A,backgroundA = SutractPolyBackground1File(ener/;"	v
+energyMax	DispPlot.py	/^    energyMax=max(np.amax(energy),energyMax)$/;"	v
+energyMax	DispPlot.py	/^energyMax=-500$/;"	v
+energyMax	TDepPlot.py	/^    energyMax=max(np.amax(energy),energyMax)$/;"	v
+energyMax	TDepPlot.py	/^energyMax=-500$/;"	v
+energyMin	DispPlot.py	/^    energyMin=min(np.amin(energy),energyMin)$/;"	v
+energyMin	DispPlot.py	/^energyMin=1000$/;"	v
+energyMin	TDepPlot.py	/^    energyMin=min(np.amin(energy),energyMin)$/;"	v
+energyMin	TDepPlot.py	/^energyMin=1000$/;"	v
+energyS	StokesAS.py	/^            energyS,DataWithoutBackgroundS,error1S,backgroundS = SutractPolyBackground1File(ener/;"	v
+error	DispPlot.py	/^    error=AllData[:,][:,2]$/;"	v
+error	DispPlot.py	/^error=[]$/;"	v
+error	StokesAS.py	/^    error=AllData[:,][:,2]$/;"	v
+error	Symmetrize_H.py	/^        error=error1$/;"	v
+error	Symmetrize_H_K.py	/^        error=error1$/;"	v
+error	TDepPlot.py	/^    error=AllData[:,][:,2]$/;"	v
+error	TDepPlot.py	/^error=[]$/;"	v
+error0	DispPlot.py	/^error0=np.zeros((len(energy0),len(FileNames)))$/;"	v
+error0	TDepPlot.py	/^error0=np.zeros((len(energy0),len(datasetdir)))$/;"	v
+error1	StokesAS.py	/^            error1=error[max(indices0):]$/;"	v
+error1	Symmetrize_H.py	/^           error1=AllData1[:,][:,2]$/;"	v
+error1	Symmetrize_H.py	/^        error1=DataPlus[:,][:,2]$/;"	v
+error1	Symmetrize_H_K.py	/^           error1=AllData1[:,][:,2]$/;"	v
+error1	Symmetrize_H_K.py	/^        error1=DataPlus[:,][:,2]$/;"	v
+error1	compare_data.py	/^            error1=AllData1[:,][:,2]$/;"	v
+error1A	StokesAS.py	/^            energyA,DataWithoutBackgroundA,error1A,backgroundA = SutractPolyBackground1File(ener/;"	v
+error1S	StokesAS.py	/^            energyS,DataWithoutBackgroundS,error1S,backgroundS = SutractPolyBackground1File(ener/;"	v
+error2	StokesAS.py	/^            error2=error[:min(indices0)]$/;"	v
+error2	Symmetrize_H.py	/^           error2=AllData2[:,][:,2]$/;"	v
+error2	Symmetrize_H.py	/^        error2=DataMinus[:,][:,2]$/;"	v
+error2	Symmetrize_H_K.py	/^           error2=AllData2[:,][:,2]$/;"	v
+error2	Symmetrize_H_K.py	/^        error2=DataMinus[:,][:,2]$/;"	v
+error2	compare_data.py	/^            error2=AllData2[:,][:,2]$/;"	v
+error3	Symmetrize_H_K.py	/^        error3=DataMinus[:,][:,2]$/;"	v
+error4	Symmetrize_H_K.py	/^        error4=DataMinus[:,][:,2]$/;"	v
+errorA	StokesAS.py	/^            errorA=np.zeros(len(energyA))$/;"	v
+errorS	StokesAS.py	/^            errorS=np.zeros(len(energyS))$/;"	v
+estep	DispPlot.py	/^estep=0.25$/;"	v
+estep	TDepPlot.py	/^estep=1.25$/;"	v
+evalError	TextFile.py	/^    def evalError(self,string):$/;"	m	class:Parameters
+evalIntWarning	TextFile.py	/^    def evalIntWarning(self,string,default):$/;"	m	class:Parameters
+evalReaNoWarning	TextFile.py	/^    def evalReaNoWarning(self,string,default):$/;"	m	class:Parameters
+evalRealWarning	TextFile.py	/^    def evalRealWarning(self,string,default):$/;"	m	class:Parameters
+evalWarning	TextFile.py	/^    def evalWarning(self,string,default):$/;"	m	class:Parameters
+event_files	PreprocessNXSPE.py	/^event_files = sorted($/;"	v
+filenames1	StokesAS.py	/^filenames1=[file for file in os.listdir(datasetdir1) if file.startswith("H")and not file.endswit/;"	v
+filenames1	Symmetrize_H.py	/^filenames1=[file for file in os.listdir(datasetdir1) if file.startswith("H")and not file.endswit/;"	v
+filenames1	Symmetrize_H_K.py	/^filenames1=[file for file in os.listdir(datasetdir1) if file.startswith("H")and not file.endswit/;"	v
+filenames1	compare_data.py	/^filenames1=[file for file in os.listdir(datasetdir1) if file.startswith("H")and not file.endswit/;"	v
+filenames2	Symmetrize_H.py	/^filenames2=[file for file in os.listdir(datasetdir1) if file.startswith("B_H")and not file.endsw/;"	v
+filenames2	Symmetrize_H_K.py	/^filenames2=[file for file in os.listdir(datasetdir1) if file.startswith("B_H")and not file.endsw/;"	v
+filenames2	compare_data.py	/^filenames2=[file for file in os.listdir(datasetdir2) if file.startswith("H")and not file.endswit/;"	v
+files	SubtractBackground.py	/^    files=[file for file in os.listdir(folder) if file.startswith(RSE_Constants.STARTS_WITH) \\$/;"	v
+files	SubtractBackground_old.py	/^    files=[file for file in os.listdir(folder) if file.startswith(RSE_Constants.STARTS_WITH) and/;"	v
+files	file_tools/tmp/PreprocessNXSPE.py	/^files = sorted(glob.glob('\/SNS\/ARCS\/IPTS-26347\/shared\/jpark\/nxspe120Ei_010K_Ebin1_RCmasked/;"	v
+filter_array	Tools to access raw data/hdf5Access.py	/^    def filter_array(self, arr, min_vals, max_vals):$/;"	m	class:access_data_in_hdf5
+fn	file_tools/tmp/PreprocessNXSPE.py	/^fn = '\/SNS\/ARCS\/IPTS-26347\/shared\/jpark\/120meV300Hz010K_run_list.txt'$/;"	v
+folder	BackgroundAdjustment.py	/^folder=params.folderForBkgSubtractedFiles$/;"	v
+folder	BackgroundAdjustmentLine.py	/^folder=params.folderForBkgSubtractedFiles$/;"	v
+folder	BackgroundAdjustmentLine2.py	/^folder=params.folderForBkgSubtractedFiles$/;"	v
+folder	MakeAdjustmentList.py	/^folder=params.folderForBkgSubtractedFiles$/;"	v
+folder	MultiFit.py	/^    folder=params.locationForOutputParam$/;"	v
+folder	SubtractBackground.py	/^    folder=params.path_data+folderForBkgSubtractedFiles[i]+'\/' # path of the folder to do in th/;"	v
+folder	SubtractBackground_old.py	/^    folder=params.path_data+folderForBkgSubtractedFiles[i]+'\/'$/;"	v
+folderForBkgSubtractedFiles	SubtractBackground.py	/^folderForBkgSubtractedFiles=[subdir for subdir in os.listdir(params.path_data) if \\$/;"	v
+folderForBkgSubtractedFiles	SubtractBackground_old.py	/^folderForBkgSubtractedFiles=[subdir for subdir in os.listdir(params.path_data) if subdir.startsw/;"	v
+font	DispPlot.py	/^font = {'family': 'serif',$/;"	v
+font	StokesAS.py	/^font = {'family': 'serif',$/;"	v
+font	Symmetrize_H.py	/^font = {'family': 'serif',$/;"	v
+font	Symmetrize_H_K.py	/^font = {'family': 'serif',$/;"	v
+font	TDepPlot.py	/^font = {'family': 'serif',$/;"	v
+font	compare_data.py	/^font = {'family': 'serif',$/;"	v
+generateFit	SubtractPolyBackgr.py	/^def generateFit(x,y,errors):$/;"	f
+generate_BG_cuts	Data.py	/^    def generate_BG_cuts(self):$/;"	m	class:DataBackgroundQs
+generate_BG_cuts	Data_parallelized.py	/^    def generate_BG_cuts(self):$/;"	m	class:DataBackgroundQs
+getFileName	TextFile.py	/^    def getFileName(self):$/;"	m	class:TextFile
+getFitResultsArray	plotDataWithFit.py	/^    def getFitResultsArray(self,fitResults, Energy,indx):$/;"	m	class:Plot
+getFitResultsArray	plotDataWithFit_.py	/^    def getFitResultsArray(self,fitResults, Energy,indx):$/;"	m	class:Plot
+getFolderName	TextFile.py	/^    def getFolderName(self):$/;"	m	class:TextFile
+getIndex	TextFile.py	/^    def getIndex(self,keyword,parameters):$/;"	m	class:Parameters
+get_Q_points_arr	Data.py	/^    def get_Q_points_arr(self):$/;"	m	class:CollectionOfQs
+get_Q_points_arr	Data.py	/^    def get_Q_points_arr(self):$/;"	m	class:DataSmall_q
+get_Q_points_arr	Data_parallelized.py	/^    def get_Q_points_arr(self):$/;"	m	class:CollectionOfQs
+get_Q_points_arr	Data_parallelized.py	/^    def get_Q_points_arr(self):$/;"	m	class:DataSmall_q
+get_adaptive_energy_window	Data.py	/^    def get_adaptive_energy_window(self):$/;"	m	class:DataBackgroundQs
+get_adaptive_energy_window	Data_parallelized.py	/^    def get_adaptive_energy_window(self):$/;"	m	class:DataBackgroundQs
+get_arrays_from_histo_ws	file_tools/m_MDE_tools.py	/^    def get_arrays_from_histo_ws(self):$/;"	m	class:c_MDE_tools
+get_arrays_from_histo_ws	file_tools/m_save_MDE_to_hdf5.py	/^    def get_arrays_from_histo_ws(self):$/;"	m	class:c_reduced_MDE_tools
+get_arrays_from_histo_ws	m_save_MDE_to_hdf5.py	/^    def get_arrays_from_histo_ws(self):$/;"	m	class:_c_reduced_MDE_tools
+get_bin_str	file_tools/m_MDE_tools.py	/^    def get_bin_str(self,bins):$/;"	m	class:c_MDE_tools
+get_binning	file_tools/m_save_MDE_to_hdf5.py	/^    def get_binning(self):$/;"	m	class:c_reduced_MDE_tools
+get_binning	m_save_MDE_to_hdf5.py	/^    def get_binning(self):$/;"	m	class:_c_reduced_MDE_tools
+get_cartesian_coords	file_tools/m_MDE_tools.py	/^    def get_cartesian_coords(self):$/;"	m	class:c_MDE_tools
+get_cartesian_coords	file_tools/m_save_MDE_to_hdf5.py	/^    def get_cartesian_coords(self):$/;"	m	class:c_reduced_MDE_tools
+get_cartesian_coords	m_save_MDE_to_hdf5.py	/^    def get_cartesian_coords(self):$/;"	m	class:_c_reduced_MDE_tools
+get_dim_array	file_tools/m_MDE_tools.py	/^    def get_dim_array(self,dim):$/;"	m	class:c_MDE_tools
+get_dim_array	file_tools/m_save_MDE_to_hdf5.py	/^    def get_dim_array(self,dim):$/;"	m	class:c_reduced_MDE_tools
+get_dim_array	m_save_MDE_to_hdf5.py	/^    def get_dim_array(self,dim):$/;"	m	class:_c_reduced_MDE_tools
+get_dim_mesh	file_tools/m_MDE_tools.py	/^    def get_dim_mesh(self,dim_array_list):$/;"	m	class:c_MDE_tools
+get_dim_mesh	file_tools/m_save_MDE_to_hdf5.py	/^    def get_dim_mesh(self,dim_array_list):$/;"	m	class:c_reduced_MDE_tools
+get_dim_mesh	m_save_MDE_to_hdf5.py	/^    def get_dim_mesh(self,dim_array_list):$/;"	m	class:_c_reduced_MDE_tools
+get_input_file	Utils.py	/^    def get_input_file(self):$/;"	m	class:arg_parser
+get_intensity_and_error_Single_Q	Tools to access raw data/hdf5Access.py	/^    def get_intensity_and_error_Single_Q(self,Q,cutoff=0.5):$/;"	m	class:access_data_in_hdf5
+get_intensity_and_error_in_Array_of_Qs	Tools to access raw data/hdf5Access.py	/^    def get_intensity_and_error_in_Array_of_Qs(self,Q):$/;"	m	class:access_data_in_hdf5
+get_intensity_and_error_in_Q_range	Tools to access raw data/hdf5Access.py	/^    def get_intensity_and_error_in_Q_range(self, min_vals, max_vals):$/;"	m	class:access_data_in_hdf5
+get_lattice	file_tools/m_MDE_tools.py	/^    def get_lattice(self,ws_name):$/;"	m	class:c_MDE_tools
+get_lattice	file_tools/m_save_MDE_to_hdf5.py	/^    def get_lattice(self):$/;"	m	class:c_reduced_MDE_tools
+get_lattice	m_save_MDE_to_hdf5.py	/^    def get_lattice(self):$/;"	m	class:_c_reduced_MDE_tools
+get_lattice_vectors_from_params	file_tools/m_MDE_tools.py	/^    def get_lattice_vectors_from_params(self):$/;"	m	class:c_MDE_tools
+get_lattice_vectors_from_params	file_tools/m_save_MDE_to_hdf5.py	/^    def get_lattice_vectors_from_params(self):$/;"	m	class:c_reduced_MDE_tools
+get_lattice_vectors_from_params	m_save_MDE_to_hdf5.py	/^    def get_lattice_vectors_from_params(self):$/;"	m	class:_c_reduced_MDE_tools
+get_polar_coords	file_tools/m_MDE_tools.py	/^    def get_polar_coords(self):$/;"	m	class:c_MDE_tools
+get_polar_coords	file_tools/m_save_MDE_to_hdf5.py	/^    def get_polar_coords(self):$/;"	m	class:c_reduced_MDE_tools
+get_polar_coords	m_save_MDE_to_hdf5.py	/^    def get_polar_coords(self):$/;"	m	class:_c_reduced_MDE_tools
+get_reciprocal_lattice_vectors	file_tools/m_MDE_tools.py	/^    def get_reciprocal_lattice_vectors(self):$/;"	m	class:c_MDE_tools
+get_reciprocal_lattice_vectors	file_tools/m_save_MDE_to_hdf5.py	/^    def get_reciprocal_lattice_vectors(self):$/;"	m	class:c_reduced_MDE_tools
+get_reciprocal_lattice_vectors	m_save_MDE_to_hdf5.py	/^    def get_reciprocal_lattice_vectors(self):$/;"	m	class:_c_reduced_MDE_tools
+get_sparse_arrays_from_histo_ws	file_tools/m_MDE_tools.py	/^    def get_sparse_arrays_from_histo_ws(self):$/;"	m	class:c_MDE_tools
+get_sparse_arrays_from_histo_ws	file_tools/m_save_MDE_to_hdf5.py	/^    def get_sparse_arrays_from_histo_ws(self):$/;"	m	class:c_reduced_MDE_tools
+get_sparse_arrays_from_histo_ws	m_save_MDE_to_hdf5.py	/^    def get_sparse_arrays_from_histo_ws(self):$/;"	m	class:_c_reduced_MDE_tools
+get_ws	file_tools/m_MDE_tools.py	/^    def get_ws(self,ws_name):$/;"	m	class:c_MDE_tools
+gon	file_tools/tmp/PreprocessNXSPE.py	/^gon=d[:,11].astype(float)-82.388$/;"	v
+gon_dict	file_tools/tmp/PreprocessNXSPE.py	/^gon_dict=dict()$/;"	v
+goniometer_file	PreprocessNXSPE.py	/^goniometer_file = '\/SNS\/ARCS\/IPTS-26347\/shared\/jpark\/120meV300Hz010K_run_list.txt'$/;"	v
+hdf5_file_name	file_tools/tmp/PreprocessNXSPE.py	/^hdf5_file_name = 'nxspe120Ei_010K_Ebin1ZBk.hdf5'$/;"	v
+hdf5_output_file	PreprocessNXSPE.py	/^hdf5_output_file = 'nxspe120Ei_010K_Ebin1ZBk.hdf5'$/;"	v
+import_mantid	file_tools/m_MDE_tools.py	/^    def import_mantid(self):$/;"	m	class:c_MDE_tools
+inFolder	BackgroundAdjustmentLine.py	/^inFolder=params.path_data$/;"	v
+inFolder	BackgroundAdjustmentLine2.py	/^inFolder=params.folderForBkgSubtractedFiles$/;"	v
+index	DispPlot.py	/^                index=jj$/;"	v
+index	TDepPlot.py	/^        index=np.argwhere(energy0==energy[j])$/;"	v
+indices0	StokesAS.py	/^    indices0 = [index for index, value in enumerate(energy) if -elasticLineWidth <= value <= ela/;"	v
+initFromFitResults	FitParameters.py	/^    def initFromFitResults(self,fitResults):$/;"	m	class:FitParameters
+initialize	Data.py	/^    def initialize(self):$/;"	m	class:Dataset
+initialize	Data_parallelized.py	/^    def initialize(self):$/;"	m	class:Dataset
+intensity	DispPlot.py	/^    intensity=AllData[:,][:,1]$/;"	v
+intensity	DispPlot.py	/^intensity=[]$/;"	v
+intensity	StokesAS.py	/^    intensity=AllData[:,][:,1]$/;"	v
+intensity	TDepPlot.py	/^    intensity=AllData[:,][:,1]$/;"	v
+intensity	TDepPlot.py	/^intensity=[]$/;"	v
+intensity0	DispPlot.py	/^intensity0=np.zeros((len(energy0),len(FileNames)))$/;"	v
+intensity0	TDepPlot.py	/^intensity0=np.zeros((len(energy0),len(datasetdir)))$/;"	v
+intensity1	StokesAS.py	/^            intensity1=intensity[max(indices0):]$/;"	v
+intensity1	Symmetrize_H.py	/^           intensity1=AllData1[:,][:,1]$/;"	v
+intensity1	Symmetrize_H.py	/^        intensity1=DataPlus[:,][:,1]$/;"	v
+intensity1	Symmetrize_H_K.py	/^           intensity1=AllData1[:,][:,1]$/;"	v
+intensity1	Symmetrize_H_K.py	/^        intensity1=DataPlus[:,][:,1]$/;"	v
+intensity1	compare_data.py	/^            intensity1=AllData1[:,][:,1]$/;"	v
+intensity2	StokesAS.py	/^            intensity2=intensity[:min(indices0)]$/;"	v
+intensity2	Symmetrize_H.py	/^           intensity2=AllData2[:,][:,1]$/;"	v
+intensity2	Symmetrize_H.py	/^        intensity2=DataMinus[:,][:,1]$/;"	v
+intensity2	Symmetrize_H_K.py	/^           intensity2=AllData2[:,][:,1]$/;"	v
+intensity2	Symmetrize_H_K.py	/^        intensity2=DataMinus[:,][:,1]$/;"	v
+intensity2	compare_data.py	/^            intensity2=AllData2[:,][:,1]$/;"	v
+intensity3	Symmetrize_H_K.py	/^        intensity3=DataMinus[:,][:,1]$/;"	v
+intensity4	Symmetrize_H_K.py	/^        intensity4=DataMinus[:,][:,1]$/;"	v
+intensityA	StokesAS.py	/^            intensityA=np.zeros(len(energyA))$/;"	v
+intensityS	StokesAS.py	/^            intensityS=np.zeros(len(energyS))$/;"	v
+intensitySum	Symmetrize_H.py	/^        intensitySum=intensity1$/;"	v
+intensitySum	Symmetrize_H_K.py	/^        intensitySum=intensity1$/;"	v
+j	Symmetrize_H.py	/^                j=np.argwhere(energy2==energy1[k])$/;"	v
+j1	Symmetrize_H_K.py	/^                j1=np.argwhere(energy2==energy1[k])$/;"	v
+j2	Symmetrize_H_K.py	/^                j2=np.argwhere(energy2==energy1[k])$/;"	v
+j3	Symmetrize_H_K.py	/^                j3=np.argwhere(energy2==energy1[k])$/;"	v
+load_MDE	file_tools/m_MDE_tools.py	/^    def load_MDE(self,file_name):$/;"	m	class:c_MDE_tools
+load_ws	file_tools/m_MDE_tools.py	/^    def load_ws(self,file_name,ws_name,force_load=False):$/;"	m	class:c_MDE_tools
+location_ForPlots	DispPlot.py	/^location_ForPlots='E:\/Bagage22\/Bagage_22_TA\/subtr_background\/'$/;"	v
+location_ForPlots	DispPlot.py	/^location_ForPlots='E:\/Bagage22\/Bagage_22_TA_002\/good_slices\/'$/;"	v
+location_ForPlots	StokesAS.py	/^location_ForPlots='⁨\/users\/dmitryreznik\/To be backed up⁩\/working files⁩\/LSNO_bin_test/;"	v
+location_ForPlots	Symmetrize_H_K.py	/^location_ForPlots='E:\/Data_IPTS-12942_UD55_55meV_10K\/BendingXDist\/temp\/'$/;"	v
+location_ForPlots	TDepPlot.py	/^location_ForPlots='E:\/Data_LSNO_120meV\/plots\/'$/;"	v
+location_ForPlots	compare_data.py	/^location_ForPlots='\/users\/dmitryreznik\/To be backed up\/working files\/LSr0x2MnO3JPark\/Comp5/;"	v
+m_MDE_tools	PreprocessEvents.py	/^import file_tools.m_MDE_tools as m_MDE_tools$/;"	I	nameref:module:file_tools.m_MDE_tools
+m_PreprocessNXSPE	PreprocessNXSPE.py	/^import file_tools.m_PreprocessNXSPE as m_PreprocessNXSPE$/;"	I	nameref:module:file_tools.m_PreprocessNXSPE
+main	webiste.py	/^def main():$/;"	f
+makeRawSlice	Data.py	/^    def makeRawSlice(self, bin_h, bin_k, bin_l, bin_e,folder,file,minPoints,mult=1):$/;"	m	class:Dataset
+makeRawSlice	Data_parallelized.py	/^    def makeRawSlice(self, bin_h, bin_k, bin_l, bin_e,folder,file,minPoints,mult=1):$/;"	m	class:Dataset
+make_smoothed_file	file_tools/m_background_tools.py	/^    def make_smoothed_file(self,smoothing_fwhm=None,num_blocks=1):$/;"	m	class:c_background_tools
+mde	file_tools/tmp/PreprocessNXSPE.py	/^mde=MergeMD(mdparts)$/;"	v
+mdparts	file_tools/tmp/PreprocessNXSPE.py	/^mdparts=ConvertToMD(InputWorkspace=wge, QDimensions='Q3D', dEAnalysisMode='Direct', Q3DFrames='Q/;"	v
+mp	Data_parallelized.py	/^import multiprocessing as mp$/;"	I	nameref:module:multiprocessing
+mp	file_tools/m_background_tools.py	/^import multiprocessing as mp$/;"	I	nameref:module:multiprocessing
+msi	file_tools/m_MDE_tools.py	/^            import mantid.simpleapi as msi$/;"	I	member:c_MDE_tools.import_mantid	file:	nameref:module:mantid.simpleapi
+next_page	webiste.py	/^    def next_page(self):$/;"	m	class:MainWindow
+np	DispPlot.py	/^import numpy as np$/;"	I	nameref:module:numpy
+np	StokesAS.py	/^import numpy as np$/;"	I	nameref:module:numpy
+np	SubtractBackground.py	/^import numpy as np$/;"	I	nameref:module:numpy
+np	SubtractPolyBackgr.py	/^import numpy as np$/;"	I	nameref:module:numpy
+np	Symmetrize_H.py	/^import numpy as np$/;"	I	nameref:module:numpy
+np	Symmetrize_H_K.py	/^import numpy as np$/;"	I	nameref:module:numpy
+np	TDepPlot.py	/^import numpy as np$/;"	I	nameref:module:numpy
+np	TextFile.py	/^import numpy as np$/;"	I	nameref:module:numpy
+np	Tools to access raw data/SQWAccess.py	/^import numpy as np  # !!!!$/;"	I	nameref:module:numpy
+np	Tools to access raw data/SQWAccess_parallel.py	/^import numpy as np  # !!!!$/;"	I	nameref:module:numpy
+np	Tools to access raw data/hdf5Access.py	/^import numpy as np$/;"	I	nameref:module:numpy
+np	compare_data.py	/^import numpy as np$/;"	I	nameref:module:numpy
+np	file_tools/m_MDE_tools.py	/^import numpy as np$/;"	I	nameref:module:numpy
+np	file_tools/m_PreprocessNXSPE.py	/^import numpy as np$/;"	I	nameref:module:numpy
+np	file_tools/m_background_tools.py	/^import numpy as np$/;"	I	nameref:module:numpy
+np	file_tools/m_save_MDE_to_hdf5.py	/^import numpy as np$/;"	I	nameref:module:numpy
+np	file_tools/tmp/PreprocessNXSPE.py	/^import numpy as np$/;"	I	nameref:module:numpy
+np	file_tools/tmp/bak.PreprocessNXSPE.py	/^import numpy as np$/;"	I	nameref:module:numpy
+np	m_save_MDE_to_hdf5.py	/^import numpy as np$/;"	I	nameref:module:numpy
+num_chunks	PreprocessEvents.py	/^    num_chunks = [2,2,1]$/;"	v
+offs	TDepPlot.py	/^offs=[0,0.0008,0.0008,0.0008,0.0008,0.0008]$/;"	v
+offset	DispPlot.py	/^offset=3000.000$/;"	v
+offset	StokesAS.py	/^    offset=3     #Make sure that the offset is such that it would ensure that both stokes and an/;"	v
+offset	TDepPlot.py	/^    offset=offset+offs[i]$/;"	v
+offset	TDepPlot.py	/^offset=0$/;"	v
+open_3d_graph	webiste.py	/^    def open_3d_graph(self):$/;"	m	class:GraphWindow
+open_pdf	webiste.py	/^    def open_pdf(self, idx):$/;"	m	class:MainWindow
+optimization	FittingData.py	/^import scipy.optimize as optimization$/;"	I	nameref:module:scipy.optimize
+out_file_name	PreprocessEvents.py	/^out_file_name = f'LSNO25_300K_test.hdf5'$/;"	v
+parabola	SubtractPolyBackgr.py	/^def parabola(x, a, b, c):$/;"	f
+paramFileName	MultiFit.py	/^        paramFileName='_'+RSE_Constants.FITTING_PARAM_FILE$/;"	v
+paramFileName	MultiFit.py	/^        paramFileName='_'+RSE_Constants.FITTING_PARAM_FILE+'_'+str(params.qh)+'_'+str(params.qk)/;"	v
+params	BackgroundAdjustment.py	/^params = Parameters()$/;"	v
+params	BackgroundAdjustmentLine.py	/^params = Parameters()$/;"	v
+params	BackgroundAdjustmentLine2.py	/^params = Parameters()$/;"	v
+params	GenerateConstQCuts.py	/^params=Parameters()$/;"	v
+params	MakeAdjustmentList.py	/^params = Parameters()$/;"	v
+params	MultiFit.py	/^params = Parameters()$/;"	v
+params	Replot.py	/^params = Parameters()$/;"	v
+params	SubtractBackground.py	/^params = Parameters()$/;"	v
+params	SubtractBackground_old.py	/^params = Parameters()$/;"	v
+pcov	MultiFit.py	/^    popt, pcov=Fitting.doFitting()$/;"	v
+pcov	SubtractBackground_old.py	/^            popt, pcov=Fitting.doFitting()$/;"	v
+plot	GenerateConstQCuts.py	/^    plot=Plot(params)$/;"	v
+plot	Replot.py	/^plot=Plot(params)$/;"	v
+plotDataset	plotDataWithFit.py	/^    def plotDataset(self,data,indx,fitResults=0):$/;"	m	class:Plot
+plotDataset	plotDataWithFit_.py	/^    def plotDataset(self,data,indx,fitResults=0):$/;"	m	class:Plot
+plotSingle	plotDataWithFit.py	/^    def plotSingle(self,folder,plotsFolder,filenames,FitResultsArray=0,title=0):$/;"	m	class:Plot
+plotSingle	plotDataWithFit_.py	/^    def plotSingle(self,folder,plotsFolder,filenames,FitResultsArray=0,title=0):$/;"	m	class:Plot
+plot_all_in_one	GaussianSmooth.py	/^    def plot_all_in_one(self,params,raw_file_name):$/;"	m	class:SmoothedBackground
+plot_raw_cut	GaussianSmooth.py	/^    def plot_raw_cut(self,params,raw_file_name):$/;"	m	class:SmoothedBackground
+plot_subtr_cut	GaussianSmooth.py	/^    def plot_subtr_cut(self,params,raw_file_name):$/;"	m	class:SmoothedBackground
+plot_with_smooth	SubtractBackground.py	/^    plot_with_smooth = PlotDataWithGaussianSmoothedBG(params,folder,files)$/;"	v
+plt	BackgroundAdjustment.py	/^import matplotlib.pyplot as plt$/;"	I	nameref:module:matplotlib.pyplot
+plt	BackgroundAdjustmentLine.py	/^import matplotlib.pyplot as plt$/;"	I	nameref:module:matplotlib.pyplot
+plt	BackgroundAdjustmentLine2.py	/^import matplotlib.pyplot as plt$/;"	I	nameref:module:matplotlib.pyplot
+plt	DispPlot.py	/^import matplotlib.pyplot as plt$/;"	I	nameref:module:matplotlib.pyplot
+plt	FittingData.py	/^import matplotlib.pyplot as plt$/;"	I	nameref:module:matplotlib.pyplot
+plt	StokesAS.py	/^import matplotlib.pyplot as plt$/;"	I	nameref:module:matplotlib.pyplot
+plt	SubtractBackground.py	/^import matplotlib.pyplot as plt$/;"	I	nameref:module:matplotlib.pyplot
+plt	SubtractBackground_old.py	/^import matplotlib.pyplot as plt$/;"	I	nameref:module:matplotlib.pyplot
+plt	SubtractPolyBackgr.py	/^import matplotlib.pyplot as plt$/;"	I	nameref:module:matplotlib.pyplot
+plt	Symmetrize_H.py	/^import matplotlib.pyplot as plt$/;"	I	nameref:module:matplotlib.pyplot
+plt	Symmetrize_H_K.py	/^import matplotlib.pyplot as plt$/;"	I	nameref:module:matplotlib.pyplot
+plt	TDepPlot.py	/^import matplotlib.pyplot as plt$/;"	I	nameref:module:matplotlib.pyplot
+plt	compare_data.py	/^import matplotlib.pyplot as plt$/;"	I	nameref:module:matplotlib.pyplot
+plt	plotDataWithFit.py	/^import matplotlib.pyplot as plt$/;"	I	nameref:module:matplotlib.pyplot
+plt	plotDataWithFit_.py	/^import matplotlib.pyplot as plt$/;"	I	nameref:module:matplotlib.pyplot
+popt	MultiFit.py	/^    popt, pcov=Fitting.doFitting()$/;"	v
+popt	SubtractBackground_old.py	/^            popt, pcov=Fitting.doFitting()$/;"	v
+prep_BG_cuts	Data.py	/^    def prep_BG_cuts(self):$/;"	m	class:DataBackgroundQs
+prep_BG_cuts	Data_parallelized.py	/^    def prep_BG_cuts(self):$/;"	m	class:DataBackgroundQs
+prev_page	webiste.py	/^    def prev_page(self):$/;"	m	class:MainWindow
+print_dimensions	file_tools/m_MDE_tools.py	/^    def print_dimensions(self,ws_name=None):$/;"	m	class:c_MDE_tools
+rawData	SubtractBackground_old.py	/^    rawData=Dataset(params.path_data,[rawFileName])$/;"	v
+rawFileName	SubtractBackground.py	/^    rawFileName=folder[folder.index('_' + RSE_Constants.STARTS_WITH)+1:-1] # the Q point file$/;"	v
+rawFileName	SubtractBackground_old.py	/^    rawFileName=folder[folder.index('_' + RSE_Constants.STARTS_WITH)+1:-1]$/;"	v
+readFromFile	FitParameters.py	/^    def readFromFile(self,locationForOutputParam):$/;"	m	class:FitParameters
+removeNAN	Data.py	/^    def removeNAN(self):$/;"	m	class:Dataset
+removeNAN	Data_parallelized.py	/^    def removeNAN(self):$/;"	m	class:Dataset
+revert_table	webiste.py	/^    def revert_table(self):$/;"	m	class:GraphWindow
+runs	file_tools/tmp/PreprocessNXSPE.py	/^runs=d[:,0]$/;"	v
+save_MDE_to_hdf5	file_tools/m_save_MDE_to_hdf5.py	/^def save_MDE_to_hdf5(MD_workspace,hdf5_file_name,overwrite=True):$/;"	f
+save_MDE_to_hdf5	m_save_MDE_to_hdf5.py	/^def save_MDE_to_hdf5(MD_workspace,hdf5_file_name):$/;"	f
+set_pdf_index	webiste.py	/^    def set_pdf_index(self, idx):$/;"	m	class:GraphWindow
+setup_offsets	file_tools/m_PreprocessNXSPE.py	/^def setup_offsets(H_offsets,K_offsets,L_offsets):$/;"	f
+signVar	Data.py	/^    def signVar(self,q):$/;"	m	class:DataSmall_q
+signVar	Data_parallelized.py	/^    def signVar(self,q):$/;"	m	class:DataSmall_q
+smooth	Data.py	/^    def smooth(self):$/;"	m	class:Dataset
+smooth	Data_parallelized.py	/^    def smooth(self):$/;"	m	class:Dataset
+smooth_bg	SubtractBackground.py	/^    smooth_bg = SmoothedBackground(folder)$/;"	v
+smooth_cuts_for_this_Q	GaussianSmooth.py	/^    def smooth_cuts_for_this_Q(self,params,rawFileName):$/;"	m	class:SmoothedBackground
+start_time	GenerateConstQCuts.py	/^    start_time = timeit.default_timer()$/;"	v
+stepH	file_tools/tmp/PreprocessNXSPE.py	/^stepH=0.1$/;"	v
+stepH	file_tools/tmp/bak.PreprocessNXSPE.py	/^stepH=0.1$/;"	v
+stepK	file_tools/tmp/PreprocessNXSPE.py	/^stepK=0.2$/;"	v
+stepK	file_tools/tmp/bak.PreprocessNXSPE.py	/^stepK=0.2$/;"	v
+stepL	file_tools/tmp/PreprocessNXSPE.py	/^stepL=0.2$/;"	v
+stepL	file_tools/tmp/bak.PreprocessNXSPE.py	/^stepL=0.2$/;"	v
+stop	Utils.py	/^    def stop(self):$/;"	m	class:timer
+stop	file_tools/m_file_utils.py	/^    def stop(self):     $/;"	m	class:c_timer
+string	DispPlot.py	/^    string=str(energy0[j])$/;"	v
+string	TDepPlot.py	/^    string=str(energy0[j])$/;"	v
+subtract_background	GaussianSmooth.py	/^    def subtract_background(self,params,raw_file_name):$/;"	m	class:SmoothedBackground
+subtract_background	file_tools/m_background_tools.py	/^    def subtract_background(self,num_blocks=1):$/;"	m	class:c_background_tools
+subtract_bg	PreprocessEvents.py	/^subtract_bg = False$/;"	v
+t	Tools to access raw data/Getslice.m	/^t = cut_sqw(varargin{:});$/;"	v
+testData	GenerateConstQCuts.py	/^    testData=CollectionOfQs(params)$/;"	v
+testData	GenerateConstQCuts.py	/^    testData=DataSmall_q(params, params.path_data)$/;"	v
+timer	Utils.py	/^class timer:$/;"	c
+trim	SubtractPolyBackgr.py	/^def trim(background,x,y,err):$/;"	f
+u	PreprocessEvents.py	/^    u = [ 1, 0, 0]$/;"	v
+update_pdf_buttons	webiste.py	/^    def update_pdf_buttons(self):$/;"	m	class:MainWindow
+update_table	webiste.py	/^    def update_table(self):$/;"	m	class:GraphWindow
+v	PreprocessEvents.py	/^    v = [ 0, 1, 0]$/;"	v
+w	PreprocessEvents.py	/^    w = [ 0, 0, 1]$/;"	v
+wg	file_tools/tmp/PreprocessNXSPE.py	/^wg=Load(','.join(files))$/;"	v
+wge	file_tools/tmp/PreprocessNXSPE.py	/^wge=ConvertToEventWorkspace(wg)$/;"	v
+wge	file_tools/tmp/PreprocessNXSPE.py	/^wge=CropWorkspaceForMDNorm(wge,XMin=emin,XMax=emax)$/;"	v
+writeToFile	FitParameters.py	/^    def writeToFile(self,params,filename):$/;"	m	class:FitParameters
+writeToFile	WriteFinalParamToFile.py	/^    def writeToFile(self,folder,filename,fitParams):$/;"	m	class:WriteFinalParamToFile
+write_sparse_hdf5	m_save_MDE_to_hdf5.py	/^    def write_sparse_hdf5(self,hdf5_file_name):$/;"	m	class:_c_reduced_MDE_tools

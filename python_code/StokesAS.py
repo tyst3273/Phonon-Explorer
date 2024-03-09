@@ -18,7 +18,7 @@ from SubtractPolyBackgr import *
 #ProjectDir='StretchingTests100'
 #ProjectDir='0.5,0,0/'
 
-location_ForPlots='/home/ty/Desktop/phonon_explorer/test/test/stokes/'
+location_ForPlots='⁨/users/dmitryreznik/To be backed up⁩/working files⁩/LSNO_bin_test⁩⁩/LSNO25_300K⁩/0.5,0,0⁩/StokesAS'
 #location_ForPlots='/users/dmitryreznik/To be backed up/working files/LSr0x2MnO3JPark/StokesAS/'+ProjectDir
 if not os.path.isdir(location_ForPlots):
     os.makedirs(location_ForPlots)
@@ -26,7 +26,7 @@ if not os.path.isdir(location_ForPlots):
 #datasetdir1='E:/Data_LSNO_120meV_240K/'+ProjectDir + '/good_slices/'
 #datasetdir2='E:/Data_LSNO_120meV_450K/'+ProjectDir + '/good_slices/'
 #datasetdir1='/users/dmitryreznik/To be backed up/working files/LSr0x2MnO3JPark/nxspe054Ei_010K_Ebin0p5ZB/'+ProjectDir + 'good_slices/'
-datasetdir1='/home/ty/Desktop/phonon_explorer/test/test/good_slices/'
+datasetdir1='/users/dmitryreznik/To be backed up/working files/LSNO_bin_test/LSNO25_300K/0.5,0,0/good_slices/'
 
 filenames1=[file for file in os.listdir(datasetdir1) if file.startswith("H")and not file.endswith("pdf")]
 

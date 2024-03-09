@@ -113,6 +113,42 @@ def PreprocessNXSPE(H_bins,K_bins,L_bins,event_files,goniometer_file,UB_params):
 
     # ----------------------------------------------------------------------------------------------
 
+# ----------------------------------------------------------------------------------------------
+
+def setup_offsets(H_offsets,K_offsets,L_offsets):
+    """
+    setup offsets to loop over for binning grids with different offsets
+    """
+
+    _0 = np.array([0.0],dtype=float)
+
+    if H_offsets is None:
+        H_offsets = np.copy(_0)
+    else:
+        H_offsets = np.array(H_offsets,dtype=float)
+        H_offsets = np.unique(np.append(_0,H_offsets))
+    if K_offsets is None:
+        K_offsets = np.copy(_0)
+    else:
+        K_offsets = np.array(K_offsets,dtype=float)
+        K_offsets = np.unique(np.append(_0,K_offsets))
+    if L_offsets is None:
+        L_offsets = np.copy(_0)
+    else:
+        L_offsets = np.array(L_offsets,dtype=float)
+        L_offsets = np.unique(np.append(_0,L_offsets))
+
+    H_offsets, K_offsets, L_offsets = np.meshgrid(H_offsets,K_offsets,L_offsets,indexing='ij')
+    H_offsets = H_offsets.flatten()
+    K_offsets = K_offsets.flatten()
+    L_offsets = L_offsets.flatten()
+    offsets = np.c_[H_offsets,K_offsets,L_offsets]
+
+    ind = np.argwhere((offsets == 0.0).all(axis=1))
+    offsets = np.delete(offsets,ind,axis=0)
+
+    return np.atleast_2d(offsets)
+
 # --------------------------------------------------------------------------------------------------
 
 def bin_NXSPE_with_offsets(event_files,goniometer_file,output_file,UB_params,
@@ -149,22 +185,10 @@ def bin_NXSPE_with_offsets(event_files,goniometer_file,output_file,UB_params,
     K_bins = np.array(K_bins,dtype=float)
     L_bins = np.array(L_bins,dtype=float)
 
-    # check if any offsets are defined and initialize null offsets otherwise
-    loop_over_offsets = False
-    if H_offsets is None:
-        H_offsets = np.array([0.0],dtype=float)
+    offsets = setup_offsets(H_offsets,K_offsets,L_offsets)
+    if offsets.size == 0:
+        loop_over_offsets = False
     else:
-        H_offsets = np.array(H_offsets,dtype=float)
-        loop_over_offsets = True
-    if K_offsets is None:
-        K_offsets = np.array([0.0],dtype=float)
-    else:
-        K_offsets = np.array(K_offsets,dtype=float)
-        loop_over_offsets = True
-    if L_offsets is None:
-        L_offsets = np.array([0.0],dtype=float)
-    else:
-        L_offsets = np.array(L_offsets,dtype=float)
         loop_over_offsets = True
 
     print('H_bins:',H_bins)
@@ -178,13 +202,12 @@ def bin_NXSPE_with_offsets(event_files,goniometer_file,output_file,UB_params,
     # only loop over offsets if one is defined
     if loop_over_offsets:
 
-        num_offsets = H_offsets.size*K_offsets.size*L_offsets.size
+        num_offsets = offsets.shape[0]
 
         print('\n----------------------------------------------------------------\n')
-        print('H_offsets:',H_offsets)
-        print('K_offsets:',K_offsets)
-        print('L_offsets:',L_offsets)
         print('num_offsets:',num_offsets)
+        print('offsets:')
+        print(offsets)
 
         msg = '\nlooping over offsets'
         print(msg)
@@ -193,23 +216,19 @@ def bin_NXSPE_with_offsets(event_files,goniometer_file,output_file,UB_params,
         _K_offset = np.array([0,0,0],dtype=float)
         _L_offset = np.array([0,0,0],dtype=float)
 
-        _n = 0
-
         # loop over the offsets and bin the data at each offset
-        for ii, _H in enumerate(H_offsets):
-            for jj, _K in enumerate(K_offsets):
-                for kk, _L in enumerate(L_offsets):
+        for ii in range(num_offsets):
 
-                    _H_offset[0] = _H; _H_offset[2] = _H
-                    _K_offset[0] = _K; _K_offset[2] = _K
-                    _L_offset[0] = _L; _L_offset[2] = _L
+            _H, _K, _L = offsets[ii,:]
+            print(f'\noffset[{ii+1}]:',_H,_K,_L,'\n')
 
-                    print(f'\noffset[{_n+1}]:',_H,_K,_L,'\n')
-                    _n += 1
-
-                    # go and bin the data 
-                    MD_workspace = PreprocessNXSPE(H_bins+_H_offset,K_bins+_K_offset,
-                            L_bins+_L_offset,event_files,goniometer_file,UB_params)
-                    save_MDE_to_hdf5(MD_workspace,output_file,overwrite=False)
+            _H_offset[0] = _H; _H_offset[2] = _H
+            _K_offset[0] = _K; _K_offset[2] = _K
+            _L_offset[0] = _L; _L_offset[2] = _L
+                
+            # bin and save data with on offset grids
+            MD_workspace = PreprocessNXSPE(H_bins+_H_offset,K_bins+_K_offset,L_bins+_L_offset,
+                event_files,goniometer_file,UB_params)
+            save_MDE_to_hdf5(MD_workspace,output_file,overwrite=False)
 
 # --------------------------------------------------------------------------------------------------

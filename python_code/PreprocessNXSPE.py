@@ -30,6 +30,11 @@ import glob
 from file_tools.m_PreprocessNXSPE import bin_NXSPE_with_offsets
 from file_tools.m_file_utils import c_timer
 
+from importlib import reload
+import file_tools.m_PreprocessNXSPE as m_PreprocessNXSPE
+reload(m_PreprocessNXSPE)
+bin_NXSPE_with_offsets = m_PreprocessNXSPE.bin_NXSPE_with_offsets
+
 # --------------------------------------------------------------------------------------------------
 
 # [start, step, stop]. these are interpreted like the args to mantid MDNorm and to 
@@ -37,7 +42,7 @@ from file_tools.m_file_utils import c_timer
 # the step size. i.e. the bin centers will be [start+1*step/2, start+2*step/2,
 # start+3*step/2, ...]
 
-H_bins = [  0.90,  0.20,  2.10]
+H_bins = [  0.90,  0.20,  3.10]
 K_bins = [ -6.10,  0.20,  6.10]
 L_bins = [ -4.10,  0.20,  4.10]
 
@@ -47,9 +52,9 @@ L_bins = [ -4.10,  0.20,  4.10]
 # H=0.1+-0.05, ..., H=0.5+-0.05 and similarly H=0.01+-0.05, H=0.11+-0.05, ..., H=0.51+-0.05 
 # etc. similarly for K_offets, L_offsets. 
 
-H_offsets = [  0.1]
-K_offsets = None #[  0.1] 
-L_offsets = None #[  0.1]
+H_offsets = [  0.10]
+K_offsets = [  0.00] 
+L_offsets = [  0.00]
 
 # event files (i.e. neutron => detector) binned in energy
 event_files = sorted(
