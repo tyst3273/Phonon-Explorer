@@ -1,9 +1,11 @@
 
 """
-Author: Andrei T. Savici
-Email: saviciat@ornl.gov
+PreprocessNXSPE routine:
+author: Andrei T. Savici
+email: saviciat@ornl.gov
 
-Updated by: Tyler C. Sterling
+other stuff:
+author: Tyler C. Sterling
 Email: ty.sterling@colorado.edu
 Affil: University of Colorado Boulder, Raman Spectroscopy and Neutron Scattering Lab
 
@@ -30,7 +32,17 @@ import numpy as np
 from mantid.simpleapi import *
 
 from file_tools.m_save_MDE_to_hdf5 import save_MDE_to_hdf5
-from file_tools.m_file_utils import crash
+from file_tools.m_file_utils import crash, c_timer
+
+"""
+### DEV
+# reload the modules if running interactively while modifying modules
+from importlib import reload
+import file_tools.m_save_MDE_to_hdf5 as m_save_MDE_to_hdf5
+reload(m_save_MDE_to_hdf5)
+save_MDE_to_hdf5 = m_save_MDE_to_hdf5.save_MDE_to_hdf5
+### DEV
+"""
 
 # --------------------------------------------------------------------------------------------------
 
@@ -115,120 +127,72 @@ def PreprocessNXSPE(H_bins,K_bins,L_bins,event_files,goniometer_file,UB_params):
 
 # ----------------------------------------------------------------------------------------------
 
-def setup_offsets(H_offsets,K_offsets,L_offsets):
+def _get_bins(lo,hi,bin,offset=0.0):
     """
-    setup offsets to loop over for binning grids with different offsets
+    reformat binning args for MDNorm
     """
-
-    _0 = np.array([0.0],dtype=float)
-
-    if H_offsets is None:
-        H_offsets = np.copy(_0)
-    else:
-        H_offsets = np.array(H_offsets,dtype=float)
-        H_offsets = np.unique(np.append(_0,H_offsets))
-    if K_offsets is None:
-        K_offsets = np.copy(_0)
-    else:
-        K_offsets = np.array(K_offsets,dtype=float)
-        K_offsets = np.unique(np.append(_0,K_offsets))
-    if L_offsets is None:
-        L_offsets = np.copy(_0)
-    else:
-        L_offsets = np.array(L_offsets,dtype=float)
-        L_offsets = np.unique(np.append(_0,L_offsets))
-
-    H_offsets, K_offsets, L_offsets = np.meshgrid(H_offsets,K_offsets,L_offsets,indexing='ij')
-    H_offsets = H_offsets.flatten()
-    K_offsets = K_offsets.flatten()
-    L_offsets = L_offsets.flatten()
-    offsets = np.c_[H_offsets,K_offsets,L_offsets]
-
-    ind = np.argwhere((offsets == 0.0).all(axis=1))
-    offsets = np.delete(offsets,ind,axis=0)
-
-    return np.atleast_2d(offsets)
+    lo = float(lo); hi = float(hi); bin = float(bin); offset = float(offset)
+    _mod = np.modf((hi-lo)/bin)
+    num_bins = _mod[1].astype(int)
+    decimal = _mod[0].round(6)
+    if decimal != 0.0:
+        msg = '\n*** WARNING ***\n'
+        msg += f'upper bin center {hi: 6.3f} is not commensurate with\n'
+        msg += f'lower bin center {lo: 6.3f} and bin size {bin:6.3f}\n'
+        hi = lo+bin*(num_bins+1)
+        msg += f'tweaking upper bin center to {hi: 6.3f}\n'
+        print(msg)
+    lo = np.round(lo-bin/2+offset,6)
+    hi = np.round(hi+bin/2+offset,6)
+    bin = np.round(bin,6)
+    return [lo,bin,hi]
 
 # --------------------------------------------------------------------------------------------------
 
-def bin_NXSPE_with_offsets(event_files,goniometer_file,output_file,UB_params,
-    H_bins,K_bins,L_bins,H_offsets=None,K_offsets=None,L_offsets=None):
+def bin_NXSPE(event_files,goniometer_file,output_file,UB_params,H_lo,H_hi,H_bin,K_lo,K_hi,K_bin,
+            L_lo,L_hi,L_bin,H_step=0.0,K_step=0.0,L_step=0.0,append=True):
     """
-    bin the events in the MDE workspace into a histogram workspace; note that this doesnt
-    really return anything or create new attributes. the produced data are stored in the
-    histogram workspace.
+    wrapper to translate variable names for interface with PreprocessNXSPE. note, E-binning is 
+    fixed by the binning already present in the *.nxspe files
 
-    turns out that having a seperate file for every grid offset is a nuisance. we want to 
-    have multiple binnings/grid offsets in a single file to make our lives easier.
+    H_lo = lower bin center. 
+    H_hi = *requested* upper bin center. if it's not commensurate with H_bin, it will be tweaked!
+    H_bin = widths of the bins centered on the requested array of bin-centers.
+    
+        e.g. for H_lo = 0.0, H_hi = 1.0, H_bin = 0.1, the bin centers will be H = [0.0, 0.1, 0.2,
+        ..., 1.0] which are integrated from -0.05 to 0.05, 0.05 to 0.15, etc.
 
-    H_bin = [start, step, stop]. note, these are now interpreted like the args to mantid
-        MDNorm and to Horace cut_sqw: the binning will actually start at 'start' with spacing
-        equal to the step size. i.e. the bin centers will be [start+1*step/2, start+2*step/2,
-        start+3*step/2, ...]. similarly for K_bins, L_bins.
+        e.g. for H_lo = 0.0, H_hi = 1.02, H_bin = 0.1, you will get the same binning as above.
 
-    H_offets = [offset_1, offset_2, ..., offset_N]. loop over the offets in H_offsets and bin
-        using the args in H_bin shifted by the offets. e.g. for H_offset = [0.0, 0.01] and
-        H_bins = [-0.05, 0.1, 0.55], we will generate data on a grid intergrated around
-        H=0.0+-0.05, H=0.1+-0.05, ..., H=0.5+-0.05 and similarly H=0.01+-0.05, H=0.11+-0.05, ...,   
-        H=0.51+-0.05 etc. similarly for K_offets, L_offsets.
+    K_* and L_* have the same meaning. 
 
-    num_chunks is number of chunks to split binning in Q-space. E.g. if num_chunks = [2,1,1]
-    and there are 10 bins along H, the data will be cut in 2 go's with the first 5 H-bins in
-    the first go and the last 5 in the seconds. 
+    H_step, K_step, and L_step are "offsets" applied to shift the binning grid centers by a fixed
+    amount so that users can have the same binning with arbitrary bin centers.
+        
+        e.g. if H_step = 0.03 and H_lo = 0.0, H_hi = 1.0, and H_bin = 0.1, the bin centers will
+        be H = [0.03, 0.13, ..., 1.03] intergrated from -0.02 to 0.08, 0.08 to 0.18 etc.
 
-    merged_file_name is the name of the output data. each offset grid is appended to the file
+    output_file is the name where the output histogram data will be written.
 
-    u, v, w are the projections. w is optional and the cross product of u and v if not given.
+    append deterines whether or not the file is overwritten
+
+    see the descriptions in the $ROOT/python_code/PreprocessNXSPE.py script for explanation of
+    the other args to this function
     """
 
-    H_bins = np.array(H_bins,dtype=float)
-    K_bins = np.array(K_bins,dtype=float)
-    L_bins = np.array(L_bins,dtype=float)
+    timer = c_timer('bin_NXSPE',units='m')
 
-    offsets = setup_offsets(H_offsets,K_offsets,L_offsets)
-    if offsets.size == 0:
-        loop_over_offsets = False
-    else:
-        loop_over_offsets = True
-
-    print('H_bins:',H_bins)
-    print('K_bins:',K_bins)
-    print('L_bins:',L_bins,'\n')
-
-    # bin the data on the unshifted grid first. this initiates file etc.
+    # get binning args for c_MDE_tools.bin_MDE_chunks
+    H_bins = _get_bins(H_lo,H_hi,H_bin,H_step)
+    K_bins = _get_bins(K_lo,K_hi,K_bin,K_step)
+    L_bins = _get_bins(L_lo,L_hi,L_bin,L_step)
+    
+    # bin and save data with on offset grids
     MD_workspace = PreprocessNXSPE(H_bins,K_bins,L_bins,event_files,goniometer_file,UB_params)
-    save_MDE_to_hdf5(MD_workspace,output_file)
 
-    # only loop over offsets if one is defined
-    if loop_over_offsets:
+    # append to hdf5 file
+    save_MDE_to_hdf5(MD_workspace,output_file,append)
 
-        num_offsets = offsets.shape[0]
-
-        print('\n----------------------------------------------------------------\n')
-        print('num_offsets:',num_offsets)
-        print('offsets:')
-        print(offsets)
-
-        msg = '\nlooping over offsets'
-        print(msg)
-
-        _H_offset = np.array([0,0,0],dtype=float)
-        _K_offset = np.array([0,0,0],dtype=float)
-        _L_offset = np.array([0,0,0],dtype=float)
-
-        # loop over the offsets and bin the data at each offset
-        for ii in range(num_offsets):
-
-            _H, _K, _L = offsets[ii,:]
-            print(f'\noffset[{ii+1}]:',_H,_K,_L,'\n')
-
-            _H_offset[0] = _H; _H_offset[2] = _H
-            _K_offset[0] = _K; _K_offset[2] = _K
-            _L_offset[0] = _L; _L_offset[2] = _L
-                
-            # bin and save data with on offset grids
-            MD_workspace = PreprocessNXSPE(H_bins+_H_offset,K_bins+_K_offset,L_bins+_L_offset,
-                event_files,goniometer_file,UB_params)
-            save_MDE_to_hdf5(MD_workspace,output_file,overwrite=False)
+    timer.stop()
 
 # --------------------------------------------------------------------------------------------------

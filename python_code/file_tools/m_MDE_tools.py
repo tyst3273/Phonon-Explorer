@@ -273,8 +273,10 @@ class c_MDE_tools:
 
     def bin_MDE_with_offsets(self,H_bins,K_bins,L_bins,E_bins,H_offsets=None,K_offsets=None,
         L_offsets=None,num_chunks=[1,1,1],merged_file_name='MD_histo.hdf5',
-        u=[1,0,0],v=[0,1,0],w=None):
+        u=[1,0,0],v=[0,1,0],w=None,append=True):
         """
+        DEPRECATED 3/15/2024
+
         bin the events in the MDE workspace into a histogram workspace; note that this doesnt
         really return anything or create new attributes. the produced data are stored in the
         histogram workspace.
@@ -317,7 +319,7 @@ class c_MDE_tools:
         print('L_bins:',L_bins,'\n')
 
         # bin the data on the unshifted grid first. this initiates file etc.
-        self.bin_MDE_chunks(H_bins,K_bins,L_bins,E_bins,num_chunks,merged_file_name,u,v,w)
+        self.bin_MDE_chunks(H_bins,K_bins,L_bins,E_bins,num_chunks,merged_file_name,u,v,w,append)
 
         # only loop over offsets if one is defined
         if loop_over_offsets:
@@ -346,14 +348,14 @@ class c_MDE_tools:
                 _K_offset[0] = _K; _K_offset[2] = _K
                 _L_offset[0] = _L; _L_offset[2] = _L
 
-                # go and bin the data 
+                # go and bin the data -- these MUST be appended.
                 self.bin_MDE_chunks(H_bins+_H_offset,K_bins+_K_offset,L_bins+_L_offset,E_bins,
-                    num_chunks,merged_file_name,u,v,w,overwrite=False)
+                    num_chunks,merged_file_name,u,v,w,append=True)
 
     # ----------------------------------------------------------------------------------------------
 
     def bin_MDE_chunks(self,H_bin_args,K_bin_args,L_bin_args,E_bin_args,num_chunks=[1,1,1],
-        merged_file_name='merged_sparse_histo.hdf5',u=[1,0,0],v=[0,1,0],w=None,overwrite=True):
+        merged_file_name='merged_histo.hdf5',u=[1,0,0],v=[0,1,0],w=None,append=True):
         """
         split requested binning into chunks and bin over small chunks separately. merge the 
         results of them all into a single file
@@ -379,10 +381,19 @@ class c_MDE_tools:
         self.merged_file_name = merged_file_name
 
         # overwrite by default, but dont overwrite in some cases, e.g. assembling multiple offsets
-        if os.path.exists(merged_file_name) and overwrite:
-            msg = 'merged file already exists. removing it ...\n'
-            print(msg)
-            os.remove(merged_file_name)
+        _exists = os.path.exists(merged_file_name)
+        if append:
+            if not _exists:
+                msg = f'creating file \'{self.merged_file_name}\'\n'
+                print(msg)
+            else:
+                msg = f'appending to file \'{self.merged_file_name}\'\n'
+                print(msg)
+        else:
+            if _exists:
+                msg = f'file \'{self.merged_file_name}\' already exists. removing it ...\n'
+                print(msg)
+                os.remove(merged_file_name)
         
         self.u = u; self.v = v; self.w = w
     
@@ -904,6 +915,85 @@ class c_MDE_tools:
 
 
 
+# --------------------------------------------------------------------------------------------------
+
+def _get_bins(lo,hi,bin,offset=0.0):
+    """
+    get binning args for c_MDE_tools bin_MDE
+    """
+    lo = float(lo); hi = float(hi); bin = float(bin); offset = float(offset)
+    _mod = np.modf((hi-lo)/bin)
+    num_bins = _mod[1].astype(int)
+    decimal = _mod[0].round(6)
+    if decimal != 0.0:
+        msg = '\n*** WARNING ***\n'
+        msg += f'upper bin center {hi: 6.3f} is not commensurate with\n'
+        msg += f'lower bin center {lo: 6.3f} and bin size {bin:6.3f}\n'
+        hi = lo+bin*(num_bins+1)
+        msg += f'tweaking upper bin center to {hi: 6.3f}\n'
+        print(msg)
+    lo = np.round(lo-bin/2+offset,6)
+    hi = np.round(hi+bin/2+offset,6)
+    bin = np.round(bin,6)
+    return [lo,bin,hi]
+
+# --------------------------------------------------------------------------------------------------
+
+def bin_MDE(MDE_file_name,H_lo,H_hi,H_bin,K_lo,K_hi,K_bin,L_lo,L_hi,L_bin,E_lo,E_hi,E_bin,
+            H_step=0.0,K_step=0.0,L_step=0.0,merged_file_name='merged_file.hdf5',
+            u=[1,0,0],v=[0,1,0],w=None,num_chunks=[1,1,1],append=True):
+    """
+    wrapper to translate variable names for interface with c_MDE_tools.bin_MDE_chunks_with_offsets 
+    to more sensible names for the user.
+
+    dont confuse this with the c_MDE_tools.bin_MDE method which is unrelated.
+
+    H_lo = lower bin center. 
+    H_hi = *requested* upper bin center. if it's not commensurate with H_bin, it will be tweaked!
+    H_bin = widths of the bins centered on the requested array of bin-centers.
+    
+        e.g. for H_lo = 0.0, H_hi = 1.0, H_bin = 0.1, the bin centers will be H = [0.0, 0.1, 0.2,
+        ..., 1.0] which are integrated from -0.05 to 0.05, 0.05 to 0.15, etc.
+
+        e.g. for H_lo = 0.0, H_hi = 1.02, H_bin = 0.1, you will get the same binning as above.
+
+    K_* and L_* have the same meaning. 
+
+    H_step, K_step, and L_step are "offsets" applied to shift the binning grid centers by a fixed
+    amount so that users can have the same binning with arbitrary bin centers.
+        
+        e.g. if H_step = 0.03 and H_lo = 0.0, H_hi = 1.0, and H_bin = 0.1, the bin centers will
+        be H = [0.03, 0.13, ..., 1.03] intergrated from -0.02 to 0.08, 0.08 to 0.18 etc.
+
+    merged_file_name is the name where the output histogram data will be written.
+
+    u, v, w are the projections. w is optional and the cross product of u and v if not given.
+    see the Mantid MDNorm docs for more info!
+
+    num_chunks is number of chunks to split binning in Q-space. E.g. if num_chunks = [2,1,1]
+    and there are 10 bins along H, the data will be cut in 2 go's with the first 5 H-bins in
+    the first go and the last 5 in the seconds. 
+
+    append deterines whether or not the file is overwritten
+    """
+
+    timer = c_timer('bin_MDE',units='m')
+
+    # get binning args for c_MDE_tools.bin_MDE_chunks
+    H_bins = _get_bins(H_lo,H_hi,H_bin,H_step)
+    K_bins = _get_bins(K_lo,K_hi,K_bin,K_step)
+    L_bins = _get_bins(L_lo,L_hi,L_bin,L_step)
+    E_bins = _get_bins(E_lo,E_hi,E_bin)
+    
+    MDE_tools = c_MDE_tools(MDE_file_name)
+    MDE_tools.bin_MDE_chunks(H_bins,K_bins,L_bins,E_bins,num_chunks,
+                             merged_file_name,u,v,w,append)
+
+    timer.stop()
+
+# --------------------------------------------------------------------------------------------------    
+
+    
 
 
 

@@ -24,51 +24,39 @@ Description:
 """
 
 import glob
-from file_tools.m_PreprocessNXSPE import bin_NXSPE
+from file_tools.m_PreprocessNXSPE import bin_NXSPE_with_offsets
 from file_tools.m_file_utils import c_timer
 
-"""
 ### DEV
 # reload the modules if running interactively while modifying modules
-from importlib import reload
-import file_tools.m_PreprocessNXSPE as m_PreprocessNXSPE
-reload(m_PreprocessNXSPE)
-bin_NXSPE = m_PreprocessNXSPE.bin_NXSPE
+#from importlib import reload
+#import file_tools.m_PreprocessNXSPE as m_PreprocessNXSPE
+#reload(m_PreprocessNXSPE)
+#bin_NXSPE_with_offsets = m_PreprocessNXSPE.bin_NXSPE_with_offsets
 ### DEV
-"""
 
 # --------------------------------------------------------------------------------------------------
 
-# H_lo = lower bin center. H_hi = *requested* upper bin center. if it's not commensurate with 
-# H_bin, it will be tweaked! H_bin = widths of the bins centered on the requested array of 
-# bin-centers. e.g. for H_lo = 0.0, H_hi = 1.0, H_bin = 0.1, the bin centers will be H = [0.0, 
-# 0.1, 0.2,..., 1.0] which are integrated from -0.05 to 0.05, 0.05 to 0.15, etc. e.g. for 
-# H_lo = 0.0, H_hi = 1.02, H_bin = 0.1, you will get the same binning as above. K_* and L_* 
-# have the same meaning. H_step, K_step, and L_step are "offsets" applied to shift the binning 
-# grid centers by a fixed amount so that users can have the same binning with arbitrary bin 
-# centers. e.g. if H_step = 0.03 and H_lo = 0.0, H_hi = 1.0, and H_bin = 0.1, the bin centers 
-# will be H = [0.03, 0.13, ..., 1.03] intergrated from -0.02 to 0.08, 0.08 to 0.18 etc.
-# the point of H_step is that you can have multiple bins in the same file. to do this, just 
-# run this script again with a new 'step' and append to the existing file.
+# binning args: [start, step, stop]. these are interpreted like the args to mantid MDNorm and to 
+# Horace cut_sqw algorithms. the binning will actually start 'start' with spacing equal to the
+# step size. i.e. the  bin centers will be [start+1*step/2, start+2*step/2, start+3*step/2, ...]. 
+# e.g. for H_bins = [-0.05, 0.10, 1.05], the bin centers will be H = [ 0, 0.1, ..., 1] integrated 
+# -0.05 to 0.05, 0.05 to 0.15, etc.
+H_bins = [  0.90,  0.20,  3.10]
+K_bins = [ -6.10,  0.20,  6.10]
+L_bins = [ -4.10,  0.20,  4.10]
 
-H_lo = 1
-H_hi = 3
-H_bin = 0.20
-H_step = 0.1
-
-K_lo = -6
-K_hi = 6
-K_bin = 0.20
-K_step = 0.0
-
-L_lo = -4
-L_hi = 4
-L_bin = 0.20
-L_step = 0.0
-
-# whether or not to append to file (or overwrite).
-# e.g. for when you want to add multiple binning schemes to a single file 
-append = True
+# for the binning args above, bin data with this offset. e.g. for 0.0, it is just the binning args 
+# above. for 0.1, the bins above are offset by 0.1 etc. it is unecessary to give 0.0 as an offset 
+# as this is included automatically and, no matter what offsets are requested by the user, zero
+# offset is always calculated (the default). as an example, assume H_offsets = [0.05] and  
+# K_offsets = L_offsets = None. Then data will be binned on the grid specified by bin args above 
+# and offset along H by 0.05 rlu. e.g. if H_bins = [-0.05, 0.10, 1.05], data in the file will have 
+# bin centers H = [ 0, 0.1, ..., 1,  0.05, 0.15, ..., 0.95, 1.05]. keep in mind that the  bins will
+# using this scheme.
+H_offsets = [  0.10]
+K_offsets = [  0.00] 
+L_offsets = [  0.00]
 
 # event files (i.e. neutron => detector) already binned in energy
 event_files = sorted(
@@ -85,10 +73,13 @@ UB_params={'a':3.93,'b':3.93,'c':3.93,'alpha':90,'beta':90,'gamma':90,
 # --------------------------------------------------------------------------------------------------
 # you don't have to change anything below here!
 
-# this goes and does the stuff
-bin_NXSPE(event_files,goniometer_file,hdf5_output_file,UB_params,
-          H_lo,H_hi,H_bin,K_lo,K_hi,K_bin,L_lo,L_hi,L_bin,H_step,K_step,L_step,append)
+_timer = c_timer('bin_with_offsets',units='m')
 
+# this goes and does the stuff
+bin_NXSPE_with_offsets(event_files,goniometer_file,hdf5_output_file,UB_params,
+    H_bins,K_bins,L_bins,H_offsets,K_offsets,L_offsets)
+
+_timer.stop()
 
 
 

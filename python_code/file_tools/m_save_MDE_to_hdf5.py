@@ -435,7 +435,7 @@ class c_reduced_MDE_tools:
 
 # --------------------------------------------------------------------------------------------------
 
-def save_MDE_to_hdf5(MD_workspace,hdf5_file_name,overwrite=True):
+def save_MDE_to_hdf5(MD_workspace,hdf5_file_name,append=True):
 
     """
     takes MD Histogram workspace and hdf5 file name as args. gets signal, error, lattice info,
@@ -443,14 +443,22 @@ def save_MDE_to_hdf5(MD_workspace,hdf5_file_name,overwrite=True):
     that contain only NaNs along energy axis. 
     """
 
-    MDE_tools = c_reduced_MDE_tools(MD_workspace)
-
-    if overwrite:
-        if os.path.exists(hdf5_file_name):
-            msg = 'hdf5 file already exists. removing it ...\n'
+    # overwrite by default, but dont overwrite in some cases, e.g. assembling multiple offsets
+    _exists = os.path.exists(hdf5_file_name)
+    if append:
+        if not _exists:
+            msg = f'creating file \'{hdf5_file_name}\'\n'
+            print(msg)
+        else:
+            msg = f'appending to file \'{hdf5_file_name}\'\n'
+            print(msg)
+    else:
+        if _exists:
+            msg = f'file \'{hdf5_file_name}\' already exists. removing it ...\n'
             print(msg)
             os.remove(hdf5_file_name)
 
+    MDE_tools = c_reduced_MDE_tools(MD_workspace)
     MDE_tools.append_sparse_to_hdf5(hdf5_file_name)    
 
 # --------------------------------------------------------------------------------------------------
