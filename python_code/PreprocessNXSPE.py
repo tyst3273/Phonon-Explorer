@@ -17,23 +17,24 @@ Description:
         modified "Facilities.xml" file. there is one provied in 'file_tools' dir. 
         allegedly we can just copy this to our $HOME/.mantid/instrument dir, but that 
         didnt work recently (it used to). I had to edit $HOME/.mantid/Mantid.user.properties 
-        file and add instrumentDefinition.directory=/SNS/users/YOUR-USER-NAME/.mantid/instrument
-        where you should replace YOUR-USER-NAME by your user name on the SNS server. 
-        for other computers, the path should ultimately it should point to 
-        $HOME/.mantid/instrument
+        file and add instrumentDefinition.directory=$HOME/.mantid/instrument where you should 
+        replace $HOME by the actual path. this might break some stuff, however, as mantid 
+        needs to find the correct *.xml configuration files for each instrument. i found these
+        under /opt/mantid*/instrument where the * means the correct version. i copied them 
+        to $HOME/.mantid/instrument and all is well! :)
 """
 
 import glob
-from file_tools.m_PreprocessNXSPE import bin_NXSPE
+from file_tools.m_NXSPE _tools import bin_NXSPE
 from file_tools.m_file_utils import c_timer
 
 """
 ### DEV
 # reload the modules if running interactively while modifying modules
 from importlib import reload
-import file_tools.m_PreprocessNXSPE as m_PreprocessNXSPE
-reload(m_PreprocessNXSPE)
-bin_NXSPE = m_PreprocessNXSPE.bin_NXSPE
+import file_tools.m_NXSPE_tools as m_NXSPE_tools
+reload(m_NXSPE_tools)
+bin_NXSPE = m_NXSPE_tools.bin_NXSPE
 ### DEV
 """
 
