@@ -435,7 +435,7 @@ class c_reduced_MDE_tools:
 
 # --------------------------------------------------------------------------------------------------
 
-def save_MDE_to_hdf5(MD_workspace,hdf5_file_name,append=True):
+def save_MDE_to_hdf5(MD_workspace,hdf5_file_name,append=False):
 
     """
     takes MD Histogram workspace and hdf5 file name as args. gets signal, error, lattice info,

@@ -1,14 +1,14 @@
 
 """
-Author: Tyler C. Sterling
-Email: ty.sterling@colorado.edu
-Affil: University of Colorado Boulder, Raman Spectroscopy and Neutron Scattering Lab
-Date: 04/26/2023
-Description:
-    tools to:
-        - programatically get data from mantid MDE files (in nexus format) using mantid
-            and write to custom hdf5 for quick access from phonon explorer
-        - calculate and subtract background from raw data in custom hdf5 file
+this file is part of the phonon explorer package!
+author: tyler c. sterling & dmitry reznik.
+email: ty.sterling@colorado.edu
+affil: University of Colorado Boulder, Raman Spectroscopy and Neutron Scattering Lab
+date: 05/16/2024
+description:
+    take binning and projection args from the user and call mantid MDNorm (on the backend)
+    to "prebin" data for later analysis with phonon explorer. can be split into "chunks" to 
+    save memory. see the description of the variables below.
 """
 
 from file_tools.m_file_utils import *
@@ -16,7 +16,6 @@ from file_tools.m_file_utils import *
 import numpy as np
 import h5py 
 import os
-
 
 # --------------------------------------------------------------------------------------------------
 # class to interact with mantid
@@ -235,127 +234,8 @@ class c_MDE_tools:
 
     # ----------------------------------------------------------------------------------------------
 
-    def _setup_offsets(self,H_offsets,K_offsets,L_offsets):
-        """
-        setup offsets to loop over for binning grids with different offsets
-        """
-
-        _0 = np.array([0.0],dtype=float)
-
-        if H_offsets is None:
-            H_offsets = np.copy(_0)
-        else:
-            H_offsets = np.array(H_offsets,dtype=float)
-            H_offsets = np.unique(np.append(_0,H_offsets))
-        if K_offsets is None:
-            K_offsets = np.copy(_0)
-        else:
-            K_offsets = np.array(K_offsets,dtype=float)
-            K_offsets = np.unique(np.append(_0,K_offsets))
-        if L_offsets is None:
-            L_offsets = np.copy(_0)
-        else:
-            L_offsets = np.array(L_offsets,dtype=float)
-            L_offsets = np.unique(np.append(_0,L_offsets))
-
-        H_offsets, K_offsets, L_offsets = np.meshgrid(H_offsets,K_offsets,L_offsets,indexing='ij')
-        H_offsets = H_offsets.flatten() 
-        K_offsets = K_offsets.flatten()
-        L_offsets = L_offsets.flatten()
-        offsets = np.c_[H_offsets,K_offsets,L_offsets]
-        
-        ind = np.argwhere((offsets == 0.0).all(axis=1))
-        offsets = np.delete(offsets,ind,axis=0)
-       
-        return np.atleast_2d(offsets)
- 
-    # ----------------------------------------------------------------------------------------------
-
-    def bin_MDE_with_offsets(self,H_bins,K_bins,L_bins,E_bins,H_offsets=None,K_offsets=None,
-        L_offsets=None,num_chunks=[1,1,1],merged_file_name='MD_histo.hdf5',
-        u=[1,0,0],v=[0,1,0],w=None,append=True):
-        """
-        DEPRECATED 3/15/2024
-
-        bin the events in the MDE workspace into a histogram workspace; note that this doesnt
-        really return anything or create new attributes. the produced data are stored in the
-        histogram workspace.
-
-        turns out that having a seperate file for every grid offset is a nuisance. we want to 
-        have multiple binnings/grid offsets in a single file to make our lives easier.
-
-        H_bin = [start, step, stop]. note, these are now interpreted like the args to mantid
-            MDNorm and to Horace cut_sqw: the binning will actually start at 'start' with spacing
-            equal to the step size. i.e. the bin centers will be [start+1*step/2, start+2*step/2,
-            start+3*step/2, ...]. similarly for K_bins, L_bins.
-
-        H_offets = [offset_1, offset_2, ..., offset_N]. loop over the offets in H_offsets and bin
-            using the args in H_bin shifted by the offets. e.g. for H_offset = [0.0, 0.01] and
-            H_bins = [-0.05, 0.1, 0.55], we will generate data on a grid intergrated around
-            H=0.0+-0.05, H=0.1+-0.05, ..., H=0.5+-0.05 and similarly H=0.01+-0.05, H=0.11+-0.05, ...,   
-            H=0.51+-0.05 etc. similarly for K_offets, L_offsets.
-
-        num_chunks is number of chunks to split binning in Q-space. E.g. if num_chunks = [2,1,1]
-        and there are 10 bins along H, the data will be cut in 2 go's with the first 5 H-bins in
-        the first go and the last 5 in the seconds. 
-
-        merged_file_name is the name of the output data. each offset grid is appended to the file
-
-        u, v, w are the projections. w is optional and the cross product of u and v if not given.
-        """
-
-        H_bins = np.array(H_bins,dtype=float)
-        K_bins = np.array(K_bins,dtype=float)
-        L_bins = np.array(L_bins,dtype=float)
-
-        offsets = self._setup_offsets(H_offsets,K_offsets,L_offsets)
-        if offsets.size == 0:
-            loop_over_offsets = False
-        else: 
-            loop_over_offsets = True
-
-        print('H_bins:',H_bins)
-        print('K_bins:',K_bins)
-        print('L_bins:',L_bins,'\n')
-
-        # bin the data on the unshifted grid first. this initiates file etc.
-        self.bin_MDE_chunks(H_bins,K_bins,L_bins,E_bins,num_chunks,merged_file_name,u,v,w,append)
-
-        # only loop over offsets if one is defined
-        if loop_over_offsets:
-
-            num_offsets = offsets.shape[0]
-
-            print('\n----------------------------------------------------------------\n')
-            print('num_offsets:',num_offsets)
-            print('offsets:')
-            print(offsets)
-            
-            msg = '\nlooping over offsets'
-            print(msg)
-
-            _H_offset = np.array([0,0,0],dtype=float)
-            _K_offset = np.array([0,0,0],dtype=float)
-            _L_offset = np.array([0,0,0],dtype=float)
-
-            # loop over the offsets and bin the data at each offset
-            for ii in range(num_offsets):
-
-                _H, _K, _L = offsets[ii,:]
-                print(f'\noffset[{ii+1}]:',_H,_K,_L,'\n')
-
-                _H_offset[0] = _H; _H_offset[2] = _H
-                _K_offset[0] = _K; _K_offset[2] = _K
-                _L_offset[0] = _L; _L_offset[2] = _L
-
-                # go and bin the data -- these MUST be appended.
-                self.bin_MDE_chunks(H_bins+_H_offset,K_bins+_K_offset,L_bins+_L_offset,E_bins,
-                    num_chunks,merged_file_name,u,v,w,append=True)
-
-    # ----------------------------------------------------------------------------------------------
-
     def bin_MDE_chunks(self,H_bin_args,K_bin_args,L_bin_args,E_bin_args,num_chunks=[1,1,1],
-        merged_file_name='merged_histo.hdf5',u=[1,0,0],v=[0,1,0],w=None,append=True):
+        merged_file_name='merged_histo.hdf5',u=[1,0,0],v=[0,1,0],w=None,append=False):
         """
         split requested binning into chunks and bin over small chunks separately. merge the 
         results of them all into a single file
@@ -407,10 +287,10 @@ class c_MDE_tools:
         self.E_bin_args = E_bin_args
         self.E_bin_edges, self.E_range, self.dE = self._get_bin_edges(E_bin_args)
 
-        H_bin_centers = np.round((self.H_bin_edges[:-1]+self.H_bin_edges[1:])/2,2)
-        K_bin_centers = np.round((self.K_bin_edges[:-1]+self.K_bin_edges[1:])/2,2)
-        L_bin_centers = np.round((self.L_bin_edges[:-1]+self.L_bin_edges[1:])/2,2)
-        E_bin_centers = np.round((self.E_bin_edges[:-1]+self.E_bin_edges[1:])/2,2)
+        H_bin_centers = np.round((self.H_bin_edges[:-1]+self.H_bin_edges[1:])/2,3)
+        K_bin_centers = np.round((self.K_bin_edges[:-1]+self.K_bin_edges[1:])/2,3)
+        L_bin_centers = np.round((self.L_bin_edges[:-1]+self.L_bin_edges[1:])/2,3)
+        E_bin_centers = np.round((self.E_bin_edges[:-1]+self.E_bin_edges[1:])/2,3)
         print('H_bin_centers\n',H_bin_centers)
         print('K_bin_centers\n',K_bin_centers)
         print('L_bin_centers\n',L_bin_centers)
@@ -914,6 +794,44 @@ class c_MDE_tools:
     # ----------------------------------------------------------------------------------------------
 
 
+# --------------------------------------------------------------------------------------------------
+
+def _setup_shifts(H_step,K_step,L_step,H_bin,K_bin,L_bin):
+    """
+    setup shifts to loop over for binning grids with different shifts
+    """
+    
+    H_bin = int(H_bin)
+    if H_bin == 0: H_bin = 1
+    K_bin = int(K_bin)
+    if K_bin == 0: K_bin = 1
+    L_bin = int(L_bin)
+    if L_bin == 0: L_bin = 1
+    print('H_bin:',H_bin)
+    print('K_bin:',K_bin)
+    print('L_bin:',L_bin,'\n')
+    
+    _H_step = float(H_step)/H_bin
+    _H_shifts = np.round(np.arange(H_bin)*_H_step,4)#[1:]
+    _K_step = float(K_step)/K_bin
+    _K_shifts = np.round(np.arange(K_bin)*_K_step,4)#[1:]
+    _L_step = float(L_step)/L_bin
+    _L_shifts = np.round(np.arange(L_bin)*_L_step,4)#[1:]
+
+    print('H_shifts:',_H_shifts)
+    print('K_shifts:',_K_shifts)
+    print('L_shifts:',_L_shifts)
+
+    _H_shifts, _K_shifts, _L_shifts = np.meshgrid(_H_shifts,_K_shifts,_L_shifts,indexing='ij')
+    _H_shifts = _H_shifts.flatten()
+    _K_shifts = _K_shifts.flatten()
+    _L_shifts = _L_shifts.flatten()
+    shifts = np.c_[_H_shifts,_K_shifts,_L_shifts]
+
+    ind = np.argwhere((shifts == 0.0).all(axis=1))
+    shifts = np.delete(shifts,ind,axis=0)
+
+    return np.atleast_2d(shifts)
 
 # --------------------------------------------------------------------------------------------------
 
@@ -939,31 +857,41 @@ def _get_bins(lo,hi,bin,offset=0.0):
 
 # --------------------------------------------------------------------------------------------------
 
-def bin_MDE(MDE_file_name,H_lo,H_hi,H_bin,K_lo,K_hi,K_bin,L_lo,L_hi,L_bin,E_lo,E_hi,E_bin,
-            H_step=0.0,K_step=0.0,L_step=0.0,merged_file_name='merged_file.hdf5',
-            u=[1,0,0],v=[0,1,0],w=None,num_chunks=[1,1,1],append=True):
+def bin_MDE(MDE_file_name,H_lo,H_hi,H_step,K_lo,K_hi,K_step,L_lo,L_hi,L_step,E_lo,E_hi,E_step,
+            H_bin=1,K_bin=1,L_bin=1,merged_file_name='merged_file.hdf5',
+            u=[1,0,0],v=[0,1,0],w=None,num_chunks=[1,1,1]):
+
     """
-    wrapper to translate variable names for interface with c_MDE_tools.bin_MDE_chunks_with_offsets 
+    wrapper to translate variable names for interface with c_MDE_tools.bin_MDE_chunks
     to more sensible names for the user.
 
     dont confuse this with the c_MDE_tools.bin_MDE method which is unrelated.
 
     H_lo = lower bin center. 
-    H_hi = *requested* upper bin center. if it's not commensurate with H_bin, it will be tweaked!
-    H_bin = widths of the bins centered on the requested array of bin-centers.
+    H_hi = *requested* upper bin center. if it's not commensurate with H_step, it will be tweaked!
+    H_step = widths of the bins centered on the requested array of bin-centers.
     
-        e.g. for H_lo = 0.0, H_hi = 1.0, H_bin = 0.1, the bin centers will be H = [0.0, 0.1, 0.2,
+        e.g. for H_lo = 0.0, H_hi = 1.0, H_step = 0.1, the bin centers will be H = [0.0, 0.1, 0.2,
         ..., 1.0] which are integrated from -0.05 to 0.05, 0.05 to 0.15, etc.
 
-        e.g. for H_lo = 0.0, H_hi = 1.02, H_bin = 0.1, you will get the same binning as above.
+        e.g. for H_lo = 0.0, H_hi = 1.02, H_step = 0.1, you will get the same binning as above.
 
-    K_* and L_* have the same meaning. 
+    K_*, L_*, and E_* have the same meaning. 
 
-    H_step, K_step, and L_step are "offsets" applied to shift the binning grid centers by a fixed
-    amount so that users can have the same binning with arbitrary bin centers.
+    H_bin, K_bin, and L_bin are number of steps *within* a bin to take. data are integrated 
+    once for each step by shifting bin centers by that amount. but keeping bin widths the same:
+    e.g. if H_step = 0.1 and H_bin = 2, first bin centers will be shifted by 0.0 (i.e. unshifted),
+    then shifted by 0.05 rlu and integrated again. shifts along different directions are 'meshed', 
+    i.e. H_bin = 2, K_bin = 2, L_bin = 1, H_step = 0.1, K_step = 0.1, L_step = 0.1 will result in 
+    4 integrations with shifts
+        1) [0.00, 0.00, 0.00]
+        2) [0.00, 0.05, 0.00]
+        3) [0.05, 0.00, 0.00]
+        4) [0.05, 0.05, 0.00]
         
-        e.g. if H_step = 0.03 and H_lo = 0.0, H_hi = 1.0, and H_bin = 0.1, the bin centers will
-        be H = [0.03, 0.13, ..., 1.03] intergrated from -0.02 to 0.08, 0.08 to 0.18 etc.
+    each shifted integration grid will be appended to the same file. e.g. for if H_bin = 2 and 
+    H_lo = 0.0, H_hi = 1.0, and H_step = 0.1, the bin centers will be H = [0.00, 0.05, 0.10, 
+    0.15, ..., 0.95, 1.00, 1.05] intergrated from -0.05 to 0.05, 0.00 to 0.10, 0.05 to 0.15, etc.
 
     merged_file_name is the name where the output histogram data will be written.
 
@@ -973,21 +901,64 @@ def bin_MDE(MDE_file_name,H_lo,H_hi,H_bin,K_lo,K_hi,K_bin,L_lo,L_hi,L_bin,E_lo,E
     num_chunks is number of chunks to split binning in Q-space. E.g. if num_chunks = [2,1,1]
     and there are 10 bins along H, the data will be cut in 2 go's with the first 5 H-bins in
     the first go and the last 5 in the seconds. 
-
-    append deterines whether or not the file is overwritten
     """
 
     timer = c_timer('bin_MDE',units='m')
 
-    # get binning args for c_MDE_tools.bin_MDE_chunks
-    H_bins = _get_bins(H_lo,H_hi,H_bin,H_step)
-    K_bins = _get_bins(K_lo,K_hi,K_bin,K_step)
-    L_bins = _get_bins(L_lo,L_hi,L_bin,L_step)
-    E_bins = _get_bins(E_lo,E_hi,E_bin)
-    
+    # class to do all of the stuff
     MDE_tools = c_MDE_tools(MDE_file_name)
-    MDE_tools.bin_MDE_chunks(H_bins,K_bins,L_bins,E_bins,num_chunks,
-                             merged_file_name,u,v,w,append)
+
+    # convert binning args to ones used by c_MDE_tools
+    H_bins = _get_bins(H_lo,H_hi,H_step)
+    K_bins = _get_bins(K_lo,K_hi,K_step)
+    L_bins = _get_bins(L_lo,L_hi,L_step)
+    E_bins = _get_bins(E_lo,E_hi,E_step)
+    print('H_bins:',H_bins)
+    print('K_bins:',K_bins)
+    print('L_bins:',L_bins)
+    print('E_bins:',E_bins,'\n')
+
+    # convert shift args to useful form
+    shifts = _setup_shifts(H_step,K_step,L_step,H_bin,K_bin,L_bin)
+    if shifts.size == 0:
+        loop_over_shifts = False
+    else:
+        loop_over_shifts = True
+    print('\nbin shifts:')
+    print(shifts,'\n')
+
+    # bin the data on the unshifted grid first. this initiates file etc.
+    MDE_tools.bin_MDE_chunks(H_bins,K_bins,L_bins,E_bins,num_chunks,merged_file_name,u,v,w)
+
+    # only loop over offsets if atleast one is defined
+    if loop_over_shifts:
+
+        num_shifts = shifts.shape[0]
+
+        print('\n----------------------------------------------------------------\n')
+        print('num_shifts:',num_shifts)
+        print('shifts:')
+        print(shifts)
+
+        msg = '\nlooping over shifts'
+        print(msg)
+
+        _H_shift = np.array([0,0,0],dtype=float)
+        _K_shift = np.array([0,0,0],dtype=float)
+        _L_shift = np.array([0,0,0],dtype=float)
+
+        for ii in range(num_shifts):
+
+            _H, _K, _L = shifts[ii,:]
+            print(f'\nshifts[{ii+1}]:',_H,_K,_L,'\n')
+
+            _H_shift[0] = _H; _H_shift[2] = _H
+            _K_shift[0] = _K; _K_shift[2] = _K
+            _L_shift[0] = _L; _L_shift[2] = _L
+
+            # go and bin the data -- these MUST be appended.
+            MDE_tools.bin_MDE_chunks(H_bins+_H_shift,K_bins+_K_shift,L_bins+_L_shift,E_bins,
+                num_chunks,merged_file_name,u,v,w,append=True)
 
     timer.stop()
 
