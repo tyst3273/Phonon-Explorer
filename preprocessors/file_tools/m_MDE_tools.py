@@ -4,7 +4,7 @@ this file is part of the phonon explorer package!
 author: tyler c. sterling & dmitry reznik.
 email: ty.sterling@colorado.edu
 affil: University of Colorado Boulder, Raman Spectroscopy and Neutron Scattering Lab
-date: 05/16/2024
+date: 05/22/2024
 description:
     take binning and projection args from the user and call mantid MDNorm (on the backend)
     to "prebin" data for later analysis with phonon explorer. can be split into "chunks" to 
@@ -17,8 +17,6 @@ import numpy as np
 import h5py 
 import os
 
-# --------------------------------------------------------------------------------------------------
-# class to interact with mantid
 # --------------------------------------------------------------------------------------------------
 
 class c_MDE_tools:

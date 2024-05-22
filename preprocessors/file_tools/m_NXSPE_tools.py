@@ -9,7 +9,7 @@ author: Tyler C. Sterling
 Email: ty.sterling@colorado.edu
 Affil: University of Colorado Boulder, Raman Spectroscopy and Neutron Scattering Lab
 
-Date: 05/16/2024
+Date: 05/22/2024
 Description:
     - parse files NXSPE files from JPARC, merge into MDE dataset, use MDNorm to bin, 
         then write the histogrammed data to .hdf5 file that can be used by phonon 
