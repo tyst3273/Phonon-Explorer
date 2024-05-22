@@ -798,29 +798,14 @@ class c_MDE_tools:
 
 def _setup_shifts(H_step,K_step,L_step,H_bin,K_bin,L_bin):
     """
-    setup shifts to loop over for binning grids with different shifts
     """
+    _H_shifts = np.arange(H_bin)*H_step 
+    _K_shifts = np.arange(K_bin)*K_step
+    _L_shifts = np.arange(L_bin)*L_step
     
-    H_bin = int(H_bin)
-    if H_bin == 0: H_bin = 1
-    K_bin = int(K_bin)
-    if K_bin == 0: K_bin = 1
-    L_bin = int(L_bin)
-    if L_bin == 0: L_bin = 1
-    print('H_bin:',H_bin)
-    print('K_bin:',K_bin)
-    print('L_bin:',L_bin,'\n')
-    
-    _H_step = float(H_step)/H_bin
-    _H_shifts = np.round(np.arange(H_bin)*_H_step,4)#[1:]
-    _K_step = float(K_step)/K_bin
-    _K_shifts = np.round(np.arange(K_bin)*_K_step,4)#[1:]
-    _L_step = float(L_step)/L_bin
-    _L_shifts = np.round(np.arange(L_bin)*_L_step,4)#[1:]
-
     print('H_shifts:',_H_shifts)
     print('K_shifts:',_K_shifts)
-    print('L_shifts:',_L_shifts)
+    print('L_shifts:',_L_shifts,'\n')
 
     _H_shifts, _K_shifts, _L_shifts = np.meshgrid(_H_shifts,_K_shifts,_L_shifts,indexing='ij')
     _H_shifts = _H_shifts.flatten()
@@ -835,25 +820,25 @@ def _setup_shifts(H_step,K_step,L_step,H_bin,K_bin,L_bin):
 
 # --------------------------------------------------------------------------------------------------
 
-def _get_bins(lo,hi,bin,offset=0.0):
+def _get_bins(lo,hi,step):
     """
-    get binning args for c_MDE_tools bin_MDE
     """
-    lo = float(lo); hi = float(hi); bin = float(bin); offset = float(offset)
-    _mod = np.modf((hi-lo)/bin)
+    lo = float(lo); hi = float(hi); step = float(step)
+    _mod = np.modf((hi-lo)/step)
     num_bins = _mod[1].astype(int)
     decimal = _mod[0].round(6)
     if decimal != 0.0:
         msg = '\n*** WARNING ***\n'
         msg += f'upper bin center {hi: 6.3f} is not commensurate with\n'
-        msg += f'lower bin center {lo: 6.3f} and bin size {bin:6.3f}\n'
-        hi = lo+bin*(num_bins+1)
+        msg += f'lower bin center {lo: 6.3f} and bin size {step:6.3f}\n'
+        hi = lo+step*(num_bins+1)
         msg += f'tweaking upper bin center to {hi: 6.3f}\n'
         print(msg)
-    lo = np.round(lo-bin/2+offset,6)
-    hi = np.round(hi+bin/2+offset,6)
-    bin = np.round(bin,6)
-    return [lo,bin,hi]
+    lo = np.round(lo-step/2,6)
+    hi = np.round(hi+step/2,6)
+    step = np.round(step,6)
+    bins = [lo,step,hi]
+    return bins
 
 # --------------------------------------------------------------------------------------------------
 
@@ -865,42 +850,8 @@ def bin_MDE(MDE_file_name,H_lo,H_hi,H_step,K_lo,K_hi,K_step,L_lo,L_hi,L_step,E_l
     wrapper to translate variable names for interface with c_MDE_tools.bin_MDE_chunks
     to more sensible names for the user.
 
-    dont confuse this with the c_MDE_tools.bin_MDE method which is unrelated.
+    ...
 
-    H_lo = lower bin center. 
-    H_hi = *requested* upper bin center. if it's not commensurate with H_step, it will be tweaked!
-    H_step = widths of the bins centered on the requested array of bin-centers.
-    
-        e.g. for H_lo = 0.0, H_hi = 1.0, H_step = 0.1, the bin centers will be H = [0.0, 0.1, 0.2,
-        ..., 1.0] which are integrated from -0.05 to 0.05, 0.05 to 0.15, etc.
-
-        e.g. for H_lo = 0.0, H_hi = 1.02, H_step = 0.1, you will get the same binning as above.
-
-    K_*, L_*, and E_* have the same meaning. 
-
-    H_bin, K_bin, and L_bin are number of steps *within* a bin to take. data are integrated 
-    once for each step by shifting bin centers by that amount. but keeping bin widths the same:
-    e.g. if H_step = 0.1 and H_bin = 2, first bin centers will be shifted by 0.0 (i.e. unshifted),
-    then shifted by 0.05 rlu and integrated again. shifts along different directions are 'meshed', 
-    i.e. H_bin = 2, K_bin = 2, L_bin = 1, H_step = 0.1, K_step = 0.1, L_step = 0.1 will result in 
-    4 integrations with shifts
-        1) [0.00, 0.00, 0.00]
-        2) [0.00, 0.05, 0.00]
-        3) [0.05, 0.00, 0.00]
-        4) [0.05, 0.05, 0.00]
-        
-    each shifted integration grid will be appended to the same file. e.g. for if H_bin = 2 and 
-    H_lo = 0.0, H_hi = 1.0, and H_step = 0.1, the bin centers will be H = [0.00, 0.05, 0.10, 
-    0.15, ..., 0.95, 1.00, 1.05] intergrated from -0.05 to 0.05, 0.00 to 0.10, 0.05 to 0.15, etc.
-
-    merged_file_name is the name where the output histogram data will be written.
-
-    u, v, w are the projections. w is optional and the cross product of u and v if not given.
-    see the Mantid MDNorm docs for more info!
-
-    num_chunks is number of chunks to split binning in Q-space. E.g. if num_chunks = [2,1,1]
-    and there are 10 bins along H, the data will be cut in 2 go's with the first 5 H-bins in
-    the first go and the last 5 in the seconds. 
     """
 
     timer = c_timer('bin_MDE',units='m')
@@ -908,10 +859,15 @@ def bin_MDE(MDE_file_name,H_lo,H_hi,H_step,K_lo,K_hi,K_step,L_lo,L_hi,L_step,E_l
     # class to do all of the stuff
     MDE_tools = c_MDE_tools(MDE_file_name)
 
+    H_bin = int(H_bin); K_bin = int(K_bin); L_bin = int(L_bin)
+    if H_bin < 1: H_bin = 1
+    if K_bin < 1: K_bin = 1
+    if L_bin < 1: L_bin = 1
+
     # convert binning args to ones used by c_MDE_tools
-    H_bins = _get_bins(H_lo,H_hi,H_step)
-    K_bins = _get_bins(K_lo,K_hi,K_step)
-    L_bins = _get_bins(L_lo,L_hi,L_step)
+    H_bins = _get_bins(H_lo,H_hi,H_step*H_bin)
+    K_bins = _get_bins(K_lo,K_hi,K_step*K_bin)
+    L_bins = _get_bins(L_lo,L_hi,L_step*L_bin)
     E_bins = _get_bins(E_lo,E_hi,E_step)
     print('H_bins:',H_bins)
     print('K_bins:',K_bins)
@@ -924,8 +880,6 @@ def bin_MDE(MDE_file_name,H_lo,H_hi,H_step,K_lo,K_hi,K_step,L_lo,L_hi,L_step,E_l
         loop_over_shifts = False
     else:
         loop_over_shifts = True
-    print('\nbin shifts:')
-    print(shifts,'\n')
 
     # bin the data on the unshifted grid first. this initiates file etc.
     MDE_tools.bin_MDE_chunks(H_bins,K_bins,L_bins,E_bins,num_chunks,merged_file_name,u,v,w)
@@ -938,9 +892,9 @@ def bin_MDE(MDE_file_name,H_lo,H_hi,H_step,K_lo,K_hi,K_step,L_lo,L_hi,L_step,E_l
         print('\n----------------------------------------------------------------\n')
         print('num_shifts:',num_shifts)
         print('shifts:')
-        print(shifts)
+        print(shifts,'\n')
 
-        msg = '\nlooping over shifts'
+        msg = 'looping over shifts'
         print(msg)
 
         _H_shift = np.array([0,0,0],dtype=float)

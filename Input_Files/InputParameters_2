@@ -35,7 +35,7 @@ horace_threads=8
 
 # Name and directory for the sqw file, nxs file, or hdf5 file (Tys custom interface)
 # sqw_path=/users/dmitryreznik/To be backed up/working files/LSNO_bin_test/data/LSNO25_300K.hdf5
-sqw_path=/home/ty/research/projects/phonon_explorer_test/test/LSNO25_300K_test.hdf5
+sqw_path=/home/ty/research/repos/effective-potato/phonon_explorer_test/test/LSNO25_300K_test.hdf5
 
 # HoracePath -- Needed on Linux only!! --  path to where the horace_on.m and herbert_on.m 
 # files are. not needed 
@@ -44,7 +44,7 @@ HoracePath=/usr/local/mprogs/Users/
 
 # This is where the constant-energy cuts and everything else related to them (e.g. files 
 # for background calculations, background-subtracted cuts, plots, etc. are stored.
-projectRootDir=/home/ty/research/projects/phonon_explorer_test/test/
+projectRootDir=/home/ty/research/repos/effective-potato/phonon_explorer_test/test/
 
 # Dataset name. All data and its processing for a given set of cuts will be stored in this 
 # subdirectory (see instructions)
@@ -52,7 +52,7 @@ ProcessedDataName=tmp_2
 
 # Directory where all input files except this file are stored. E.g. the text file listing 
 # Q-values to be explored.
-InputFilesDir=/home/ty/research/projects/phonon_explorer_test/test/
+InputFilesDir=/home/ty/research/repos/effective-potato/phonon_explorer_test/test/
 
 # Maximum allowed Ratio of Error to Intensity. Data points for which it is larger are thrown 
 # out (not saved) and do not count towards MinPointsInDataFile.

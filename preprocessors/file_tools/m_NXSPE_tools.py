@@ -73,7 +73,7 @@ def PreprocessNXSPE(H_bins,K_bins,L_bins,event_files,goniometer_file,UB_params):
     """
     # !!! DEV !!!
     # set _stride != 0 to use only every _stride^th files to test run
-    _stride = 0
+    _stride = 100
     if _stride:
         event_files = event_files[::_stride]  
     # !!! DEV !!!
@@ -141,29 +141,14 @@ def PreprocessNXSPE(H_bins,K_bins,L_bins,event_files,goniometer_file,UB_params):
 
 def _setup_shifts(H_step,K_step,L_step,H_bin,K_bin,L_bin):
     """
-    setup shifts to loop over for binning grids with different shifts
     """
-
-    H_bin = int(H_bin)
-    if H_bin == 0: H_bin = 1
-    K_bin = int(K_bin)
-    if K_bin == 0: K_bin = 1
-    L_bin = int(L_bin)
-    if L_bin == 0: L_bin = 1
-    print('H_bin:',H_bin)
-    print('K_bin:',K_bin)
-    print('L_bin:',L_bin,'\n')
-
-    _H_step = float(H_step)/H_bin
-    _H_shifts = np.round(np.arange(H_bin)*_H_step,4)#[1:]
-    _K_step = float(K_step)/K_bin
-    _K_shifts = np.round(np.arange(K_bin)*_K_step,4)#[1:]
-    _L_step = float(L_step)/L_bin
-    _L_shifts = np.round(np.arange(L_bin)*_L_step,4)#[1:]
+    _H_shifts = np.arange(H_bin)*H_step
+    _K_shifts = np.arange(K_bin)*K_step
+    _L_shifts = np.arange(L_bin)*L_step
 
     print('H_shifts:',_H_shifts)
     print('K_shifts:',_K_shifts)
-    print('L_shifts:',_L_shifts)
+    print('L_shifts:',_L_shifts,'\n')
 
     _H_shifts, _K_shifts, _L_shifts = np.meshgrid(_H_shifts,_K_shifts,_L_shifts,indexing='ij')
     _H_shifts = _H_shifts.flatten()
@@ -178,25 +163,25 @@ def _setup_shifts(H_step,K_step,L_step,H_bin,K_bin,L_bin):
 
 # --------------------------------------------------------------------------------------------------
 
-def _get_bins(lo,hi,bin,offset=0.0):
+def _get_bins(lo,hi,step):
     """
-    get binning args for MDNorm
     """
-    lo = float(lo); hi = float(hi); bin = float(bin); offset = float(offset)
-    _mod = np.modf((hi-lo)/bin)
+    lo = float(lo); hi = float(hi); step = float(step)
+    _mod = np.modf((hi-lo)/step)
     num_bins = _mod[1].astype(int)
     decimal = _mod[0].round(6)
     if decimal != 0.0:
         msg = '\n*** WARNING ***\n'
         msg += f'upper bin center {hi: 6.3f} is not commensurate with\n'
-        msg += f'lower bin center {lo: 6.3f} and bin size {bin:6.3f}\n'
-        hi = lo+bin*(num_bins+1)
+        msg += f'lower bin center {lo: 6.3f} and bin size {step:6.3f}\n'
+        hi = lo+step*(num_bins+1)
         msg += f'tweaking upper bin center to {hi: 6.3f}\n'
         print(msg)
-    lo = np.round(lo-bin/2+offset,6)
-    hi = np.round(hi+bin/2+offset,6)
-    bin = np.round(bin,6)
-    return [lo,bin,hi]
+    lo = np.round(lo-step/2,6)
+    hi = np.round(hi+step/2,6)
+    step = np.round(step,6)
+    bins = [lo,step,hi]
+    return bins
 
 # --------------------------------------------------------------------------------------------------
 
@@ -207,44 +192,21 @@ def bin_NXSPE(event_files,goniometer_file,output_file,UB_params,H_lo,H_hi,H_step
     wrapper to translate variable names for interface with PreprocessNXSPE. note, E-binning is 
     fixed by the binning already present in the *.nxspe files
 
-    H_lo = lower bin center. 
-    H_hi = *requested* upper bin center. if it's not commensurate with H_step, it will be tweaked!
-    H_step = widths of the bins centered on the requested array of bin-centers.
-    
-        e.g. for H_lo = 0.0, H_hi = 1.0, H_step = 0.1, the bin centers will be H = [0.0, 0.1, 0.2,
-        ..., 1.0] which are integrated from -0.05 to 0.05, 0.05 to 0.15, etc.
+    ...
 
-        e.g. for H_lo = 0.0, H_hi = 1.02, H_step = 0.1, you will get the same binning as above.
-
-    K_* and L_* have the same meaning. 
-
-    H_bin, K_bin, and L_bin are number of steps *within* a bin to take. data are integrated 
-    once for each step by shifting bin centers by that amount. but keeping bin widths the same:
-    e.g. if H_step = 0.1 and H_bin = 2, first bin centers will be shifted by 0.0 (i.e. unshifted),
-    then shifted by 0.05 rlu and integrated again. shifts along different directions are 'meshed', 
-    i.e. H_bin = 2, K_bin = 2, L_bin = 1, H_step = 0.1, K_step = 0.1, L_step = 0.1 will result in 
-    4 integrations with shifts
-        1) [0.00, 0.00, 0.00]
-        2) [0.00, 0.05, 0.00]
-        3) [0.05, 0.00, 0.00]
-        4) [0.05, 0.05, 0.00]
-        
-    each shifted integration grid will be appended to the same file. e.g. for if H_bin = 2 and 
-    H_lo = 0.0, H_hi = 1.0, and H_step = 0.1, the bin centers will be H = [0.00, 0.05, 0.10, 
-    0.15, ..., 0.95, 1.00, 1.05] intergrated from -0.05 to 0.05, 0.00 to 0.10, 0.05 to 0.15, etc.
-
-    output_file is the name where the output histogram data will be written.
-
-    see the descriptions in the $ROOT/python_code/PreprocessNXSPE.py script for explanation of
-    the other args to this function
     """
 
     timer = c_timer('bin_NXSPE',units='m')
 
+    H_bin = int(H_bin); K_bin = int(K_bin); L_bin = int(L_bin)
+    if H_bin < 1: H_bin = 1
+    if K_bin < 1: K_bin = 1
+    if L_bin < 1: L_bin = 1
+
     # convert binning args to ones used by c_MDE_tools
-    H_bins = _get_bins(H_lo,H_hi,H_step)
-    K_bins = _get_bins(K_lo,K_hi,K_step)
-    L_bins = _get_bins(L_lo,L_hi,L_step)
+    H_bins = _get_bins(H_lo,H_hi,H_step*H_bin)
+    K_bins = _get_bins(K_lo,K_hi,K_step*K_bin)
+    L_bins = _get_bins(L_lo,L_hi,L_step*L_bin)
     print('H_bins:',H_bins)
     print('K_bins:',K_bins)
     print('L_bins:',L_bins,'\n')
@@ -255,8 +217,6 @@ def bin_NXSPE(event_files,goniometer_file,output_file,UB_params,H_lo,H_hi,H_step
         loop_over_shifts = False
     else:
         loop_over_shifts = True
-    print('\nbin shifts:')
-    print(shifts,'\n')
 
     # bin and save data with no offset
     MD_workspace = PreprocessNXSPE(H_bins,K_bins,L_bins,event_files,goniometer_file,UB_params)
