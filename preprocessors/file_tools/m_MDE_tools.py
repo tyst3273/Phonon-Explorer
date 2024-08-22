@@ -4,7 +4,7 @@ this file is part of the phonon explorer package!
 author: tyler c. sterling & dmitry reznik.
 email: ty.sterling@colorado.edu
 affil: University of Colorado Boulder, Raman Spectroscopy and Neutron Scattering Lab
-date: 05/22/2024
+date: 08/22/2024
 description:
     take binning and projection args from the user and call mantid MDNorm (on the backend)
     to "prebin" data for later analysis with phonon explorer. can be split into "chunks" to 
@@ -17,6 +17,8 @@ import numpy as np
 import h5py 
 import os
 
+# --------------------------------------------------------------------------------------------------
+# class to interact with mantid
 # --------------------------------------------------------------------------------------------------
 
 class c_MDE_tools:
@@ -233,7 +235,8 @@ class c_MDE_tools:
     # ----------------------------------------------------------------------------------------------
 
     def bin_MDE_chunks(self,H_bin_args,K_bin_args,L_bin_args,E_bin_args,num_chunks=[1,1,1],
-        merged_file_name='merged_histo.hdf5',u=[1,0,0],v=[0,1,0],w=None,append=False):
+        merged_file_name='merged_histo.hdf5',u=[1,0,0],v=[0,1,0],w=None,append=False,
+        **MDNorm_kw_args):
         """
         split requested binning into chunks and bin over small chunks separately. merge the 
         results of them all into a single file
@@ -256,6 +259,7 @@ class c_MDE_tools:
         
         _t = c_timer('bin_MDE_chunks',units='m')
 
+        self.MDNorm_kw_args = MDNorm_kw_args
         self.merged_file_name = merged_file_name
 
         # overwrite by default, but dont overwrite in some cases, e.g. assembling multiple offsets
@@ -310,6 +314,8 @@ class c_MDE_tools:
         loop over the bin edges and cut the data
         """
 
+        MDNorm_kw_args = self.MDNorm_kw_args 
+
         msg = f'\nsplitting binning into {self.num_grid} voxels\n'
         print(msg)
 
@@ -331,7 +337,7 @@ class c_MDE_tools:
 
                     # get the data for this voxel
                     self.bin_MDE(H_bins,K_bins,L_bins,self.E_bin_args,
-                            self.u,self.v,self.w)
+                            self.u,self.v,self.w,**MDNorm_kw_args)
 
                     # append all the non-empty bins to the file
                     self.append_sparse_to_hdf5(self.merged_file_name)
@@ -699,7 +705,8 @@ class c_MDE_tools:
 
     # ----------------------------------------------------------------------------------------------
 
-    def bin_MDE(self,H_bins=None,K_bins=None,L_bins=None,E_bins=None,u=[1,0,0],v=[0,1,0],w=None):
+    def bin_MDE(self,H_bins=None,K_bins=None,L_bins=None,E_bins=None,u=[1,0,0],v=[0,1,0],w=None,
+                **MDNorm_kw_args):
         """
         bin the events in the MDE workspace into a histogram workspace; note that this doesnt 
         really return anything or create new attributes. the produced data are stored in the 
@@ -757,6 +764,9 @@ class c_MDE_tools:
         msg += f'E_bins: {E_bins:>9}\n\n'
         print(msg)
 
+        print('MDNorm keyword-args:')
+        print(MDNorm_kw_args,'\n')
+
         # call MDNorm to bin MDE workspace
         self.msi.MDNorm(InputWorkspace=MDE_ws,
                         QDimension0=u,
@@ -772,7 +782,8 @@ class c_MDE_tools:
                         Dimension3Binning=E_bins,
                         OutputWorkspace=self.histo_ws_name,
                         OutputDataWorkspace='_d',
-                        OutputNormalizationWorkspace='_n')
+                        OutputNormalizationWorkspace='_n',
+                        **MDNorm_kw_args)
     
     # ----------------------------------------------------------------------------------------------
 
@@ -842,12 +853,15 @@ def _get_bins(lo,hi,step):
 
 def bin_MDE(MDE_file_name,H_lo,H_hi,H_step,K_lo,K_hi,K_step,L_lo,L_hi,L_step,E_lo,E_hi,E_step,
             H_bin=1,K_bin=1,L_bin=1,merged_file_name='merged_file.hdf5',
-            u=[1,0,0],v=[0,1,0],w=None,num_chunks=[1,1,1]):
+            u=[1,0,0],v=[0,1,0],w=None,num_chunks=[1,1,1],**MDNorm_kw_args):
 
     """
     wrapper to translate variable names for interface with c_MDE_tools.bin_MDE_chunks
     to more sensible names for the user.
-
+    
+    MDNorm_kw_args are any bonus arguments you want to pass to MDNorm. Note, you have to give 
+    them as kw-args in function call:
+        ex. bin_NXSPE(...,SymmetryOperations='x,y,z;-x-y-z')
     ...
 
     """
@@ -880,7 +894,8 @@ def bin_MDE(MDE_file_name,H_lo,H_hi,H_step,K_lo,K_hi,K_step,L_lo,L_hi,L_step,E_l
         loop_over_shifts = True
 
     # bin the data on the unshifted grid first. this initiates file etc.
-    MDE_tools.bin_MDE_chunks(H_bins,K_bins,L_bins,E_bins,num_chunks,merged_file_name,u,v,w)
+    MDE_tools.bin_MDE_chunks(H_bins,K_bins,L_bins,E_bins,num_chunks,merged_file_name,u,v,w,
+                             **MDNorm_kw_args)
 
     # only loop over offsets if atleast one is defined
     if loop_over_shifts:
@@ -910,7 +925,7 @@ def bin_MDE(MDE_file_name,H_lo,H_hi,H_step,K_lo,K_hi,K_step,L_lo,L_hi,L_step,E_l
 
             # go and bin the data -- these MUST be appended.
             MDE_tools.bin_MDE_chunks(H_bins+_H_shift,K_bins+_K_shift,L_bins+_L_shift,E_bins,
-                num_chunks,merged_file_name,u,v,w,append=True)
+                num_chunks,merged_file_name,u,v,w,append=True,**MDNorm_kw_args)
 
     timer.stop()
 

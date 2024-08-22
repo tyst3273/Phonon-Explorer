@@ -4,7 +4,7 @@ author: Tyler C. Sterling
 Email: ty.sterling@colorado.edu
 Affil: University of Colorado Boulder, Raman Spectroscopy and Neutron Scattering Lab
 
-Date: 05/16/2024
+Date: 08/22/2024
 Description:
     - parse files NXSPE files from JPARC, merge into MDE dataset, use MDNorm to bin, 
         then write the histogrammed data to .hdf5 file that can be used by phonon 
@@ -44,39 +44,46 @@ bin_NXSPE = m_NXSPE_tools.bin_NXSPE
 
 # ...
 
-H_lo = 1
-H_hi = 8
+H_lo = 0
+H_hi = 6
 H_step = 0.05
-H_bin = 2
+H_bin = 1
 
-K_lo = -6
-K_hi = 6
+K_lo = -3
+K_hi = 3
 K_step = 0.05
-K_bin = 2
+K_bin = 1
 
-L_lo = -4
-L_hi = 4
+L_lo = -3
+L_hi = 3
 L_step = 0.05
-L_bin = 2
+L_bin = 1
 
 # event files (i.e. neutron => detector) already binned in energy
 event_files = sorted(
-    glob.glob('/SNS/ARCS/IPTS-26347/shared/jpark/nxspe120Ei_010K_Ebin1_RCmasked/S0*.nxspe'))
+    glob.glob('/SNS/ARCS/IPTS-26347/shared/jpark/nxspe054Ei_335K_Ebin0p5_RCmasked/S0*.nxspe'))
 
 # file that lists the goniometer angles for each NXPSE file
-goniometer_file = '/SNS/ARCS/IPTS-26347/shared/jpark/120meV300Hz010K_run_list.txt'
-hdf5_output_file = 'nxspe120Ei_010K_Ebin1.hdf5'
+goniometer_file = '/SNS/ARCS/IPTS-26347/shared/jpark/120meV300Hz335K_run_list.txt'
+hdf5_output_file = 'nxspe054Ei_335K_Ebin0p5Hres2_symm.hdf5'
 
 # this should be aligned UV matrix
-UB_params={'a':3.93,'b':3.93,'c':3.93,'alpha':90,'beta':90,'gamma':90,
-    'u':'1,0,-0.1','v':'0,1,-0.1'}
+UB_params={'a':3.92,'b':3.92,'c':3.92,'alpha':90,'beta':90,'gamma':90,
+    'u':'1,0,-0.0935','v':'0,1,-0.0987'}
+
+# symmetry args for MDNorm
+# -- dunno what you actually need, this is an example with identity, reflections, and inversion
+# -- you can just set to None if you dont want to use symmetry
+SymmetryOperations = 'x,y,z;-x,y,z;x,-y,z;x,y,-z;-x,-y,-z'
+#SymmetryOperations = None
 
 # --------------------------------------------------------------------------------------------------
 # you don't have to change anything below here!
 
 # this goes and does the stuff
 bin_NXSPE(event_files,goniometer_file,hdf5_output_file,UB_params,
-          H_lo,H_hi,H_step,K_lo,K_hi,K_step,L_lo,L_hi,L_step,H_bin,K_bin,L_bin)
+          H_lo,H_hi,H_step,K_lo,K_hi,K_step,L_lo,L_hi,L_step,H_bin,K_bin,L_bin,
+          SymmetryOperations=SymmetryOperations)
 
 
 

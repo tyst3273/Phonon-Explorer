@@ -9,7 +9,7 @@ author: Tyler C. Sterling
 Email: ty.sterling@colorado.edu
 Affil: University of Colorado Boulder, Raman Spectroscopy and Neutron Scattering Lab
 
-Date: 05/22/2024
+Date: 08/22/2024
 Description:
     - parse files NXSPE files from JPARC, merge into MDE dataset, use MDNorm to bin, 
         then write the histogrammed data to .hdf5 file that can be used by phonon 
@@ -17,6 +17,8 @@ Description:
     - all the code to talk to the JPARC files was written by Andrei. Tyler wrote the 
         wrapper that loops over Q-pt grids and he wrote the code that writes histo 
         data to file.
+    - now allows user to pass other mantid key-word arguments to MDnorm, e.g. to pass
+        symmetry args into MDNorm to create symmetrized hisotgram file.
 
     - note: to get mantid to correctly accept files from JPARC, you have to use a 
         modified "Facilities.xml" file. there is one provied in 'file_tools' dir. 
@@ -49,7 +51,7 @@ save_MDE_to_hdf5 = m_save_MDE_to_hdf5.save_MDE_to_hdf5
 
 # --------------------------------------------------------------------------------------------------
 
-def PreprocessNXSPE(H_bins,K_bins,L_bins,event_files,goniometer_file,UB_params):
+def PreprocessNXSPE(H_bins,K_bins,L_bins,event_files,goniometer_file,UB_params,**MDNorm_kw_args):
     """
     wrap the code to load and preprocess NXSPE files from JPARC measurement.
 
@@ -109,6 +111,9 @@ def PreprocessNXSPE(H_bins,K_bins,L_bins,event_files,goniometer_file,UB_params):
     #    'u':'1,0,-0.1','v':'0,1,-0.1'}
     #SetUB(mde,**UB_params)
 
+    print('MDNorm keyword-args:')
+    print(MDNorm_kw_args,'\n')
+
     #print(axis_deltaE)
     # test MDNorm - elastic slice
     MDNorm(InputWorkspace=mde,
@@ -123,10 +128,10 @@ def PreprocessNXSPE(H_bins,K_bins,L_bins,event_files,goniometer_file,UB_params):
            Dimension2Binning="{},{},{}".format(L_bins[0],L_bins[1],L_bins[2]),
            Dimension3Name='DeltaE',
            Dimension3Binning="{}".format(de_step),
-    #       SymmetryOperations='x,y,z;-x,-y,z;x,y,-z;-x,-y,-z;y,x,z;y,x,-z',
            OutputWorkspace='o',
            OutputDataWorkspace='d',
-           OutputNormalizationWorkspace='n')
+           OutputNormalizationWorkspace='n',
+           **MDNorm_kw_args)
 
     #SaveMD(InputWorkspace="o",Filename="/SNS/ARCS/IPTS-26347/shared/jpark/MDHistoFile.nxs")
 
@@ -186,13 +191,15 @@ def _get_bins(lo,hi,step):
 # --------------------------------------------------------------------------------------------------
 
 def bin_NXSPE(event_files,goniometer_file,output_file,UB_params,H_lo,H_hi,H_step,K_lo,K_hi,K_step,
-            L_lo,L_hi,L_step,H_bin=1,K_bin=1,L_bin=1):
+            L_lo,L_hi,L_step,H_bin=1,K_bin=1,L_bin=1,**MDNorm_kw_args):
 
     """
     wrapper to translate variable names for interface with PreprocessNXSPE. note, E-binning is 
     fixed by the binning already present in the *.nxspe files
 
-    ...
+    MDNorm_kw_args are any bonus arguments you want to pass to MDNorm. Note, you have to give 
+    them as kw-args in function call:
+        ex. bin_NXSPE(...,SymmetryOperations='x,y,z;-x-y-z')
 
     """
 
@@ -219,7 +226,8 @@ def bin_NXSPE(event_files,goniometer_file,output_file,UB_params,H_lo,H_hi,H_step
         loop_over_shifts = True
 
     # bin and save data with no offset
-    MD_workspace = PreprocessNXSPE(H_bins,K_bins,L_bins,event_files,goniometer_file,UB_params)
+    MD_workspace = PreprocessNXSPE(H_bins,K_bins,L_bins,event_files,goniometer_file,UB_params,
+                                   **MDNorm_kw_args)
     save_MDE_to_hdf5(MD_workspace,output_file)
 
     # only loop over offsets if atleast one is defined
@@ -250,7 +258,7 @@ def bin_NXSPE(event_files,goniometer_file,output_file,UB_params,H_lo,H_hi,H_step
 
             # go and bin the data -- these MUST be appended.
             MD_workspace = PreprocessNXSPE(H_bins+_H_shift,K_bins+_K_shift,L_bins+_L_shift,
-                                           event_files,goniometer_file,UB_params)
+                                           event_files,goniometer_file,UB_params,**MDNorm_kw_args)
             save_MDE_to_hdf5(MD_workspace,output_file,append=True)
 
     timer.stop()
