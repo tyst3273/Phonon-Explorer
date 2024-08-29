@@ -68,7 +68,7 @@ num_chunks = [1,1,1]
 # -- dunno what you actually need, this is an example with identity, reflections, and inversion
 # -- you can just set to None if you dont want to use symmetry
 #SymmetryOperations = 'x,y,z;-x,-y,z;-y,x,z;y,-x,z;x,-y,z;-x,y,z;-y,-x,z;y,x,z'
-SymmetryOperations = 'P 4/m m m' #None
+SymmetryOperations = 'P 4' #None
 
 # --------------------------------------------------------------------------------------------------
 # you don't have to change anything below here!
