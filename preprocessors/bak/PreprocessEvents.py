@@ -4,7 +4,7 @@ this file is part of the phonon explorer package!
 author: tyler c. sterling & dmitry reznik.
 email: ty.sterling@colorado.edu
 affil: University of Colorado Boulder, Raman Spectroscopy and Neutron Scattering Lab
-date: 08/29/2024
+date: 08/22/2024
 description:
     take binning and projection args from the user and call mantid MDNorm (on the backend)
     to "prebin" data for later analysis with phonon explorer. can be split into "chunks" to 
@@ -68,13 +68,13 @@ num_chunks = [1,1,1]
 # -- dunno what you actually need, this is an example with identity, reflections, and inversion
 # -- you can just set to None if you dont want to use symmetry
 #SymmetryOperations = 'x,y,z;-x,-y,z;-y,x,z;y,-x,z;x,-y,z;-x,y,z;-y,-x,z;y,x,z'
-SymmetryOperations = 'P 4/m m m' #None
+SymmetryOperations = None
 
 # --------------------------------------------------------------------------------------------------
 # you don't have to change anything below here!
 
 # load the raw event dataset. dont change this.
 bin_MDE(MDE_file_name,H_lo,H_hi,H_step,K_lo,K_hi,K_step,L_lo,L_hi,L_step,E_lo,E_hi,E_step,
-        H_bin,K_bin,L_bin,merged_file_name,u,v,w,num_chunks,SymmetryOperations)
+        H_bin,K_bin,L_bin,merged_file_name,u,v,w,num_chunks,SymmetryOperations=SymmetryOperations)
 
 

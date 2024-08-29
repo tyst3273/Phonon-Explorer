@@ -9,7 +9,7 @@ author: Tyler C. Sterling
 Email: ty.sterling@colorado.edu
 Affil: University of Colorado Boulder, Raman Spectroscopy and Neutron Scattering Lab
 
-Date: 08/29/2024
+Date: 08/22/2024
 Description:
     - parse files NXSPE files from JPARC, merge into MDE dataset, use MDNorm to bin, 
         then write the histogrammed data to .hdf5 file that can be used by phonon 
@@ -38,7 +38,6 @@ from mantid.simpleapi import *
 
 from file_tools.m_save_MDE_to_hdf5 import save_MDE_to_hdf5
 from file_tools.m_file_utils import crash, c_timer
-from file_tools.m_symmetry import check_symmetry_args
 
 """
 ### DEV
@@ -52,7 +51,7 @@ save_MDE_to_hdf5 = m_save_MDE_to_hdf5.save_MDE_to_hdf5
 
 # --------------------------------------------------------------------------------------------------
 
-def PreprocessNXSPE(H_bins,K_bins,L_bins,event_files,goniometer_file,UB_params,SymmetryOperations):
+def PreprocessNXSPE(H_bins,K_bins,L_bins,event_files,goniometer_file,UB_params,**MDNorm_kw_args):
     """
     wrap the code to load and preprocess NXSPE files from JPARC measurement.
 
@@ -112,8 +111,8 @@ def PreprocessNXSPE(H_bins,K_bins,L_bins,event_files,goniometer_file,UB_params,S
     #    'u':'1,0,-0.1','v':'0,1,-0.1'}
     #SetUB(mde,**UB_params)
 
-    print('\nSymmetryOperations:')
-    print(SymmetryOperations,'\n')
+    print('MDNorm keyword-args:')
+    print(MDNorm_kw_args,'\n')
 
     #print(axis_deltaE)
     # test MDNorm - elastic slice
@@ -132,7 +131,7 @@ def PreprocessNXSPE(H_bins,K_bins,L_bins,event_files,goniometer_file,UB_params,S
            OutputWorkspace='o',
            OutputDataWorkspace='d',
            OutputNormalizationWorkspace='n',
-           SymmetryOperations=SymmetryOperations)
+           **MDNorm_kw_args)
 
     #SaveMD(InputWorkspace="o",Filename="/SNS/ARCS/IPTS-26347/shared/jpark/MDHistoFile.nxs")
 
@@ -192,7 +191,7 @@ def _get_bins(lo,hi,step):
 # --------------------------------------------------------------------------------------------------
 
 def bin_NXSPE(event_files,goniometer_file,output_file,UB_params,H_lo,H_hi,H_step,K_lo,K_hi,K_step,
-            L_lo,L_hi,L_step,H_bin=1,K_bin=1,L_bin=1,SymmetryOperations=None):
+            L_lo,L_hi,L_step,H_bin=1,K_bin=1,L_bin=1,**MDNorm_kw_args):
 
     """
     wrapper to translate variable names for interface with PreprocessNXSPE. note, E-binning is 
@@ -205,8 +204,6 @@ def bin_NXSPE(event_files,goniometer_file,output_file,UB_params,H_lo,H_hi,H_step
     """
 
     timer = c_timer('bin_NXSPE',units='m')
-
-    check_symmetry_args(SymmetryOperations)
 
     H_bin = int(H_bin); K_bin = int(K_bin); L_bin = int(L_bin)
     if H_bin < 1: H_bin = 1
@@ -230,7 +227,7 @@ def bin_NXSPE(event_files,goniometer_file,output_file,UB_params,H_lo,H_hi,H_step
 
     # bin and save data with no offset
     MD_workspace = PreprocessNXSPE(H_bins,K_bins,L_bins,event_files,goniometer_file,UB_params,
-                                   SymmetryOperations)
+                                   **MDNorm_kw_args)
     save_MDE_to_hdf5(MD_workspace,output_file)
 
     # only loop over offsets if atleast one is defined
@@ -261,8 +258,7 @@ def bin_NXSPE(event_files,goniometer_file,output_file,UB_params,H_lo,H_hi,H_step
 
             # go and bin the data -- these MUST be appended.
             MD_workspace = PreprocessNXSPE(H_bins+_H_shift,K_bins+_K_shift,L_bins+_L_shift,
-                                           event_files,goniometer_file,UB_params,
-                                           SymmetryOperations=SymmetryOperations)
+                                           event_files,goniometer_file,UB_params,**MDNorm_kw_args)
             save_MDE_to_hdf5(MD_workspace,output_file,append=True)
 
     timer.stop()
